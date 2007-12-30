@@ -30,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package alienrabble;
+package alienrabble.sort;
 
 import com.jme.input.MouseInput;
 import com.jme.input.action.InputActionEvent;
@@ -38,17 +38,22 @@ import com.jme.input.action.MouseInputAction;
 import com.jme.intersection.BoundingPickResults;
 import com.jme.intersection.PickResults;
 import com.jme.math.Ray;
+import com.jme.math.Vector2f;
+import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
+import com.jme.scene.Geometry;
 import com.jme.scene.Node;
 import com.jme.scene.Text;
+import com.jme.system.DisplaySystem;
 
 /**
  * <code>MousePick</code>
  * @author Mark Powell
  * @version
  */
-public class MousePick extends MouseInputAction {
+public class AlienPick extends MouseInputAction {
 
+	private DisplaySystem display;
     private Camera camera;
     private Node scene;
     private float shotTime = 0;
@@ -57,8 +62,9 @@ public class MousePick extends MouseInputAction {
     private Text text;
     private String hitItems;
 
-    public MousePick(Camera camera, Node scene, Text text) {
-        this.camera = camera;
+    public AlienPick(DisplaySystem display, Camera camera, Node scene, Text text) {
+        this.display = display;
+    	this.camera = camera;
         this.scene = scene;
         this.text = text;
     }
@@ -67,14 +73,30 @@ public class MousePick extends MouseInputAction {
      */
     public void performAction(InputActionEvent evt) {
         shotTime += evt.getTime();
-        if( MouseInput.get().isButtonDown(0) && shotTime > 0.1f) {
-            shotTime = 0;
-            Ray ray = new Ray(camera.getLocation(), camera.getDirection()); // camera direction is already normalized
+        if( MouseInput.get().isButtonDown(0) && shotTime > 0.15f) {
+            float x = MouseInput.get().getXAbsolute();
+            float y = MouseInput.get().getYAbsolute(); 
+        	shotTime = 0;
+//            Ray ray = new Ray(camera.getLocation(), camera.getDirection()); // camera direction is already normalized
+			Vector2f screenPos = new Vector2f();
+			// Get the position that the mouse is pointing to
+			//screenPos.set(am.getHotSpotPosition().x, am.getHotSpotPosition().y);
+			screenPos.set(x,y);
+			// Get the world location of that X,Y value
+			Vector3f worldCoords = display.getWorldCoordinates(screenPos, 0);
+			Vector3f worldCoords2 = display.getWorldCoordinates(screenPos, 1);
+          //  logger.info( worldCoords.toString() );
+            // Create a ray starting from the camera, and going in the direction
+			// of the mouse's location
+			Ray ray = new Ray(worldCoords, worldCoords2
+					.subtractLocal(worldCoords).normalizeLocal());
+        	
+//        	Ray ray = new Ray(camera.getLocation(), camera.getDirection()); // camera direction is already normalized
             PickResults results = new BoundingPickResults();
             results.setCheckDistance(true);
             scene.findPick(ray,results);
 
-
+            
             hits += results.getNumber();
             hitItems = "";
             if(results.getNumber() > 0) {
@@ -83,6 +105,17 @@ public class MousePick extends MouseInputAction {
                     if(i != results.getNumber() -1) {
                         hitItems += ", ";
                     }
+                    Geometry geom = results.getPickData(i).getTargetMesh().getParentGeom();
+                    Node element = geom.getParent();
+                    while (!(element instanceof AlienSort)) { 
+                      element = element.getParent();
+                    }
+        	        if ( element instanceof AlienSort ) {
+        	        	//we should make this vanish and log 
+        	        	AlienSort as = (AlienSort) element;
+        	        	as.Clicked();
+        	        	break;
+        			}
                 }
             }
             shots++;

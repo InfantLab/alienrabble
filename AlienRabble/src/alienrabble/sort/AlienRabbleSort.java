@@ -30,33 +30,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package alienrabble;
+package alienrabble.sort;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jmetest.input.TestInputHandler;
+
 import com.jme.app.SimpleGame;
-import com.jme.bounding.BoundingBox;
-import com.jme.bounding.BoundingCapsule;
+import com.jme.image.Texture;
+import com.jme.input.AbsoluteMouse;
 import com.jme.math.FastMath;
+import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
-import com.jme.renderer.ColorRGBA;
-import com.jme.scene.Line;
-import com.jme.scene.Node;
 import com.jme.scene.SceneElement;
+import com.jme.scene.Spatial;
 import com.jme.scene.Text;
-import com.jme.scene.state.LightState;
+import com.jme.scene.state.AlphaState;
 import com.jme.scene.state.TextureState;
+import com.jme.util.TextureManager;
 import com.jme.util.export.binary.BinaryImporter;
 import com.jme.util.resource.ResourceLocatorTool;
 import com.jme.util.resource.SimpleResourceLocator;
-import com.jmex.model.animation.JointController;
-import com.jmex.model.converters.MilkToJme;
+
 
 /**
  * <code>TestPick</code>
@@ -68,8 +67,10 @@ public class AlienRabbleSort extends SimpleGame {
     private static final Logger logger = Logger.getLogger(AlienRabbleSort.class
             .getName());
 
-	private Node model;
+	private AlienSort[] allAlienSort;
+    private AbsoluteMouse mouse;
 
+	
 	/**
 	 * Entry point for the test,
 	 * 
@@ -92,20 +93,42 @@ public class AlienRabbleSort extends SimpleGame {
                     ResourceLocatorTool.TYPE_TEXTURE,
                     new SimpleResourceLocator(AlienRabbleSort.class
                             .getClassLoader().getResource(
-                                    "jmetest/data/model/msascii/")));
+                                    "alienrabble/data/Greebles/Family1/")));
         } catch (URISyntaxException e1) {
             logger.log(Level.WARNING, "unable to setup texture directory.", e1);
         }
 
+        input.removeAllFromAttachedHandlers();
+        
         display.setTitle("Mouse Pick");
-		cam.setLocation(new Vector3f(0.0f, 50.0f, 100.0f));
+		cam.setLocation(new Vector3f(0.0f, 0f, 100.0f));
 		cam.update();
 		
         Text text = Text.createDefaultTextLabel("Test Label", "Hits: 0 Shots: 0");
         text.setCullMode(SceneElement.CULL_NEVER);
         text.setTextureCombineMode(TextureState.REPLACE);
         text.setLocalTranslation(new Vector3f(1, 60, 0));
-		
+
+        mouse = new AbsoluteMouse( "Mouse Cursor", display.getWidth(), display.getHeight() );
+        TextureState cursorTextureState = display.getRenderer().createTextureState();
+        cursorTextureState.setTexture(
+                TextureManager.loadTexture(
+                        TestInputHandler.class.getClassLoader().getResource( "jmetest/data/cursor/cursor1.PNG" ),
+                        Texture.MM_LINEAR, Texture.FM_LINEAR )
+        );
+        mouse.setRenderState( cursorTextureState );
+        mouse.registerWithInputHandler( input );
+        
+        AlphaState as1 = display.getRenderer().createAlphaState();
+        as1.setBlendEnabled(true);
+        as1.setSrcFunction(AlphaState.SB_ONE);
+        as1.setDstFunction(AlphaState.DB_ONE_MINUS_SRC_COLOR);
+        as1.setTestEnabled(true);
+        as1.setTestFunction(AlphaState.TF_GREATER);
+        mouse.setRenderState(as1);
+        fpsNode.attachChild(mouse);
+
+        
         Text cross = Text.createDefaultTextLabel("Cross hairs", "+");
         cross.setCullMode(SceneElement.CULL_NEVER);
         cross.setTextureCombineMode(TextureState.REPLACE);
@@ -115,38 +138,36 @@ public class AlienRabbleSort extends SimpleGame {
 				display.getHeight() / 2f - 8f, 0));
 
 		fpsNode.attachChild(text);
-		fpsNode.attachChild(cross);
 
-		MilkToJme converter = new MilkToJme();
-		URL MSFile = AlienRabbleSort.class.getClassLoader().getResource(
-				"jmetest/data/model/msascii/run.ms3d");
-		ByteArrayOutputStream BO = new ByteArrayOutputStream();
-
-		try {
-			converter.convert(MSFile.openStream(), BO);
-		} catch (IOException e) {
-			logger.info("IO problem writting the file!!!");
-			logger.info(e.getMessage());
-			System.exit(0);
-		}
-		model = null;
-		try {
-			model = (Node)BinaryImporter.getInstance().load(new ByteArrayInputStream(BO
-					.toByteArray()));
-            model.setModelBound(new BoundingCapsule());
-            model.updateModelBound();
-		} catch (IOException e) {
-			logger.info("darn exceptions:" + e.getMessage());
-		}
-		((JointController) model.getController(0)).setActive(false);
+		Quaternion q = new Quaternion();
+		q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
         
+		String[] allAliens;
+		
+		allAliens = new String[3];
+		allAliens[0] = "alienrabble/data/Greebles/Family1/f1-11.jbin";
+		allAliens[1] = "alienrabble/data/Greebles/Family1/f1-12.jbin";
+		allAliens[2] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
+		
+		allAlienSort = new AlienSort[3];
 	
-
-		rootNode.attachChild(l);
-		rootNode.attachChild(model);
-
-		MousePick pick = new MousePick(cam, rootNode, text);
+		for(int i=0;i<allAliens.length;i++)
+		{
+			URL alienURL = AlienSort.class.getClassLoader().getResource(allAliens[i]);
+			BinaryImporter BI = new BinaryImporter();
+			Spatial model;
+			try {
+				model = (Spatial)BI.load(alienURL.openStream());
+				allAlienSort[i] = new AlienSort(allAliens[i],model);
+				allAlienSort[i].setLocalTranslation(-10 + 10*i,30,0);
+				allAlienSort[i].setLocalRotation(q);
+				allAlienSort[i].setupTranslations();
+				rootNode.attachChild(allAlienSort[i]);				
+			} catch (IOException e) {
+				logger.info("darn exceptions:" + e.getMessage());
+			}
+		}
+		AlienPick pick = new AlienPick(display, cam, rootNode, text);
 		input.addAction(pick);
 	}
-
 }

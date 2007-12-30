@@ -37,7 +37,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.jme.app.AbstractGame;
@@ -49,11 +48,11 @@ import com.jme.util.export.binary.BinaryExporter;
 import com.jme.util.export.binary.BinaryImporter;
 import com.jmex.model.converters.AseToJme;
 import com.jmex.model.converters.FormatConverter;
+import com.jmex.model.converters.MaxToJme;
 import com.jmex.model.converters.Md2ToJme;
 import com.jmex.model.converters.Md3ToJme;
 import com.jmex.model.converters.MilkToJme;
 import com.jmex.model.converters.ObjToJme;
-import com.jmex.model.converters.MaxToJme;
 import com.jmex.model.util.ModelLoader;
 
 /**
@@ -75,46 +74,58 @@ public class AlienConverter extends SimpleGame {
     }
 
     protected void simpleInitGame() {
-/****
-    	// Point to a URL of my model
-        URL model=AlienConverter.class.getClassLoader().getResource("jmet	est/data/model/maggie.obj");
 
-        // Create something to convert .obj format to .jme
-        FormatConverter converter=new ObjToJme();
-        // Point the converter to where it will find the .mtl file from
-        converter.setProperty("mtllib",model);
-
-
-        // This byte array will hold my .jme file
-        ByteArrayOutputStream BO=new ByteArrayOutputStream();
-        try {
-            // Use the format converter to convert .obj to .jme
-            converter.convert(model.openStream(), BO);
-            Node maggie=(Node)BinaryImporter.getInstance().load(new ByteArrayInputStream(BO.toByteArray()));
-            // shrink this baby down some
-            maggie.setLocalScale(.1f);
-            maggie.setModelBound(new BoundingSphere());
-            maggie.updateModelBound();
-            // Put her on the scene graph
-****/
 //    		String modelpath = "jmetest/data/model/bike.3ds";
-    		String modelpath = "jmetest/data/model/grabber2.3ds";
-    		Node maggie = loadModel(modelpath);
-            maggie.setLocalScale(.1f);
-            maggie.setModelBound(new BoundingSphere());
-            maggie.updateModelBound();
-            rootNode.attachChild(maggie);
-/***
-    } catch (IOException e) {   // Just in case anything happens
-            logger.logp(Level.SEVERE, this.getClass().toString(),
-                    "simpleInitGame()", "Exception", e);
-            System.exit(0);
-        }
-        
-    ***/
+//    		String modelpath = "jmetest/data/model/grabber2.3ds";
+ //   		String modelpath = "jmetest/data/Greebles/f1-11.3ds";
+    		String modelpath;
+    		Node newmodel;
+ 
+    		
+    		modelpath = "alienconverter/data/Greebles/Family1/m1_11.3ds";
+    		newmodel = loadModel(modelpath);
+    		
+    		newmodel.setLocalScale(.1f);
+    		newmodel.setModelBound(new BoundingSphere());
+    		newmodel.updateModelBound();
+            rootNode.attachChild(newmodel);
+            
+            
+    		
+    		modelpath = "alienconverter/data/Greebles/Family1/m1_12.3ds";
+    		newmodel = loadModel(modelpath);
+    		
+    	
+            
+            
+    		modelpath = "alienconverter/data/Greebles/Family1/m1_13.3ds";
+    		newmodel = loadModel(modelpath);
+    		
+    		modelpath = "alienconverter/data/Greebles/Family1/m1_14.3ds";
+    		newmodel = loadModel(modelpath);
+    		
+    		modelpath = "alienconverter/data/Greebles/Family1/m1_15.3ds";
+    		newmodel = loadModel(modelpath);
+    		
+    		modelpath = "alienconverter/data/Greebles/Family1/m1_16.3ds";
+    		newmodel = loadModel(modelpath);
+    		
+    		modelpath = "alienconverter/data/Greebles/Family1/m1_17.3ds";
+    		newmodel = loadModel(modelpath);
+    		
+    		modelpath = "alienconverter/data/Greebles/Family1/m1_18.3ds";
+    		newmodel = loadModel(modelpath);
+    		
+    		modelpath = "alienconverter/data/Greebles/Family1/m1_19.3ds";
+    		newmodel = loadModel(modelpath);
+
+    		modelpath = "alienconverter/data/Greebles/Family1/m1_110.3ds";
+    		newmodel = loadModel(modelpath);
+    		
+    		
     }
     
-    
+    	
     /*
      *  This method opens a model in various format evaluating the extension
      *  In case in the same directory is already presents the same model in jbin format loads it
@@ -129,6 +140,8 @@ public class AlienConverter extends SimpleGame {
     	String			modelFormat 	= modelFile.substring(modelFile.lastIndexOf(".") + 1, modelFile.length());
     	String			modelBinary	= modelFile.substring(0, modelFile.lastIndexOf(".") + 1) + "jbin";
     	URL			modelURL	= ModelLoader.class.getClassLoader().getResource(modelBinary);
+    	
+
     	
     	//verify the presence of the jbin model
     	if (modelURL == null){

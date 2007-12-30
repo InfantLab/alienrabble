@@ -290,7 +290,7 @@ public class Grab extends DebugGameState {
 	        
 	        //set the vehicles attributes (these numbers can be thought
 	        //of as Unit/Second).
-	        player = new Vehicle("Player Node", model);
+	        player = new Vehicle("Player Node",scene, model);
 	        player.setAcceleration(15);
 	        player.setBraking(15);
 	        player.setTurnSpeed(2.5f);
