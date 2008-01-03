@@ -40,7 +40,6 @@ import com.jme.intersection.PickResults;
 import com.jme.math.Ray;
 import com.jme.math.Vector2f;
 import com.jme.math.Vector3f;
-import com.jme.renderer.Camera;
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;
 import com.jme.scene.Text;
@@ -54,33 +53,34 @@ import com.jme.system.DisplaySystem;
 public class AlienPick extends MouseInputAction {
 
 	private DisplaySystem display;
-    private Camera camera;
     private Node scene;
     private float shotTime = 0;
+    private boolean performingAction = false;
     private int hits = 0;
     private int shots = 0;
     private Text text;
     private String hitItems;
+    private AlienSort selectedAlien;
+    
 
-    public AlienPick(DisplaySystem display, Camera camera, Node scene, Text text) {
+    public AlienPick(DisplaySystem display, Node scene, Text text) {
         this.display = display;
-    	this.camera = camera;
         this.scene = scene;
         this.text = text;
+        selectedAlien = null;
     }
     /* (non-Javadoc)
      * @see com.jme.input.action.MouseInputAction#performAction(float)
      */
     public void performAction(InputActionEvent evt) {
         shotTime += evt.getTime();
-        if( MouseInput.get().isButtonDown(0) && shotTime > 0.15f) {
+        if( MouseInput.get().isButtonDown(0) && shotTime > 0.15f && !performingAction) {
+        	performingAction = true;
             float x = MouseInput.get().getXAbsolute();
             float y = MouseInput.get().getYAbsolute(); 
         	shotTime = 0;
-//            Ray ray = new Ray(camera.getLocation(), camera.getDirection()); // camera direction is already normalized
 			Vector2f screenPos = new Vector2f();
 			// Get the position that the mouse is pointing to
-			//screenPos.set(am.getHotSpotPosition().x, am.getHotSpotPosition().y);
 			screenPos.set(x,y);
 			// Get the world location of that X,Y value
 			Vector3f worldCoords = display.getWorldCoordinates(screenPos, 0);
@@ -107,20 +107,42 @@ public class AlienPick extends MouseInputAction {
                     }
                     Geometry geom = results.getPickData(i).getTargetMesh().getParentGeom();
                     Node element = geom.getParent();
-                    while (!(element instanceof AlienSort)) { 
+                    while (!(element instanceof AlienSort) && !(element == null) ) { 
                       element = element.getParent();
                     }
         	        if ( element instanceof AlienSort ) {
         	        	//we should make this vanish and log 
         	        	AlienSort as = (AlienSort) element;
-        	        	as.Clicked();
-        	        	break;
+        	        	if (as.equals(selectedAlien))
+        	        	{
+               	        	as.Unselect();
+               	        	selectedAlien = null;       
+            	        	break;
+        	        	}else{
+        	        		as.Select();
+        	        		selectedAlien = as;
+        	        		break;
+        	        	}	        	 
         			}
+        	        element = geom.getParent();
+                    while (!(element == null) && !(element.getName().startsWith("packingcase") )  ) { 
+                      element = element.getParent();
+                    }
+        	        if (!(element == null) && (element.getName().startsWith("packingcase") )) {
+        	        	//we should make this vanish and log 
+        	        	if (selectedAlien != null)
+        	        	{
+        	        		selectedAlien.PutinBox(element);
+            	        	break;
+        	        	}
+        			}
+        	     
                 }
             }
             shots++;
             results.clear();
             text.print("Hits: " + hits + " Shots: " + shots + " : " + hitItems);
+            performingAction = false;
         }
     }
 }

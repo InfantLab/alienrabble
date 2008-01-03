@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 
 import jmetest.terrain.TestTerrain;
 
-import alienrabble.FlagRushHandler;
+import alienrabble.AlienRabbleHandler;
 import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
 import com.jme.image.Texture;
@@ -489,6 +489,6 @@ public class Grab extends DebugGameState {
 	     *
 	     */
 	    private void buildInput() {
-	        input = new FlagRushHandler(player, DisplaySystem.getDisplaySystem().getRenderer().toString());
+	        input = new AlienRabbleHandler(player, DisplaySystem.getDisplaySystem().getRenderer().toString());
 	    }
 }

@@ -44,7 +44,7 @@ import com.jme.input.KeyInput;
  * @author Mark Powell
  *
  */
-public class FlagRushHandler extends InputHandler {
+public class AlienRabbleHandler extends InputHandler {
     //the vehicle we are going to control
     private Vehicle vehicle;
     //the default action
@@ -64,7 +64,7 @@ public class FlagRushHandler extends InputHandler {
      * @param vehicle the node we wish to move
      * @param api the library that will handle creation of the input.
      */
-    public FlagRushHandler(Vehicle vehicle, String api) {
+    public AlienRabbleHandler(Vehicle vehicle, String api) {
         this.vehicle = vehicle;
         setKeyBindings(api);
         setActions(vehicle);

@@ -39,14 +39,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jmetest.input.TestInputHandler;
+import alienrabble.AlienRabble;
 
 import com.jme.app.SimpleGame;
 import com.jme.image.Texture;
 import com.jme.input.AbsoluteMouse;
+import com.jme.input.KeyInput;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.scene.SceneElement;
+import com.jme.scene.Skybox;
 import com.jme.scene.Spatial;
 import com.jme.scene.Text;
 import com.jme.scene.state.AlphaState;
@@ -69,6 +72,9 @@ public class AlienRabbleSort extends SimpleGame {
 
 	private AlienSort[] allAlienSort;
     private AbsoluteMouse mouse;
+    private PackingCases packingcases;
+    private Skybox skybox;
+    private KeyInput key;
 
 	
 	/**
@@ -129,15 +135,7 @@ public class AlienRabbleSort extends SimpleGame {
         fpsNode.attachChild(mouse);
 
         
-        Text cross = Text.createDefaultTextLabel("Cross hairs", "+");
-        cross.setCullMode(SceneElement.CULL_NEVER);
-        cross.setTextureCombineMode(TextureState.REPLACE);
-        cross.setLocalTranslation(new Vector3f(
-				display.getWidth() / 2f - 8f, // 8 is half the width
-														// of a font char
-				display.getHeight() / 2f - 8f, 0));
-
-		fpsNode.attachChild(text);
+        fpsNode.attachChild(text);
 
 		Quaternion q = new Quaternion();
 		q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
@@ -167,7 +165,84 @@ public class AlienRabbleSort extends SimpleGame {
 				logger.info("darn exceptions:" + e.getMessage());
 			}
 		}
-		AlienPick pick = new AlienPick(display, cam, rootNode, text);
+		AlienPick pick = new AlienPick(display, rootNode, text);
 		input.addAction(pick);
+		
+		packingcases = new PackingCases(3);
+		
+		rootNode.attachChild(packingcases);
+		
+		buildSkyBox();
+		rootNode.attachChild(skybox);
+		
+        key = KeyInput.get();
 	}
+	
+	
+	protected void simpleUpdate()  {
+        if(key.isKeyDown(KeyInput.KEY_DOWN)) {
+        	packingcases.RemoveCase();     
+        }
+
+        if(key.isKeyDown(KeyInput.KEY_UP)) {
+        	packingcases.AddCase();
+        }
+    	for(int i=0;i<allAlienSort.length;i++){
+    		allAlienSort[i].update(tpf);
+    	}
+        
+    }
+	
+	
+    /**
+     * buildSkyBox creates a new skybox object with all the proper textures. The
+     * textures used are the standard skybox textures from all the tests.
+     *
+     */
+    private void buildSkyBox() {
+        skybox = new Skybox("skybox", 200, 200, 200);
+
+        Texture north = TextureManager.loadTexture(
+        		AlienRabble.class.getClassLoader().getResource(
+            "jmetest/data/texture/north.jpg"),
+            Texture.MM_LINEAR,
+            Texture.FM_LINEAR);
+        Texture south = TextureManager.loadTexture(
+        		AlienRabble.class.getClassLoader().getResource(
+            "jmetest/data/texture/south.jpg"),
+            Texture.MM_LINEAR,
+            Texture.FM_LINEAR);
+        Texture east = TextureManager.loadTexture(
+        		AlienRabble.class.getClassLoader().getResource(
+            "jmetest/data/texture/east.jpg"),
+            Texture.MM_LINEAR,
+            Texture.FM_LINEAR);
+        Texture west = TextureManager.loadTexture(
+        		AlienRabble.class.getClassLoader().getResource(
+            "jmetest/data/texture/west.jpg"),
+            Texture.MM_LINEAR,
+            Texture.FM_LINEAR);
+        Texture up = TextureManager.loadTexture(
+        		AlienRabble.class.getClassLoader().getResource(
+            "jmetest/data/texture/top.jpg"),
+            Texture.MM_LINEAR,
+            Texture.FM_LINEAR);
+        Texture down = TextureManager.loadTexture(
+        		AlienRabble.class.getClassLoader().getResource(
+            "jmetest/data/texture/bottom.jpg"),
+            Texture.MM_LINEAR,
+            Texture.FM_LINEAR);
+
+        skybox.setTexture(Skybox.NORTH, north);
+        skybox.setTexture(Skybox.WEST, west);
+        skybox.setTexture(Skybox.SOUTH, south);
+        skybox.setTexture(Skybox.EAST, east);
+        skybox.setTexture(Skybox.UP, up);
+        skybox.setTexture(Skybox.DOWN, down);
+        skybox.preloadTextures();
+        skybox.updateRenderState();
+       // scene.attachChild(skybox);
+    }
+	
+	
 }

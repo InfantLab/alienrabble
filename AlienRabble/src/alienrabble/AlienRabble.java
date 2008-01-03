@@ -3,15 +3,14 @@ package alienrabble;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
-import jmetest.renderer.ShadowTweaker;
 import jmetest.renderer.TestText;
-import jmetest.stress.swarm.CollisionTreeManager;
+
+import alienrabble.sort.AlienSort;
 
 import com.jme.app.BaseGame;
 import com.jme.bounding.BoundingBox;
@@ -47,9 +46,6 @@ import com.jme.system.JmeException;
 import com.jme.util.TextureManager;
 import com.jme.util.Timer;
 import com.jme.util.export.binary.BinaryImporter;
-import com.jmex.editors.swing.settings.GameSettingsPanel;
-import com.jmex.game.StandardGame;
-import com.jmex.game.state.GameStateManager;
 import com.jmex.terrain.TerrainBlock;
 import com.jmex.terrain.util.MidPointHeightMap;
 import com.jmex.terrain.util.ProceduralTextureGenerator;
@@ -69,10 +65,13 @@ public class AlienRabble extends BaseGame{
 	    //the flag to grab
 	    private Flag flag;
 	    //the flag to grab
-	    private Alien alien, alien2, alien3;
+	    private Node aliencontainer;
+	    private Alien[] allAliens;
+	    private String[] strAliens;
 	    private Text text;
 	    //private CollisionTreeManager collisionTreeManager;
 		private CollisionResults results;
+		
 		
 	    //private ChaseCamera chaser;
 	    protected InputHandler input;
@@ -124,7 +123,7 @@ public class AlienRabble extends BaseGame{
         //update the fence to animate the force field texture
         fence.update(interpolation);
         //update the flag to make it flap in the wind
-        flag.update(interpolation);
+//        flag.update(interpolation);
         
         //we want to keep the skybox around our eyes, so move it with
         //the camera
@@ -165,6 +164,10 @@ public class AlienRabble extends BaseGame{
         //the graph.
         scene.updateGeometricState(interpolation, true);
         
+        
+        //update all our aliens
+        aliencontainer.updateWorldData(interpolation);
+        
    
 /*		results.clear();
 		player.findCollisions(alien, results);
@@ -177,30 +180,12 @@ public class AlienRabble extends BaseGame{
         player.findCollisions(fence, results);
         if (results.getNumber()>0){
 			player.setVelocity(-0.7f * player.getVelocity());
-		}
-        
+		} 
         results.clear();
-        player.findCollisions(alien, results);
+        player.findCollisions(aliencontainer,results);
         if (results.getNumber()>0){
-        	text.print("ALIEN - grabbed!");
-        	alien.removeFromParent();
-        }else{
-        	text.print("ALIEN - still on the loose!");
-        }
-        
-        results.clear();
-        player.findCollisions(alien2, results);
-        if (results.getNumber()>0){
-        	text.print("ALIEN - grabbed!");
-        	alien2.removeFromParent();
-        }
-        
-        results.clear();
-        player.findCollisions(alien3, results);
-        if (results.getNumber()>0){
-        	text.print("ALIEN - grabbed!");
-        	alien3.removeFromParent();
-        }
+			player.setVelocity(-0.7f * player.getVelocity());
+		} 
         
     }
 
@@ -291,7 +276,7 @@ public class AlienRabble extends BaseGame{
         //Add terrain to the scene
         buildTerrain();
         //Add a flag randomly to the terrain
-        buildFlag();
+        //buildFlag();
         //Light the world
         buildLighting();
         //add the force field fence
@@ -350,7 +335,7 @@ public class AlienRabble extends BaseGame{
         passManager.add(rPass);
 
         shadowPass.add(scene);
-        shadowPass.addOccluder(player);
+//        shadowPass.addOccluder(player);
 //        shadowPass.addOccluder(flag);
         shadowPass.setRenderShadows(true);
         shadowPass.setLightingMethod(ShadowedRenderPass.MODULATIVE);
@@ -374,21 +359,39 @@ public class AlienRabble extends BaseGame{
      *
      */
     private void addAliens() {
-        //create the flag and place it
-        alien = new Alien(tb, scene);
-        scene.attachChild(alien);
-        alien.placeAlien();
-        //collisionTreeManager.add(alien);
-        //create the flag and place it
-        alien2 = new Alien(tb, scene);
-        scene.attachChild(alien2);
-        alien2.placeAlien();
+    	
+    	aliencontainer = new Node("aliencontainer");
+    	scene.attachChild(aliencontainer);
+    	
+		Quaternion q = new Quaternion();
+		q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
         
-        //create the flag and place it
-        alien3 = new Alien(tb, scene);
-        scene.attachChild(alien3);
-        alien3.placeAlien();
-        
+	 	
+		strAliens = new String[3];
+		strAliens[0] = "alienrabble/data/Greebles/Family1/f1-11.jbin";
+		strAliens[1] = "alienrabble/data/Greebles/Family1/f1-12.jbin";
+		strAliens[2] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
+		
+		allAliens = new Alien[3];
+	
+		for(int i=0;i<strAliens.length;i++)
+		{
+			URL alienURL = AlienSort.class.getClassLoader().getResource(strAliens[i]);
+			BinaryImporter BI = new BinaryImporter();
+			Spatial model;
+			try {
+				model = (Spatial)BI.load(alienURL.openStream());
+				allAliens[i] = new Alien(tb, scene,"alien"+i,model);
+				allAliens[i].setLocalRotation(q);
+				aliencontainer.attachChild(allAliens[i]);
+				allAliens[i].placeAlien();
+				allAliens[i].setPlayer(player);
+				} 
+			catch (IOException e) {
+					logger.info("darn exceptions:" + e.getMessage());
+			}
+		}	
+		
     }
     
     /**
@@ -545,6 +548,21 @@ public class AlienRabble extends BaseGame{
         tb.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         scene.attachChild(tb);
         
+//        Pyramid p = new Pyramid("Pyramid", 10, 20);
+//        p.setModelBound(new BoundingBox());
+//        p.updateModelBound();
+//        p.setRenderState(treeTex);
+//        p.setTextureCombineMode(TextureState.REPLACE);
+//        
+//        for (int i = 0; i < 500; i++) {
+//        	Spatial s1 = new SharedMesh("tree"+i, p);
+//            float x = (float) Math.random() * 128 * 5;
+//            float z = (float) Math.random() * 128 * 5;
+//            s1.setLocalTranslation(new Vector3f(x, tb.getHeight(x, z)+10, z));
+//            rootNode.attachChild(s1);
+//        }
+
+        
         
     }
     
@@ -625,7 +643,7 @@ public class AlienRabble extends BaseGame{
      *
      */
     private void buildInput() {
-        input = new FlagRushHandler(player, properties.getRenderer());
+        input = new AlienRabbleHandler(player, properties.getRenderer());
     }
     
 

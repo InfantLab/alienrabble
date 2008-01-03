@@ -42,6 +42,7 @@ import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
+import com.jme.scene.Spatial;
 import com.jme.scene.shape.Cylinder;
 import com.jmex.terrain.TerrainBlock;
 
@@ -71,55 +72,68 @@ public class Alien extends Node{
     private Vector3f orientation;
     
     private final Node rootNode;
-   // private Controller alienmover;
-    	
+    private Spatial model;
     private CollisionResults results;
-	
+    private Node player;
+    
+    
     /**
      * Constructor builds the flag, taking the terrain as the parameter. This
      * is just the reference to the game's terrain object so that we can 
      * randomly place this flag on the level.
      * @param tb the terrain used to place the flag.
      */
-    public Alien(TerrainBlock tb, Node scene) {
-        super("alien");
+    public Alien(TerrainBlock tb, Node scene, String name, Spatial model) {
+        super(name);
         this.tb = tb;
         this.rootNode = scene;
-        
-        //Create the flag pole
-        Cylinder c = new Cylinder("alien1", 10, 10, 2, 25 );
-        this.attachChild(c);
-        Quaternion q = new Quaternion();
-        //rotate the cylinder to be vertical
-        q.fromAngleAxis(FastMath.PI/2, new Vector3f(1,0,0));
-        c.setLocalRotation(q);
-        c.setLocalTranslation(new Vector3f(-12.5f,-12.5f,0));
-        c.setDefaultColor(ColorRGBA.randomColor());
-        
         BoundingBox box = new BoundingBox();
         this.setModelBound(box);
+        results = new BoundingCollisionResults();
+        
+        if (model == null){
+	        //Create the flag pole
+	        Cylinder c = new Cylinder("alien1", 10, 10, 2, 25 );
+	        this.attachChild(c);
+	        Quaternion q = new Quaternion();
+	        //rotate the cylinder to be vertical
+	        q.fromAngleAxis(FastMath.PI/2, new Vector3f(1,0,0));
+	        c.setLocalRotation(q);
+	        c.setLocalTranslation(new Vector3f(-12.5f,-12.5f,0));
+	        c.setDefaultColor(ColorRGBA.randomColor());
+        }else{
+        	setModel(model);
+        }
+
         this.updateModelBound();
 
         this.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         this.setLocalScale(0.25f);
-
-        results = new BoundingCollisionResults();
- /****
-		text = new Text("Text Label", "Alien Collision: No");
-		text.setLocalTranslation(new Vector3f(1, 60, 0));
-		this.attachChild(text);
-
         
-		results = new BoundingCollisionResults() {
-			public void processCollisions() {
-				if (getNumber() > 0) {
-					text.print("Alien 1 Collision: YES");
-				} else {
-					text.print("Alien 1 Collision: NO");
-				}
-			}
-		};
- ****/
+    }
+    
+    public void setPlayer(Node player){
+    	this.player = player;
+    }
+    
+    /**
+     * retrieves the model Spatial of this alien.
+     * @return the model Spatial of this alien.
+     */
+    public Spatial getModel() {
+        return model;
+    }
+    
+    /**
+     * sets the model spatial of this vehicle. It first
+     * detaches any previously attached models.
+     * @param model the model to attach to this vehicle.
+     */
+    public void setModel(final Spatial model) {
+        this.detachChild(this.model);
+        this.model = model;
+        this.attachChild(this.model);
+        this.updateModelBound();
     }
     
     /**
@@ -128,21 +142,25 @@ public class Alien extends Node{
      * @param time the time between frame.
      */
     public void update(float time) {
+    	super.updateRenderState();
         countdown -= time;
         
         if(countdown <= 0) {
             reset();
         }
         
-        results.clear();
-		this.calculateCollisions(rootNode, results);
-		for ( int i = results.getNumber() - 1; i >= 0; i-- ) {
-	        final Node node = results.getCollisionData( i ).getSourceMesh().getParent();
-	        if ( node instanceof Vehicle ) {
-	        	//we should make this vanish and log 
-				removeFromParent();
-			}
-		}	
+//        results.clear();
+//        player.calculateCollisions(this,  results);
+//		for ( int i = results.getNumber() - 1; i >= 0; i-- ) {
+//			Node element = results.getCollisionData(i).getSourceMesh().getParent();
+//            while (!(element instanceof Vehicle) && !(element == null) ) { 
+//              element = element.getParent();
+//            }
+//	        if ( element instanceof Vehicle ) {
+//	        	//we should make this vanish and log 
+//				removeFromParent();
+//			}
+//		}	
     }
     /**
      * reset sets the life time back to 10 seconds, and then randomly places the flag
@@ -163,7 +181,7 @@ public class Alien extends Node{
     public void placeAlien() {
         float x = 45 + FastMath.nextRandomFloat() * 130;
         float z = 45 + FastMath.nextRandomFloat() * 130;
-        float y = tb.getHeight(x,z) + 1.5f;
+        float y = tb.getHeight(x,z) + 0.2f;
         localTranslation.x = x;
         localTranslation.y = y;
         localTranslation.z = z;
