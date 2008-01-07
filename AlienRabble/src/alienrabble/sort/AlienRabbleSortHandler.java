@@ -1,4 +1,4 @@
-/*
+		/*
  * Copyright (c) 2003-2006 jMonkeyEngine
  * All rights reserved.
  *
@@ -30,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package alienrabble;
+package alienrabble.sort;
 
 import alienrabble.actions.*;
 
@@ -44,19 +44,17 @@ import com.jme.input.KeyInput;
  * @author Mark Powell
  *
  */
-public class AlienRabbleHandler extends InputHandler {
-    //the vehicle we are going to control
-    private Vehicle vehicle;
-    //the default action
-    private DriftAction drift;
+public class AlienRabbleSortHandler extends InputHandler {
+	private static final long serialVersionUID = 1L;
+	
+    //the packing cases we are going to control
+    private PackingCases packingcases;
     
     public void update(float time) {
         if ( !isEnabled() ) return;
 
         super.update(time);
-        //we always want to allow friction to control the drift
-        drift.performAction(event);
-        vehicle.update(time);
+        packingcases.update(time);
     }
     
     /**
@@ -64,10 +62,10 @@ public class AlienRabbleHandler extends InputHandler {
      * @param vehicle the node we wish to move
      * @param api the library that will handle creation of the input.
      */
-    public AlienRabbleHandler(Vehicle vehicle, String api) {
-        this.vehicle = vehicle;
+    public AlienRabbleSortHandler(PackingCases cases, String api) {
+        this.packingcases = cases;
         setKeyBindings(api);
-        setActions(vehicle);
+        setActions();
 
     }
 
@@ -79,29 +77,22 @@ public class AlienRabbleHandler extends InputHandler {
     private void setKeyBindings(String api) {
         KeyBindingManager keyboard = KeyBindingManager.getKeyBindingManager();
 
-        keyboard.set("forward", KeyInput.KEY_W);
-        keyboard.set("backward", KeyInput.KEY_S);
-        keyboard.set("turnRight", KeyInput.KEY_D);
-        keyboard.set("turnLeft", KeyInput.KEY_A);
+        keyboard.set("addCase", KeyInput.KEY_UP);
+        keyboard.set("addCase", KeyInput.KEY_RIGHT);
+        keyboard.set("removeCase", KeyInput.KEY_DOWN);
+        keyboard.set("removeCase", KeyInput.KEY_LEFT);
     }
 
     /**
-     * assigns action classes to triggers. These actions handle moving the node forward, backward and 
-     * rotating it. It also creates an action for drifting that is not assigned to key trigger, this
-     * action will occur each frame.
-     * @param node the node to control.
+     * assigns action classes to triggers. These actions handle adding and removing the cases
+     * that aliens are sorted into and may handle other features too eventually. 
      */
-    private void setActions(Vehicle node) {
-        ForwardAndBackwardAction forward = new ForwardAndBackwardAction(node, ForwardAndBackwardAction.FORWARD);
-        addAction(forward, "forward", true);
-        ForwardAndBackwardAction backward = new ForwardAndBackwardAction(node, ForwardAndBackwardAction.BACKWARD);
-        addAction(backward, "backward", true);
-        VehicleRotateAction rotateLeft = new VehicleRotateAction(node, VehicleRotateAction.LEFT);
-        addAction(rotateLeft, "turnLeft", true);
-        VehicleRotateAction rotateRight = new VehicleRotateAction(node, VehicleRotateAction.RIGHT);
-        addAction(rotateRight, "turnRight", true);
-        
-        //not triggered by keyboard
-        drift = new DriftAction(node);
+    private void setActions() {
+        PackingCaseAction addcase = new PackingCaseAction(packingcase, PackingCaseAction.ADDCASE);
+        addAction(addcase, "addcase", true);
+        PackingCaseAction removecase = new PackingCaseAction(packingcase, PackingCaseAction.REMOVECASE);
+        addAction(removecase, "removecase", true);
     }
+    
+    
 }

@@ -132,7 +132,7 @@ public class AlienPick extends MouseInputAction {
         	        	//we should make this vanish and log 
         	        	if (selectedAlien != null)
         	        	{
-        	        		selectedAlien.PutinBox(element);
+        	        		selectedAlien.putInBox((Node) element);
             	        	break;
         	        	}
         			}

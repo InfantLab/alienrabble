@@ -15,6 +15,7 @@ import com.jme.math.Vector3f;
  *
  */
 public class VehicleRotateAction extends KeyInputAction {
+	private static final long serialVersionUID = 1L;
     public static final int RIGHT = 0;
     public static final int LEFT = 1;
     //temporary variables to handle rotation
@@ -43,9 +44,9 @@ public class VehicleRotateAction extends KeyInputAction {
      * backwards, swap direction.
      */
     public void performAction(InputActionEvent evt) {
-        if(vehicle.getVelocity() > -FastMath.FLT_EPSILON && vehicle.getVelocity() < FastMath.FLT_EPSILON) {
-            return;
-        }
+//        if(vehicle.getVelocity() > -FastMath.FLT_EPSILON && vehicle.getVelocity() < FastMath.FLT_EPSILON) {
+//            return;
+//        }
         //affect the direction
         if(direction == LEFT) {
             modifier = 1;
@@ -54,7 +55,7 @@ public class VehicleRotateAction extends KeyInputAction {
         }
         //we want to turn differently depending on which direction we are traveling in.
         if(vehicle.getVelocity() < 0) {
-            incr.fromAngleNormalAxis(-modifier * vehicle.getTurnSpeed() * evt.getTime(), upAxis);
+            incr.fromAngleNormalAxis(modifier * vehicle.getTurnSpeed() * evt.getTime(), upAxis);
         } else {
             incr.fromAngleNormalAxis(modifier * vehicle.getTurnSpeed() * evt.getTime(), upAxis);
         }

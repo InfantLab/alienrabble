@@ -67,6 +67,7 @@ import com.jme.util.resource.SimpleResourceLocator;
  * @version $Id: TestPick.java,v 1.35 2007/08/17 22:04:20 nca Exp $
  */
 public class AlienRabbleSort extends SimpleGame {
+	private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(AlienRabbleSort.class
             .getName());
 
@@ -133,40 +134,46 @@ public class AlienRabbleSort extends SimpleGame {
         as1.setTestFunction(AlphaState.TF_GREATER);
         mouse.setRenderState(as1);
         fpsNode.attachChild(mouse);
-
-        
         fpsNode.attachChild(text);
 
-		Quaternion q = new Quaternion();
-		q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
+        AlienPick pick = new AlienPick(display, rootNode, text);
+		input.addAction(pick);
+		
+		/**
+		 * Set the action called "firebullet", bound to KEY_F, to performAction
+		 * FireBullet
+		 */
+        input.addAction( new FireBullet(), "addCase", KeyInput.KEY_F, false );
         
 		String[] allAliens;
 		
-		allAliens = new String[3];
+		allAliens = new String[4];
 		allAliens[0] = "alienrabble/data/Greebles/Family1/f1-11.jbin";
 		allAliens[1] = "alienrabble/data/Greebles/Family1/f1-12.jbin";
 		allAliens[2] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
+		allAliens[3] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
 		
-		allAlienSort = new AlienSort[3];
+		allAlienSort = new AlienSort[4];
 	
 		for(int i=0;i<allAliens.length;i++)
 		{
 			URL alienURL = AlienSort.class.getClassLoader().getResource(allAliens[i]);
 			BinaryImporter BI = new BinaryImporter();
 			Spatial model;
+			Quaternion q = new Quaternion();
+			q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
 			try {
 				model = (Spatial)BI.load(alienURL.openStream());
 				allAlienSort[i] = new AlienSort(allAliens[i],model);
 				allAlienSort[i].setLocalTranslation(-10 + 10*i,30,0);
 				allAlienSort[i].setLocalRotation(q);
-				allAlienSort[i].setupTranslations();
+				allAlienSort[i].setInitialValues();
+				allAlienSort[i].addAllControllers();
 				rootNode.attachChild(allAlienSort[i]);				
 			} catch (IOException e) {
 				logger.info("darn exceptions:" + e.getMessage());
 			}
 		}
-		AlienPick pick = new AlienPick(display, rootNode, text);
-		input.addAction(pick);
 		
 		packingcases = new PackingCases(3);
 		
@@ -174,23 +181,24 @@ public class AlienRabbleSort extends SimpleGame {
 		
 		buildSkyBox();
 		rootNode.attachChild(skybox);
+
 		
+
         key = KeyInput.get();
 	}
 	
 	
 	protected void simpleUpdate()  {
         if(key.isKeyDown(KeyInput.KEY_DOWN)) {
-        	packingcases.RemoveCase();     
+        	packingcases.removeCase();     
         }
 
         if(key.isKeyDown(KeyInput.KEY_UP)) {
-        	packingcases.AddCase();
+        	packingcases.addCase();
         }
-    	for(int i=0;i<allAlienSort.length;i++){
-    		allAlienSort[i].update(tpf);
-    	}
-        
+//    	for(int i=0;i<allAlienSort.length;i++){
+//    		allAlienSort[i].update(tpf);
+//    	}
     }
 	
 	

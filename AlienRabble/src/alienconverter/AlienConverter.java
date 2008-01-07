@@ -63,6 +63,7 @@ import com.jmex.model.util.ModelLoader;
  * @author Jack Lindamood
  */
 public class AlienConverter extends SimpleGame {
+	private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger
             .getLogger(AlienConverter.class.getName());
     

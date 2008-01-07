@@ -126,7 +126,7 @@ public class Vehicle extends Node {
         this.localTranslation.addLocal(this.localRotation.getRotationColumn(2, tempVa)
                 .multLocal(velocity * time));
         //rotateWheels(time);
-        //processLean(time);
+        processLean(time);
         results.clear();
         this.calculateCollisions(rootNode, results);
         

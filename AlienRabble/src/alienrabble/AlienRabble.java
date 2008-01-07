@@ -9,8 +9,9 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 import jmetest.renderer.TestText;
+import jmetest.terrain.TestTerrainTrees;
 
-import alienrabble.sort.AlienSort;
+import alienrabble.sort.AlienRabbleSortHandler;
 
 import com.jme.app.BaseGame;
 import com.jme.bounding.BoundingBox;
@@ -33,9 +34,11 @@ import com.jme.renderer.pass.BasicPassManager;
 import com.jme.renderer.pass.RenderPass;
 import com.jme.renderer.pass.ShadowedRenderPass;
 import com.jme.scene.Node;
+import com.jme.scene.SharedMesh;
 import com.jme.scene.Skybox;
 import com.jme.scene.Spatial;
 import com.jme.scene.Text;
+import com.jme.scene.shape.Pyramid;
 import com.jme.scene.state.AlphaState;
 import com.jme.scene.state.CullState;
 import com.jme.scene.state.LightState;
@@ -51,52 +54,53 @@ import com.jmex.terrain.util.MidPointHeightMap;
 import com.jmex.terrain.util.ProceduralTextureGenerator;
 
 public class AlienRabble extends BaseGame{
-	   private static final Logger logger = Logger.getLogger(AlienRabble.class
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(AlienRabble.class
 	            .getName());
 	    
-	    // the terrain we will drive over.
-	    private TerrainBlock tb;
-	    // fence that will keep us in.
-	    private ForceFieldFence fence;
-	    //Sky box (we update it each frame)
-	    private Skybox skybox;
-	    //the new player object
-	    private Vehicle player;
-	    //the flag to grab
-	    private Flag flag;
-	    //the flag to grab
-	    private Node aliencontainer;
-	    private Alien[] allAliens;
-	    private String[] strAliens;
-	    private Text text;
-	    //private CollisionTreeManager collisionTreeManager;
-		private CollisionResults results;
+    // the terrain we will drive over.
+    private TerrainBlock tb;
+    // fence that will keep us in.
+    private ForceFieldFence fence;
+    //Sky box (we update it each frame)
+    private Skybox skybox;
+    //the new player object
+    private Vehicle player;
+    //the flag to grab
+    private Flag flag;
+    //the flag to grab
+    private Node aliencontainer;
+    private Alien[] allAliens;
+    private String[] strAliens;
+    private Text text;
+    //private CollisionTreeManager collisionTreeManager;
+	private CollisionResults results;
 		
 		
-	    //private ChaseCamera chaser;
-	    protected InputHandler input;
-	    //the timer
-	    protected Timer timer;
-	    // Our camera object for viewing the scene
-	    private Camera cam;
-	    //The chase camera, this will follow our player as he zooms around the level
-	    private ChaseCamera chaser;
-	    // the root node of the scene graph
-	    private Node scene;
+    //private ChaseCamera chaser;
+    protected InputHandler input;
+    //the timer
+    protected Timer timer;
+    // Our camera object for viewing the scene
+    private Camera cam;
+    //The chase camera, this will follow our player as he zooms around the level
+    private ChaseCamera chaser;
+    // the root node of the scene graph
+    private Node scene;
 
-	    // display attributes for the window. We will keep these values
-	    // to allow the user to change them
-	    private int width, height, depth, freq;
-	    private boolean fullscreen;
-	    
-	    //store the normal of the terrain
-	    private Vector3f normal = new Vector3f();
-	    
-	    //height above ground level
-	    private float agl;
-	    
-	    private static ShadowedRenderPass shadowPass = new ShadowedRenderPass();
-	    private BasicPassManager passManager;
+    // display attributes for the window. We will keep these values
+    // to allow the user to change them
+    private int width, height, depth, freq;
+    private boolean fullscreen;
+    
+    //store the normal of the terrain
+    private Vector3f normal = new Vector3f();
+    
+    //height above ground level
+    private float agl;
+    
+    private static ShadowedRenderPass shadowPass = new ShadowedRenderPass();
+    private BasicPassManager passManager;
 
 	
 	public static void main(String[] args) throws Exception {
@@ -169,23 +173,24 @@ public class AlienRabble extends BaseGame{
         aliencontainer.updateWorldData(interpolation);
         
    
-/*		results.clear();
-		player.findCollisions(alien, results);
-		if (results.getNumber() >0 ){
-			text.print("Collision: YES");
-		} else {
-			text.print("Collision: NO");
-		}*/
         results.clear();
         player.findCollisions(fence, results);
         if (results.getNumber()>0){
 			player.setVelocity(-0.7f * player.getVelocity());
 		} 
         results.clear();
-        player.findCollisions(aliencontainer,results);
+        aliencontainer.findCollisions(player,results);
         if (results.getNumber()>0){
 			player.setVelocity(-0.7f * player.getVelocity());
 		} 
+		results.clear();
+		player.findCollisions(allAliens[1], results);
+		if (results.getNumber() >0 ){
+			player.setVelocity(-0.7f * player.getVelocity());
+			text.print("Collision: YES");
+		} else {
+			text.print("Collision: NO");
+		}
         
     }
 
@@ -367,16 +372,17 @@ public class AlienRabble extends BaseGame{
 		q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
         
 	 	
-		strAliens = new String[3];
+		strAliens = new String[4];
 		strAliens[0] = "alienrabble/data/Greebles/Family1/f1-11.jbin";
 		strAliens[1] = "alienrabble/data/Greebles/Family1/f1-12.jbin";
 		strAliens[2] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
+		strAliens[3] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
 		
-		allAliens = new Alien[3];
+		allAliens = new Alien[4];
 	
 		for(int i=0;i<strAliens.length;i++)
 		{
-			URL alienURL = AlienSort.class.getClassLoader().getResource(strAliens[i]);
+			URL alienURL = AlienRabble.class.getClassLoader().getResource(strAliens[i]);
 			BinaryImporter BI = new BinaryImporter();
 			Spatial model;
 			try {
@@ -412,11 +418,9 @@ public class AlienRabble extends BaseGame{
             model.setModelBound(new BoundingBox());
             model.updateModelBound();
             //scale it to be MUCH smaller than it is originally
-            model.setLocalScale(.25f);
+            model.setLocalScale(.40f);
         } catch (IOException e) {
-            logger
-                    .throwing(this.getClass().toString(), "buildPlayer()",
-                            e);
+            logger.throwing(this.getClass().toString(), "buildPlayer()", e);
         }
         
         Quaternion q = new Quaternion();
@@ -428,9 +432,9 @@ public class AlienRabble extends BaseGame{
         //set the vehicles attributes (these numbers can be thought
         //of as Unit/Second).
         player = new Vehicle("Player Node",scene, model);
-        player.setAcceleration(7);
-        player.setBraking(15);
-        player.setTurnSpeed(2.5f);
+        player.setAcceleration(6);
+        player.setBraking(14);
+        player.setTurnSpeed(2.2f);
         player.setWeight(25);
         player.setMaxSpeed(15);
         player.setMinSpeed(6);
@@ -548,22 +552,29 @@ public class AlienRabble extends BaseGame{
         tb.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         scene.attachChild(tb);
         
-//        Pyramid p = new Pyramid("Pyramid", 10, 20);
-//        p.setModelBound(new BoundingBox());
-//        p.updateModelBound();
-//        p.setRenderState(treeTex);
-//        p.setTextureCombineMode(TextureState.REPLACE);
-//        
-//        for (int i = 0; i < 500; i++) {
-//        	Spatial s1 = new SharedMesh("tree"+i, p);
-//            float x = (float) Math.random() * 128 * 5;
-//            float z = (float) Math.random() * 128 * 5;
-//            s1.setLocalTranslation(new Vector3f(x, tb.getHeight(x, z)+10, z));
-//            rootNode.attachChild(s1);
-//        }
-
         
+        TextureState treeTex = display.getRenderer().createTextureState();
+        treeTex.setEnabled(true);
+        Texture tr = TextureManager.loadTexture(
+                TestTerrainTrees.class.getClassLoader().getResource(
+                        "jmetest/data/texture/grass.jpg"), Texture.MM_LINEAR_LINEAR,
+                Texture.FM_LINEAR);
+        treeTex.setTexture(tr);
         
+        Pyramid p = new Pyramid("Pyramid", 3, 6);
+        p.setModelBound(new BoundingBox());
+        p.updateModelBound();
+        p.setRenderState(treeTex);
+        p.setTextureCombineMode(TextureState.REPLACE);
+        
+        for (int i = 0; i < 50; i++) {
+        	Spatial s1 = new SharedMesh("tree"+i, p);
+            float x = 45 + FastMath.nextRandomFloat() * 130;
+            float z = 45 + FastMath.nextRandomFloat() * 130;
+            float y = tb.getHeight(x,z) + 0.2f; 
+            s1.setLocalTranslation(new Vector3f(x, tb.getHeight(x, z)+5, z));
+            scene.attachChild(s1);
+        }
     }
     
     /**
@@ -627,15 +638,14 @@ public class AlienRabble extends BaseGame{
      */
     private void buildChaseCamera() {
         HashMap<String, Object> props = new HashMap<String, Object>();
-        props.put(ThirdPersonMouseLook.PROP_MAXROLLOUT, "6");
-        props.put(ThirdPersonMouseLook.PROP_MINROLLOUT, "3");
-        props.put(ThirdPersonMouseLook.PROP_MAXASCENT, ""+45 * FastMath.DEG_TO_RAD);
-        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(5, 0, 30 * FastMath.DEG_TO_RAD));
+        props.put(ThirdPersonMouseLook.PROP_ENABLED, "false");
+        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(6, 90 * FastMath.DEG_TO_RAD, 25 * FastMath.DEG_TO_RAD));
         props.put(ChaseCamera.PROP_DAMPINGK, "4");
         props.put(ChaseCamera.PROP_SPRINGK, "9");
+        props.put(ChaseCamera.PROP_STAYBEHINDTARGET, "true");
         chaser = new ChaseCamera(cam, player, props);
         chaser.setMaxDistance(8);
-        chaser.setMinDistance(2);
+        chaser.setMinDistance(4);
     }
 
     /**
@@ -643,7 +653,7 @@ public class AlienRabble extends BaseGame{
      *
      */
     private void buildInput() {
-        input = new AlienRabbleHandler(player, properties.getRenderer());
+        input = new AlienRabbleSortHandler(player, properties.getRenderer());
     }
     
 
