@@ -11,10 +11,11 @@ import javax.swing.ImageIcon;
 import jmetest.renderer.TestText;
 import jmetest.terrain.TestTerrainTrees;
 
-import alienrabble.sort.AlienRabbleSortHandler;
+import alienrabble.AlienRabbleHandler;
 
 import com.jme.app.BaseGame;
 import com.jme.bounding.BoundingBox;
+import com.jme.bounding.BoundingSphere;
 import com.jme.image.Texture;
 import com.jme.input.ChaseCamera;
 import com.jme.input.InputHandler;
@@ -33,6 +34,7 @@ import com.jme.renderer.Renderer;
 import com.jme.renderer.pass.BasicPassManager;
 import com.jme.renderer.pass.RenderPass;
 import com.jme.renderer.pass.ShadowedRenderPass;
+import com.jme.scene.Geometry;
 import com.jme.scene.Node;
 import com.jme.scene.SharedMesh;
 import com.jme.scene.Skybox;
@@ -57,6 +59,8 @@ public class AlienRabble extends BaseGame{
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(AlienRabble.class
 	            .getName());
+	
+	private static final float GRAB_RADIUS = 2.5f;
 	    
     // the terrain we will drive over.
     private TerrainBlock tb;
@@ -179,19 +183,31 @@ public class AlienRabble extends BaseGame{
 			player.setVelocity(-0.7f * player.getVelocity());
 		} 
         results.clear();
-        aliencontainer.findCollisions(player,results);
+        Vector3f relativePosition = new Vector3f();
+        player.findCollisions(aliencontainer,results);
         if (results.getNumber()>0){
-			player.setVelocity(-0.7f * player.getVelocity());
-		} 
-		results.clear();
-		player.findCollisions(allAliens[1], results);
-		if (results.getNumber() >0 ){
-			player.setVelocity(-0.7f * player.getVelocity());
-			text.print("Collision: YES");
-		} else {
-			text.print("Collision: NO");
-		}
-        
+            for(int i = 0;i<results.getNumber();i++)
+            {
+            	Geometry geom = results.getCollisionData(i).getTargetMesh();
+	            Node element = geom.getParent();
+	            while (!(element instanceof Alien) && !(element == null) ) { 
+	              element = element.getParent();
+	            }
+		        if ( element instanceof Alien ) {
+
+                    relativePosition.set( element.getWorldTranslation() );
+                    relativePosition.subtractLocal( player.getWorldTranslation() );
+                    final float distance = relativePosition.length();
+                    if ( distance < GRAB_RADIUS ) {
+                    	player.setVelocity(-0.1f * player.getVelocity());
+    		        	//we should make this vanish and log 
+    		        	Alien as = (Alien) element;
+    		        	as.removeFromParent();
+    		        	break;                    	
+                    }
+		        }
+            }
+        } 
     }
 
     /**
@@ -372,13 +388,19 @@ public class AlienRabble extends BaseGame{
 		q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
         
 	 	
-		strAliens = new String[4];
+		strAliens = new String[10];
 		strAliens[0] = "alienrabble/data/Greebles/Family1/f1-11.jbin";
 		strAliens[1] = "alienrabble/data/Greebles/Family1/f1-12.jbin";
-		strAliens[2] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
-		strAliens[3] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
+		strAliens[2] = "alienrabble/data/Greebles/Family1/f1-13.jbin";
+		strAliens[3] = "alienrabble/data/Greebles/Family1/f1-14.jbin";
+		strAliens[4] = "alienrabble/data/Greebles/Family1/f1-15.jbin";
+		strAliens[5] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
+		strAliens[6] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
+		strAliens[7] = "alienrabble/data/Greebles/Family1/m1_13.jbin";
+		strAliens[8] = "alienrabble/data/Greebles/Family1/m1_14.jbin";
+		strAliens[9] = "alienrabble/data/Greebles/Family1/m1_15.jbin";
 		
-		allAliens = new Alien[4];
+		allAliens = new Alien[10];
 	
 		for(int i=0;i<strAliens.length;i++)
 		{
@@ -396,8 +418,7 @@ public class AlienRabble extends BaseGame{
 			catch (IOException e) {
 					logger.info("darn exceptions:" + e.getMessage());
 			}
-		}	
-		
+		}			
     }
     
     /**
@@ -415,10 +436,10 @@ public class AlienRabble extends BaseGame{
             URL bikeFile = AlienRabble.class.getClassLoader().getResource("jmetest/data/model/grabber2.jbin");
             BinaryImporter importer = new BinaryImporter();
             model = (Spatial)importer.load(bikeFile.openStream());
-            model.setModelBound(new BoundingBox());
-            model.updateModelBound();
+            model.setModelBound(new BoundingSphere());
             //scale it to be MUCH smaller than it is originally
-            model.setLocalScale(.40f);
+            model.setLocalScale(.60f);
+            model.updateModelBound();
         } catch (IOException e) {
             logger.throwing(this.getClass().toString(), "buildPlayer()", e);
         }
@@ -432,11 +453,11 @@ public class AlienRabble extends BaseGame{
         //set the vehicles attributes (these numbers can be thought
         //of as Unit/Second).
         player = new Vehicle("Player Node",scene, model);
-        player.setAcceleration(6);
-        player.setBraking(14);
+        player.setAcceleration(8);
+        player.setBraking(12);
         player.setTurnSpeed(2.2f);
         player.setWeight(25);
-        player.setMaxSpeed(15);
+        player.setMaxSpeed(18);
         player.setMinSpeed(6);
         
         player.setLocalTranslation(new Vector3f(100,0, 100));
@@ -444,7 +465,7 @@ public class AlienRabble extends BaseGame{
         scene.updateGeometricState(0, true);
         //we now store this initial value, because we are rotating the wheels the bounding box will
         //change each frame.
-        agl = ((BoundingBox)player.getWorldBound()).yExtent;
+        agl = ((BoundingSphere)player.getWorldBound()).radius;
         player.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         //collisionTreeManager.add(player );
     }
@@ -571,8 +592,8 @@ public class AlienRabble extends BaseGame{
         	Spatial s1 = new SharedMesh("tree"+i, p);
             float x = 45 + FastMath.nextRandomFloat() * 130;
             float z = 45 + FastMath.nextRandomFloat() * 130;
-            float y = tb.getHeight(x,z) + 0.2f; 
-            s1.setLocalTranslation(new Vector3f(x, tb.getHeight(x, z)+5, z));
+            float y = tb.getHeight(x,z) + 6f; 
+            s1.setLocalTranslation(new Vector3f(x, y, z));
             scene.attachChild(s1);
         }
     }
@@ -633,19 +654,22 @@ public class AlienRabble extends BaseGame{
      * x and z, but be 1.5 times higher than the node.
      * 
      * We then set the roll out parameters (2 units is the closest the camera can get, and
-     * 5 is the furthest).
+     * 8 is the furthest).
      *
      */
     private void buildChaseCamera() {
         HashMap<String, Object> props = new HashMap<String, Object>();
+        Vector3f targetOffset = new Vector3f();
+        targetOffset.y = ((BoundingSphere) player.getWorldBound()).radius * 2f;
         props.put(ThirdPersonMouseLook.PROP_ENABLED, "false");
-        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(6, 90 * FastMath.DEG_TO_RAD, 25 * FastMath.DEG_TO_RAD));
+        props.put(ChaseCamera.PROP_TARGETOFFSET,targetOffset);
+        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(5, 180 * FastMath.DEG_TO_RAD, 30 * FastMath.DEG_TO_RAD));
         props.put(ChaseCamera.PROP_DAMPINGK, "4");
-        props.put(ChaseCamera.PROP_SPRINGK, "9");
+        props.put(ChaseCamera.PROP_SPRINGK, "7");
         props.put(ChaseCamera.PROP_STAYBEHINDTARGET, "true");
         chaser = new ChaseCamera(cam, player, props);
-        chaser.setMaxDistance(8);
-        chaser.setMinDistance(4);
+        chaser.setMaxDistance(9);
+        chaser.setMinDistance(3);	
     }
 
     /**
@@ -653,7 +677,7 @@ public class AlienRabble extends BaseGame{
      *
      */
     private void buildInput() {
-        input = new AlienRabbleSortHandler(player, properties.getRenderer());
+        input = new AlienRabbleHandler(player, properties.getRenderer());
     }
     
 

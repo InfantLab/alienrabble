@@ -35,6 +35,10 @@ public class PackingCases extends Node {
 		
 	}
 	
+	public void update(float fps){
+		super.updateWorldData(fps);
+	}
+	
 	public void removeCase(){
 		if (countCases > MINCASES){
 			if (this.getChild(countCases).removeFromParent()) countCases--;

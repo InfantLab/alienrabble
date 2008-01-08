@@ -95,9 +95,9 @@ public class AlienRabbleHandler extends InputHandler {
      * @param node the node to control.
      */
     private void setActions(Vehicle node) {
-        PackingCasesAction forward = new PackingCasesAction(node, PackingCasesAction.FORWARD);
+        ForwardAndBackwardAction forward = new ForwardAndBackwardAction(node, ForwardAndBackwardAction.FORWARD);
         addAction(forward, "forward", true);
-        PackingCasesAction backward = new PackingCasesAction(node, PackingCasesAction.BACKWARD);
+        ForwardAndBackwardAction backward = new ForwardAndBackwardAction(node, ForwardAndBackwardAction.BACKWARD);
         addAction(backward, "backward", true);
         VehicleRotateAction rotateLeft = new VehicleRotateAction(node, VehicleRotateAction.LEFT);
         addAction(rotateLeft, "turnLeft", true);

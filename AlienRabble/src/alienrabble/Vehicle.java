@@ -127,18 +127,18 @@ public class Vehicle extends Node {
                 .multLocal(velocity * time));
         //rotateWheels(time);
         processLean(time);
-        results.clear();
-        this.calculateCollisions(rootNode, results);
-        
-        for ( int i = results.getNumber() - 1; i >= 0; i-- ) {
-	        final Node node = results.getCollisionData( i ).getSourceMesh().getParent();
-	        if ( node instanceof Alien ) {
-	        	// not sure what to do
-	        	
-	        }else if (node instanceof ForceFieldFence){
-	           	this.velocity = 0;
-	        };
-        }
+//        results.clear();
+//        this.calculateCollisions(rootNode, results);
+//        
+//        for ( int i = results.getNumber() - 1; i >= 0; i-- ) {
+//	        final Node node = results.getCollisionData( i ).getSourceMesh().getParent();
+//	        if ( node instanceof Alien ) {
+//	        	// not sure what to do
+//	        	
+//	        }else if (node instanceof ForceFieldFence){
+//	           	this.velocity = 0;
+//	        };
+//        }
     }
     
     /**
@@ -167,7 +167,7 @@ public class Vehicle extends Node {
     }
 
     /**
-     * Convience method that determines if the vehicle is moving or not. This is
+     * Convenience method that determines if the vehicle is moving or not. This is
      * given if the velocity is approximately zero, taking float point rounding
      * errors into account.
      * @return true if the vehicle is moving, false otherwise.

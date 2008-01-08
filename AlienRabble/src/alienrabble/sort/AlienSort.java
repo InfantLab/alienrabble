@@ -78,12 +78,15 @@ public class AlienSort extends Node{
      */
     public AlienSort(String name, Spatial model) {
     	super(name);
-        BoundingBox box = new BoundingBox();
-        this.setModelBound(box);
         
-        if (model == null){
-	        //Create the flag pole
+//        BoundingBox box = new BoundingBox();
+//        this.setModelBound(box);
+
+    	if (model == null){
+	        //Create a cylinder
 	        Cylinder c = new Cylinder("cylinder", 10, 10, 2, 25 );
+	        BoundingBox box = new BoundingBox();
+	        c.setModelBound(box);
 	        this.attachChild(c);
 	        Quaternion q = new Quaternion();
 	        //rotate the cylinder to be vertical
@@ -91,15 +94,16 @@ public class AlienSort extends Node{
 	        c.setLocalRotation(q);
 	        c.setLocalTranslation(new Vector3f(-12.5f,-12.5f,0));
 	        c.setDefaultColor(ColorRGBA.randomColor());
+	        c.updateModelBound();
         }else{
         	setModel(model);
         }
         this.currentStatus = STATUS_UNSORTED_UNSELECTED;
         
-        this.updateModelBound();
+//       this.updateModelBound();
 
         this.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
-        setInitialValues();
+        //setInitialValues();
     }
     
      /**
@@ -118,8 +122,10 @@ public class AlienSort extends Node{
     public void setModel(final Spatial model) {
         this.detachChild(this.model);
         this.model = model;
-        this.attachChild(this.model);
-        this.updateModelBound();
+        BoundingBox box = new BoundingBox();
+        model.setModelBound(box);
+        model.updateModelBound();
+        this.attachChild(this.model);      
     }
     
     /**
@@ -129,6 +135,7 @@ public class AlienSort extends Node{
      */
     public void update(float time) {
     	super.updateRenderState();
+    	super.updateWorldBound();
     	
     	if (this.currentStatus == STATUS_SELECTED) {
     		if (!alienspinner.isActive()){
@@ -144,7 +151,8 @@ public class AlienSort extends Node{
     public void setInitialValues(){
     	initialLocation = this.localTranslation.clone();
     	initialSize = this.localScale.clone();
-    	initialRotation.set(this.localRotation);
+    	Quaternion q = new Quaternion(this.localRotation.x,this.localRotation.y,this.localRotation.z,this.localRotation.w);
+    	initialRotation.set(q);
     }
     public void addAllControllers(){
     	alienspinner = AlienSpinner();
@@ -158,15 +166,18 @@ public class AlienSort extends Node{
     
 	private SpatialTransformer AlienSpinner(){
 		SpatialTransformer st = new SpatialTransformer(1);
+		Quaternion q0 = new Quaternion();
+		q0.set(localRotation);
+		q0.fromAngleAxis(0, Vector3f.UNIT_Z);
 		Quaternion q = new Quaternion();
 		q.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Z);
 		st.setObject(model, 0, -1);
-		st.setRepeatType(SpatialTransformer.RT_CYCLE);
+		st.setRepeatType(SpatialTransformer.RT_WRAP);
 		st.setScale(0,0,initialSize.mult(2f));
-		st.setPosition(0, 0, initialLocation);
-		st.setRotation(0,0, initialRotation);
-		st.setRotation(0,3, initialRotation.mult(q));
-		st.setRotation(0,6, initialRotation.mult(q).mult(q));
+		st.setPosition(0,0, new Vector3f(0,0,0));
+		st.setRotation(0,0, q0);
+		st.setRotation(0,3, q0.mult(q));
+		st.setRotation(0,6, q0.mult(q).mult(q));
 		st.interpolateMissing();
 		st.setActive(false);
 		return st;
@@ -175,7 +186,7 @@ public class AlienSort extends Node{
 		SpatialTransformer st = new SpatialTransformer(1);
 		st.setRepeatType(SpatialTransformer.RT_CLAMP);
 		st.setObject(model, 0, -1);
-		st.setScale(0,0,initialSize);
+		st.setScale(0,0, initialSize);
 		st.setScale(0,2, initialSize.mult(2f));
 		st.setPosition(0, 0, initialLocation);
 		st.setPosition(0,2, new Vector3f(0,0,0));
@@ -187,10 +198,10 @@ public class AlienSort extends Node{
 		SpatialTransformer st = new SpatialTransformer(1);
 		st.setRepeatType(SpatialTransformer.RT_CLAMP);
 		st.setObject(model, 0, -1);
-		st.setScale(0,0,initialSize);
+		st.setScale(0,0, initialSize);
 		st.setScale(0,2, initialSize.mult(2f));
-		st.setPosition(0, 0, initialLocation);
-		st.setPosition(0,2, new Vector3f(0,0,0));
+		st.setPosition(0,0, new Vector3f(0,0,0));
+		st.setPosition(0,2, initialLocation);
 		st.interpolateMissing();
 		st.setActive(false);
 		return st;
@@ -208,13 +219,13 @@ public class AlienSort extends Node{
 		return st;
 	}
 	
-	public int getStatus(){
-		return currentStatus;
-	}
-	public void setStatus(int Status){
-		currentStatus = Status;
-		UpdateStatus();
-	}
+//	public int getStatus(){
+//		return currentStatus;
+//	}
+//	public void setStatus(int Status){
+//		currentStatus = Status;
+//		UpdateStatus();
+//	}
 	public void UpdateStatus(){
 
 		if( (this.currentStatus&STATUS_SELECTED)==STATUS_SELECTED)
@@ -250,8 +261,13 @@ public class AlienSort extends Node{
 	}
 	public void putInBox(Node box)
 	{
+		if (currentStatus == STATUS_SORTED) return;
 		alienputinbox = AlienPutInBox(box);
 		this.addController(alienputinbox);
+		alienshrink.setActive(false);
+		aliengrow.setActive(false);
+		alienspinner.setActive(false);
+		alienputinbox.setActive(true);
 		currentStatus = STATUS_SORTED;
 	}
 }

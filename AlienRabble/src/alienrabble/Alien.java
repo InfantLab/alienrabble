@@ -33,6 +33,8 @@
 package alienrabble;
 
 
+import java.util.logging.Logger;
+
 import com.jme.bounding.BoundingBox;
 import com.jme.intersection.BoundingCollisionResults;
 import com.jme.intersection.CollisionResults;
@@ -56,10 +58,9 @@ import com.jmex.terrain.TerrainBlock;
 public class Alien extends Node{
 	private static final long serialVersionUID = 1L;
 
-    //10 second life time
-    private static final int LIFE_TIME = 999;
-    //start off with a full life time
-    float countdown = LIFE_TIME;
+	private static final Logger logger = Logger.getLogger(AlienRabble.class
+            .getName());
+
     //reference to the level terrain for placement
     TerrainBlock tb;
     /**
@@ -73,8 +74,8 @@ public class Alien extends Node{
     
     private final Node rootNode;
     private Spatial model;
-    private CollisionResults results;
-    private Node player;
+//    private CollisionResults results;
+    private Vehicle player;
     
     
     /**
@@ -89,7 +90,7 @@ public class Alien extends Node{
         this.rootNode = scene;
         BoundingBox box = new BoundingBox();
         this.setModelBound(box);
-        results = new BoundingCollisionResults();
+ //       results = new BoundingCollisionResults();
         
         if (model == null){
 	        //Create the flag pole
@@ -105,6 +106,10 @@ public class Alien extends Node{
         	setModel(model);
         }
 
+        Quaternion q = new Quaternion();
+		q.fromAngleAxis(2 * FastMath.nextRandomFloat() * FastMath.PI, new Vector3f(0,1, 0));
+		setLocalRotation(q);
+		
         this.updateModelBound();
 
         this.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
@@ -112,7 +117,7 @@ public class Alien extends Node{
         
     }
     
-    public void setPlayer(Node player){
+    public void setPlayer(Vehicle player){
     	this.player = player;
     }
     
@@ -132,8 +137,10 @@ public class Alien extends Node{
     public void setModel(final Spatial model) {
         this.detachChild(this.model);
         this.model = model;
+        BoundingBox b = new BoundingBox();
+        model.setModelBound(b);
+        model.updateModelBound();
         this.attachChild(this.model);
-        this.updateModelBound();
     }
     
     /**
@@ -143,13 +150,8 @@ public class Alien extends Node{
      */
     public void update(float time) {
     	super.updateRenderState();
-        countdown -= time;
-        
-        if(countdown <= 0) {
-            reset();
-        }
-        
-//        results.clear();
+    	
+//    	results.clear();
 //        player.calculateCollisions(this,  results);
 //		for ( int i = results.getNumber() - 1; i >= 0; i-- ) {
 //			Node element = results.getCollisionData(i).getSourceMesh().getParent();
@@ -158,6 +160,7 @@ public class Alien extends Node{
 //            }
 //	        if ( element instanceof Vehicle ) {
 //	        	//we should make this vanish and log 
+//				player.setVelocity(-0.7f * player.getVelocity());
 //				removeFromParent();
 //			}
 //		}	
@@ -168,7 +171,7 @@ public class Alien extends Node{
      *
      */
     public void reset() {
-        countdown = LIFE_TIME;
+//        countdown = LIFE_TIME;
         placeAlien();
     }
     
@@ -185,5 +188,15 @@ public class Alien extends Node{
         localTranslation.x = x;
         localTranslation.y = y;
         localTranslation.z = z;
+    }
+    
+    /**
+     * <code>removeFromParent</code> removes this Spatial from it's parent.
+     *
+     * @return true if it has a parent and performed the remove.
+     */
+    public boolean removeFromParent() {
+    	logger.info(this.getName() + " removed @ " );
+    	return super.removeFromParent();
     }
 }

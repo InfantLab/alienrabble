@@ -119,6 +119,7 @@ public class AlienPick extends MouseInputAction {
                	        	selectedAlien = null;       
             	        	break;
         	        	}else{
+        	        		if (selectedAlien != null) selectedAlien.Unselect();
         	        		as.Select();
         	        		selectedAlien = as;
         	        		break;

@@ -32,7 +32,7 @@
 
 package alienrabble.sort;
 
-import alienrabble.actions.*;
+import alienrabble.sort.actions.PackingCasesAction;
 
 import com.jme.input.InputHandler;
 import com.jme.input.KeyBindingManager;
@@ -49,7 +49,7 @@ public class AlienRabbleSortHandler extends InputHandler {
 	
     //the packing cases we are going to control
     private PackingCases packingcases;
-    
+    	
     public void update(float time) {
         if ( !isEnabled() ) return;
 
@@ -78,9 +78,9 @@ public class AlienRabbleSortHandler extends InputHandler {
         KeyBindingManager keyboard = KeyBindingManager.getKeyBindingManager();
 
         keyboard.set("addCase", KeyInput.KEY_UP);
-        keyboard.set("addCase", KeyInput.KEY_RIGHT);
+//        keyboard.set("addCase", KeyInput.KEY_RIGHT);
         keyboard.set("removeCase", KeyInput.KEY_DOWN);
-        keyboard.set("removeCase", KeyInput.KEY_LEFT);
+ //       keyboard.set("removeCase", KeyInput.KEY_LEFT);
     }
 
     /**
@@ -88,10 +88,10 @@ public class AlienRabbleSortHandler extends InputHandler {
      * that aliens are sorted into and may handle other features too eventually. 
      */
     private void setActions() {
-        PackingCaseAction addcase = new PackingCaseAction(packingcase, PackingCaseAction.ADDCASE);
-        addAction(addcase, "addcase", true);
-        PackingCaseAction removecase = new PackingCaseAction(packingcase, PackingCaseAction.REMOVECASE);
-        addAction(removecase, "removecase", true);
+        PackingCasesAction addcase = new PackingCasesAction(packingcases, PackingCasesAction.ADDCASE);
+        addAction(addcase, "addcase", false);
+        PackingCasesAction removecase = new PackingCasesAction(packingcases, PackingCasesAction.REMOVECASE);
+        addAction(removecase, "removecase", false);
     }
     
     

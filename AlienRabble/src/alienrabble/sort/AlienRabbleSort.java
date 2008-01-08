@@ -39,12 +39,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jmetest.input.TestInputHandler;
-import alienrabble.AlienRabble;
 
 import com.jme.app.SimpleGame;
 import com.jme.image.Texture;
 import com.jme.input.AbsoluteMouse;
-import com.jme.input.KeyInput;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
@@ -75,7 +73,7 @@ public class AlienRabbleSort extends SimpleGame {
     private AbsoluteMouse mouse;
     private PackingCases packingcases;
     private Skybox skybox;
-    private KeyInput key;
+//    private KeyInput key;
 
 	
 	/**
@@ -115,61 +113,39 @@ public class AlienRabbleSort extends SimpleGame {
         text.setCullMode(SceneElement.CULL_NEVER);
         text.setTextureCombineMode(TextureState.REPLACE);
         text.setLocalTranslation(new Vector3f(1, 60, 0));
-
-        mouse = new AbsoluteMouse( "Mouse Cursor", display.getWidth(), display.getHeight() );
-        TextureState cursorTextureState = display.getRenderer().createTextureState();
-        cursorTextureState.setTexture(
-                TextureManager.loadTexture(
-                        TestInputHandler.class.getClassLoader().getResource( "jmetest/data/cursor/cursor1.PNG" ),
-                        Texture.MM_LINEAR, Texture.FM_LINEAR )
-        );
-        mouse.setRenderState( cursorTextureState );
-        mouse.registerWithInputHandler( input );
-        
-        AlphaState as1 = display.getRenderer().createAlphaState();
-        as1.setBlendEnabled(true);
-        as1.setSrcFunction(AlphaState.SB_ONE);
-        as1.setDstFunction(AlphaState.DB_ONE_MINUS_SRC_COLOR);
-        as1.setTestEnabled(true);
-        as1.setTestFunction(AlphaState.TF_GREATER);
-        mouse.setRenderState(as1);
-        fpsNode.attachChild(mouse);
-        fpsNode.attachChild(text);
-
-        AlienPick pick = new AlienPick(display, rootNode, text);
-		input.addAction(pick);
-		
-		/**
-		 * Set the action called "firebullet", bound to KEY_F, to performAction
-		 * FireBullet
-		 */
-        input.addAction( new FireBullet(), "addCase", KeyInput.KEY_F, false );
-        
-		String[] allAliens;
-		
-		allAliens = new String[4];
-		allAliens[0] = "alienrabble/data/Greebles/Family1/f1-11.jbin";
-		allAliens[1] = "alienrabble/data/Greebles/Family1/f1-12.jbin";
-		allAliens[2] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
-		allAliens[3] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
-		
-		allAlienSort = new AlienSort[4];
 	
-		for(int i=0;i<allAliens.length;i++)
+		String[] strAliens;
+		
+		strAliens = new String[10];
+		strAliens[0] = "alienrabble/data/Greebles/Family1/f1-11.jbin";
+		strAliens[1] = "alienrabble/data/Greebles/Family1/f1-12.jbin";
+		strAliens[2] = "alienrabble/data/Greebles/Family1/f1-13.jbin";
+		strAliens[3] = "alienrabble/data/Greebles/Family1/f1-14.jbin";
+		strAliens[4] = "alienrabble/data/Greebles/Family1/f1-15.jbin";
+		strAliens[5] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
+		strAliens[6] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
+		strAliens[7] = "alienrabble/data/Greebles/Family1/m1_13.jbin";
+		strAliens[8] = "alienrabble/data/Greebles/Family1/m1_14.jbin";
+		strAliens[9] = "alienrabble/data/Greebles/Family1/m1_15.jbin";
+		
+		int numaliens = strAliens.length - 8;
+		allAlienSort = new AlienSort[numaliens];
+	
+		for(int i=0;i<numaliens;i++)
 		{
-			URL alienURL = AlienSort.class.getClassLoader().getResource(allAliens[i]);
+			URL alienURL = AlienSort.class.getClassLoader().getResource(strAliens[i]);
 			BinaryImporter BI = new BinaryImporter();
 			Spatial model;
 			Quaternion q = new Quaternion();
 			q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
 			try {
 				model = (Spatial)BI.load(alienURL.openStream());
-				allAlienSort[i] = new AlienSort(allAliens[i],model);
-				allAlienSort[i].setLocalTranslation(-10 + 10*i,30,0);
+				allAlienSort[i] = new AlienSort(strAliens[i],model);
+				allAlienSort[i].setLocalTranslation(-5*numaliens + 10*i,30,0);
 				allAlienSort[i].setLocalRotation(q);
+				rootNode.attachChild(allAlienSort[i]);				
 				allAlienSort[i].setInitialValues();
 				allAlienSort[i].addAllControllers();
-				rootNode.attachChild(allAlienSort[i]);				
 			} catch (IOException e) {
 				logger.info("darn exceptions:" + e.getMessage());
 			}
@@ -182,23 +158,44 @@ public class AlienRabbleSort extends SimpleGame {
 		buildSkyBox();
 		rootNode.attachChild(skybox);
 
+		input = new AlienRabbleSortHandler(packingcases, properties.getRenderer());
 		
+        mouse = new AbsoluteMouse( "Mouse Cursor", display.getWidth(), display.getHeight() );
+        TextureState cursorTextureState = display.getRenderer().createTextureState();
+        cursorTextureState.setTexture(
+                TextureManager.loadTexture(
+                        TestInputHandler.class.getClassLoader().getResource( "jmetest/data/cursor/cursor1.PNG" ),
+                        Texture.MM_LINEAR, Texture.FM_LINEAR )
+        );
+        mouse.setRenderState( cursorTextureState );
+        mouse.registerWithInputHandler( input );
+                
+        AlphaState as1 = display.getRenderer().createAlphaState();
+        as1.setBlendEnabled(true);
+        as1.setSrcFunction(AlphaState.SB_ONE);
+        as1.setDstFunction(AlphaState.DB_ONE_MINUS_SRC_COLOR);
+        as1.setTestEnabled(true);
+        as1.setTestFunction(AlphaState.TF_GREATER);
+        mouse.setRenderState(as1);
+        fpsNode.attachChild(mouse);
+        fpsNode.attachChild(text);
+        	
 
-        key = KeyInput.get();
+	    AlienPick pick = new AlienPick(display, rootNode, text);
+		input.addAction(pick);
+	
+		
+    //    key = KeyInput.get();
 	}
 	
 	
 	protected void simpleUpdate()  {
-        if(key.isKeyDown(KeyInput.KEY_DOWN)) {
-        	packingcases.removeCase();     
-        }
-
-        if(key.isKeyDown(KeyInput.KEY_UP)) {
-        	packingcases.addCase();
-        }
-//    	for(int i=0;i<allAlienSort.length;i++){
-//    		allAlienSort[i].update(tpf);
-//    	}
+        //update the keyboard input 
+        input.update(tpf);
+        
+    	for(int i=0;i<allAlienSort.length;i++){
+    		allAlienSort[i].update(tpf);
+    	}
     }
 	
 	
@@ -211,32 +208,32 @@ public class AlienRabbleSort extends SimpleGame {
         skybox = new Skybox("skybox", 200, 200, 200);
 
         Texture north = TextureManager.loadTexture(
-        		AlienRabble.class.getClassLoader().getResource(
+        		AlienRabbleSort.class.getClassLoader().getResource(
             "jmetest/data/texture/north.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture south = TextureManager.loadTexture(
-        		AlienRabble.class.getClassLoader().getResource(
+        		AlienRabbleSort.class.getClassLoader().getResource(
             "jmetest/data/texture/south.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture east = TextureManager.loadTexture(
-        		AlienRabble.class.getClassLoader().getResource(
+        		AlienRabbleSort.class.getClassLoader().getResource(
             "jmetest/data/texture/east.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture west = TextureManager.loadTexture(
-        		AlienRabble.class.getClassLoader().getResource(
+        		AlienRabbleSort.class.getClassLoader().getResource(
             "jmetest/data/texture/west.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture up = TextureManager.loadTexture(
-        		AlienRabble.class.getClassLoader().getResource(
+        		AlienRabbleSort.class.getClassLoader().getResource(
             "jmetest/data/texture/top.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture down = TextureManager.loadTexture(
-        		AlienRabble.class.getClassLoader().getResource(
+        		AlienRabbleSort.class.getClassLoader().getResource(
             "jmetest/data/texture/bottom.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
