@@ -36,8 +36,6 @@ package alienrabble;
 import java.util.logging.Logger;
 
 import com.jme.bounding.BoundingBox;
-import com.jme.intersection.BoundingCollisionResults;
-import com.jme.intersection.CollisionResults;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
@@ -61,6 +59,7 @@ public class Alien extends Node{
 	private static final Logger logger = Logger.getLogger(AlienRabble.class
             .getName());
 
+	private Node rootNode;
     //reference to the level terrain for placement
     TerrainBlock tb;
     /**
@@ -72,7 +71,6 @@ public class Alien extends Node{
      */
     private Vector3f orientation;
     
-    private final Node rootNode;
     private Spatial model;
 //    private CollisionResults results;
     private Vehicle player;
@@ -114,6 +112,7 @@ public class Alien extends Node{
 
         this.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         this.setLocalScale(0.25f);
+        speed = FastMath.nextRandomFloat();
         
     }
     
@@ -150,6 +149,7 @@ public class Alien extends Node{
      */
     public void update(float time) {
     	super.updateRenderState();
+    	
     	
 //    	results.clear();
 //        player.calculateCollisions(this,  results);

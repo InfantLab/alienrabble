@@ -1,4 +1,4 @@
-		/*
+/*
  * Copyright (c) 2003-2006 jMonkeyEngine
  * All rights reserved.
  *
@@ -66,7 +66,7 @@ public class AlienRabbleSortHandler extends InputHandler {
         this.packingcases = cases;
         setKeyBindings(api);
         setActions();
-
+        setEnabled(true);
     }
 
     /**
@@ -89,9 +89,9 @@ public class AlienRabbleSortHandler extends InputHandler {
      */
     private void setActions() {
         PackingCasesAction addcase = new PackingCasesAction(packingcases, PackingCasesAction.ADDCASE);
-        addAction(addcase, "addcase", false);
+        addAction(addcase, "addCase", false);
         PackingCasesAction removecase = new PackingCasesAction(packingcases, PackingCasesAction.REMOVECASE);
-        addAction(removecase, "removecase", false);
+        addAction(removecase, "removeCase", false);
     }
     
     

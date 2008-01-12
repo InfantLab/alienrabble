@@ -59,6 +59,8 @@ public class AlienSort extends Node{
 	public static final int STATUS_SELECTED = 1;
 	public static final int STATUS_SORTED = 2;
 	
+	private static final float GROWFACTOR = 2.7f; // how much bigger are selected aliens?
+	
 	private int currentStatus;
 	
 	Vector3f initialLocation = new Vector3f();
@@ -168,12 +170,11 @@ public class AlienSort extends Node{
 		SpatialTransformer st = new SpatialTransformer(1);
 		Quaternion q0 = new Quaternion();
 		q0.set(localRotation);
-		q0.fromAngleAxis(0, Vector3f.UNIT_Z);
 		Quaternion q = new Quaternion();
 		q.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Z);
-		st.setObject(model, 0, -1);
+		st.setObject(this, 0, -1);
 		st.setRepeatType(SpatialTransformer.RT_WRAP);
-		st.setScale(0,0,initialSize.mult(2f));
+		st.setScale(0,0,initialSize.mult(GROWFACTOR));
 		st.setPosition(0,0, new Vector3f(0,0,0));
 		st.setRotation(0,0, q0);
 		st.setRotation(0,3, q0.mult(q));
@@ -185,9 +186,9 @@ public class AlienSort extends Node{
 	private SpatialTransformer AlienGrow(){
 		SpatialTransformer st = new SpatialTransformer(1);
 		st.setRepeatType(SpatialTransformer.RT_CLAMP);
-		st.setObject(model, 0, -1);
+		st.setObject(this, 0, -1);
 		st.setScale(0,0, initialSize);
-		st.setScale(0,2, initialSize.mult(2f));
+		st.setScale(0,2, initialSize.mult(GROWFACTOR));
 		st.setPosition(0, 0, initialLocation);
 		st.setPosition(0,2, new Vector3f(0,0,0));
 		st.interpolateMissing();
@@ -197,9 +198,9 @@ public class AlienSort extends Node{
 	private SpatialTransformer AlienShrink(){
 		SpatialTransformer st = new SpatialTransformer(1);
 		st.setRepeatType(SpatialTransformer.RT_CLAMP);
-		st.setObject(model, 0, -1);
-		st.setScale(0,0, initialSize);
-		st.setScale(0,2, initialSize.mult(2f));
+		st.setObject(this, 0, -1);
+		st.setScale(0,0, initialSize.mult(GROWFACTOR));
+		st.setScale(0,2, initialSize);
 		st.setPosition(0,0, new Vector3f(0,0,0));
 		st.setPosition(0,2, initialLocation);
 		st.interpolateMissing();
@@ -209,8 +210,8 @@ public class AlienSort extends Node{
 	private SpatialTransformer AlienPutInBox(Node box){
 		SpatialTransformer st = new SpatialTransformer(1);
 		st.setRepeatType(SpatialTransformer.RT_CLAMP);
-		st.setObject(model, 0, -1);
-		st.setScale(0,0,initialSize.mult(2f));
+		st.setObject(this, 0, -1);
+		st.setScale(0,0,initialSize.mult(GROWFACTOR));
 		st.setScale(0,2, initialSize);
 		st.setPosition(0, 0, new Vector3f(0,0,0));
 		st.setPosition(0,2, box.getWorldTranslation());

@@ -388,19 +388,21 @@ public class AlienRabble extends BaseGame{
 		q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
         
 	 	
-		strAliens = new String[10];
-		strAliens[0] = "alienrabble/data/Greebles/Family1/f1-11.jbin";
-		strAliens[1] = "alienrabble/data/Greebles/Family1/f1-12.jbin";
-		strAliens[2] = "alienrabble/data/Greebles/Family1/f1-13.jbin";
-		strAliens[3] = "alienrabble/data/Greebles/Family1/f1-14.jbin";
-		strAliens[4] = "alienrabble/data/Greebles/Family1/f1-15.jbin";
-		strAliens[5] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
-		strAliens[6] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
-		strAliens[7] = "alienrabble/data/Greebles/Family1/m1_13.jbin";
-		strAliens[8] = "alienrabble/data/Greebles/Family1/m1_14.jbin";
-		strAliens[9] = "alienrabble/data/Greebles/Family1/m1_15.jbin";
+		strAliens = new String[12];
+		strAliens[0] = "alienrabble/data/Greebles/Family1/f1_11.jbin";
+		strAliens[1] = "alienrabble/data/Greebles/Family1/f1_12.jbin";
+		strAliens[2] = "alienrabble/data/Greebles/Family1/f1_13.jbin";
+		strAliens[3] = "alienrabble/data/Greebles/Family1/f1_14.jbin";
+		strAliens[4] = "alienrabble/data/Greebles/Family1/f1_15.jbin";
+		strAliens[5] = "alienrabble/data/Greebles/Family1/f1_16.jbin";
+		strAliens[6] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
+		strAliens[7] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
+		strAliens[8] = "alienrabble/data/Greebles/Family1/m1_13.jbin";
+		strAliens[9] = "alienrabble/data/Greebles/Family1/m1_14.jbin";
+		strAliens[10] = "alienrabble/data/Greebles/Family1/m1_15.jbin";
+		strAliens[11] = "alienrabble/data/Greebles/Family1/m1_16.jbin";
 		
-		allAliens = new Alien[10];
+		allAliens = new Alien[12];
 	
 		for(int i=0;i<strAliens.length;i++)
 		{
@@ -433,7 +435,7 @@ public class AlienRabble extends BaseGame{
     private void buildPlayer() {
         Spatial model = null;
         try {
-            URL bikeFile = AlienRabble.class.getClassLoader().getResource("jmetest/data/model/grabber2.jbin");
+            URL bikeFile = AlienRabble.class.getClassLoader().getResource("alienrabble/data/model/grabber2.jbin");
             BinaryImporter importer = new BinaryImporter();
             model = (Spatial)importer.load(bikeFile.openStream());
             model.setModelBound(new BoundingSphere());
@@ -660,16 +662,16 @@ public class AlienRabble extends BaseGame{
     private void buildChaseCamera() {
         HashMap<String, Object> props = new HashMap<String, Object>();
         Vector3f targetOffset = new Vector3f();
-        targetOffset.y = ((BoundingSphere) player.getWorldBound()).radius * 2f;
+        targetOffset.y = ((BoundingSphere) player.getWorldBound()).radius * 2.3f;
         props.put(ThirdPersonMouseLook.PROP_ENABLED, "false");
         props.put(ChaseCamera.PROP_TARGETOFFSET,targetOffset);
-        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(5, 180 * FastMath.DEG_TO_RAD, 30 * FastMath.DEG_TO_RAD));
+        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(5.5f, 180 * FastMath.DEG_TO_RAD, 25 * FastMath.DEG_TO_RAD));
         props.put(ChaseCamera.PROP_DAMPINGK, "4");
         props.put(ChaseCamera.PROP_SPRINGK, "7");
         props.put(ChaseCamera.PROP_STAYBEHINDTARGET, "true");
         chaser = new ChaseCamera(cam, player, props);
         chaser.setMaxDistance(9);
-        chaser.setMinDistance(3);	
+        chaser.setMinDistance(3.5f);	
     }
 
     /**

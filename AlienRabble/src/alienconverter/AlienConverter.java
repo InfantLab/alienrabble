@@ -76,54 +76,77 @@ public class AlienConverter extends SimpleGame {
 
     protected void simpleInitGame() {
 
-//    		String modelpath = "jmetest/data/model/bike.3ds";
-//    		String modelpath = "jmetest/data/model/grabber2.3ds";
- //   		String modelpath = "jmetest/data/Greebles/f1-11.3ds";
-    		String modelpath;
-    		Node newmodel;
- 
+    	String modelpath;
+		Node newmodel;
+//
+//		modelpath = "alienconverter/data/model/grabber2.3ds";
+//    	newmodel = loadModel(modelpath);
     		
-    		modelpath = "alienconverter/data/Greebles/Family1/m1_11.3ds";
-    		newmodel = loadModel(modelpath);
     		
-    		newmodel.setLocalScale(.1f);
-    		newmodel.setModelBound(new BoundingSphere());
-    		newmodel.updateModelBound();
-            rootNode.attachChild(newmodel);
+		modelpath = "alienconverter/data/Greebles/Family5/m5_51.3ds";
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/m5_52.3ds";
+		newmodel = loadModel(modelpath);
             
+		modelpath = "alienconverter/data/Greebles/Family5/m5_53.3ds";	
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/m5_54.3ds";
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/m5_55.3ds";
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/m5_56.3ds";
+		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/m5_57.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/m5_58.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/m5_59.3ds";
+//		newmodel = loadModel(modelpath);
+//
+//		modelpath = "alienconverter/data/Greebles/Family5/m5_510.3ds";
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/f5_51.3ds";
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/f5_52.3ds";
+		newmodel = loadModel(modelpath);
             
-    		
-    		modelpath = "alienconverter/data/Greebles/Family1/m1_12.3ds";
-    		newmodel = loadModel(modelpath);
-    		
-    	
-            
-            
-    		modelpath = "alienconverter/data/Greebles/Family1/m1_13.3ds";
-    		newmodel = loadModel(modelpath);
-    		
-    		modelpath = "alienconverter/data/Greebles/Family1/m1_14.3ds";
-    		newmodel = loadModel(modelpath);
-    		
-    		modelpath = "alienconverter/data/Greebles/Family1/m1_15.3ds";
-    		newmodel = loadModel(modelpath);
-    		
-    		modelpath = "alienconverter/data/Greebles/Family1/m1_16.3ds";
-    		newmodel = loadModel(modelpath);
-    		
-    		modelpath = "alienconverter/data/Greebles/Family1/m1_17.3ds";
-    		newmodel = loadModel(modelpath);
-    		
-    		modelpath = "alienconverter/data/Greebles/Family1/m1_18.3ds";
-    		newmodel = loadModel(modelpath);
-    		
-    		modelpath = "alienconverter/data/Greebles/Family1/m1_19.3ds";
-    		newmodel = loadModel(modelpath);
+		modelpath = "alienconverter/data/Greebles/Family5/f5_53.3ds";	
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/f5_54.3ds";
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/f5_55.3ds";
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/f5_56.3ds";
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/f5_57.3ds";
+		newmodel = loadModel(modelpath);
 
-    		modelpath = "alienconverter/data/Greebles/Family1/m1_110.3ds";
-    		newmodel = loadModel(modelpath);
-    		
-    		
+		modelpath = "alienconverter/data/Greebles/Family5/f5_58.3ds";
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/f5_59.3ds";
+		newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/Greebles/Family5/f5_510.3ds";
+		newmodel = loadModel(modelpath);
+
+		newmodel.setLocalScale(1f);
+		newmodel.setModelBound(new BoundingSphere());
+		newmodel.updateModelBound();
+        rootNode.attachChild(newmodel);
     }
     
     	

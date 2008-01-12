@@ -74,7 +74,8 @@ public class AlienPick extends MouseInputAction {
      */
     public void performAction(InputActionEvent evt) {
         shotTime += evt.getTime();
-        if( MouseInput.get().isButtonDown(0) && shotTime > 0.15f && !performingAction) {
+        if( MouseInput.get().isButtonDown(0) && shotTime > 0.3f && !performingAction) {
+        	
         	performingAction = true;
             float x = MouseInput.get().getXAbsolute();
             float y = MouseInput.get().getYAbsolute(); 
@@ -117,13 +118,13 @@ public class AlienPick extends MouseInputAction {
         	        	{
                	        	as.Unselect();
                	        	selectedAlien = null;       
-            	        	break;
         	        	}else{
         	        		if (selectedAlien != null) selectedAlien.Unselect();
         	        		as.Select();
         	        		selectedAlien = as;
-        	        		break;
-        	        	}	        	 
+        	        	}	
+        	        	results.clear();
+        	        	break;
         			}
         	        element = geom.getParent();
                     while (!(element == null) && !(element.getName().startsWith("packingcase") )  ) { 
@@ -134,11 +135,11 @@ public class AlienPick extends MouseInputAction {
         	        	if (selectedAlien != null)
         	        	{
         	        		selectedAlien.putInBox((Node) element);
+        	        		results.clear();
             	        	break;
         	        	}
         			}
-        	     
-                }
+        	    }
             }
             shots++;
             results.clear();

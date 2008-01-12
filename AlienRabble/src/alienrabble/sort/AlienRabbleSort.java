@@ -116,19 +116,21 @@ public class AlienRabbleSort extends SimpleGame {
 	
 		String[] strAliens;
 		
-		strAliens = new String[10];
-		strAliens[0] = "alienrabble/data/Greebles/Family1/f1-11.jbin";
-		strAliens[1] = "alienrabble/data/Greebles/Family1/f1-12.jbin";
-		strAliens[2] = "alienrabble/data/Greebles/Family1/f1-13.jbin";
-		strAliens[3] = "alienrabble/data/Greebles/Family1/f1-14.jbin";
-		strAliens[4] = "alienrabble/data/Greebles/Family1/f1-15.jbin";
-		strAliens[5] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
-		strAliens[6] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
-		strAliens[7] = "alienrabble/data/Greebles/Family1/m1_13.jbin";
-		strAliens[8] = "alienrabble/data/Greebles/Family1/m1_14.jbin";
-		strAliens[9] = "alienrabble/data/Greebles/Family1/m1_15.jbin";
+		strAliens = new String[12];
+		strAliens[0] = "alienrabble/data/Greebles/Family1/f1_11.jbin";
+		strAliens[1] = "alienrabble/data/Greebles/Family1/f1_12.jbin";
+		strAliens[2] = "alienrabble/data/Greebles/Family1/f1_13.jbin";
+		strAliens[3] = "alienrabble/data/Greebles/Family1/f1_14.jbin";
+		strAliens[4] = "alienrabble/data/Greebles/Family1/f1_15.jbin";
+		strAliens[5] = "alienrabble/data/Greebles/Family1/f1_16.jbin";
+		strAliens[6] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
+		strAliens[7] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
+		strAliens[8] = "alienrabble/data/Greebles/Family1/m1_13.jbin";
+		strAliens[9] = "alienrabble/data/Greebles/Family1/m1_14.jbin";
+		strAliens[10] = "alienrabble/data/Greebles/Family1/m1_15.jbin";
+		strAliens[11] = "alienrabble/data/Greebles/Family1/m1_16.jbin";
 		
-		int numaliens = strAliens.length - 8;
+		int numaliens = strAliens.length;
 		allAlienSort = new AlienSort[numaliens];
 	
 		for(int i=0;i<numaliens;i++)
@@ -151,7 +153,7 @@ public class AlienRabbleSort extends SimpleGame {
 			}
 		}
 		
-		packingcases = new PackingCases(3);
+		packingcases = new PackingCases(2);
 		
 		rootNode.attachChild(packingcases);
 		
@@ -164,7 +166,7 @@ public class AlienRabbleSort extends SimpleGame {
         TextureState cursorTextureState = display.getRenderer().createTextureState();
         cursorTextureState.setTexture(
                 TextureManager.loadTexture(
-                        TestInputHandler.class.getClassLoader().getResource( "jmetest/data/cursor/cursor1.PNG" ),
+                        TestInputHandler.class.getClassLoader().getResource( "alienrabble/data/cursor/cursor1.png" ),
                         Texture.MM_LINEAR, Texture.FM_LINEAR )
         );
         mouse.setRenderState( cursorTextureState );

@@ -41,8 +41,10 @@ public class PackingCases extends Node {
 	
 	public void removeCase(){
 		if (countCases > MINCASES){
-			if (this.getChild(countCases).removeFromParent()) countCases--;
-			rearrangeCases();
+			if (this.getChild(countCases-1).removeFromParent()){ 
+				countCases--;
+				rearrangeCases();
+			}
 		}
 	}
 	
@@ -63,14 +65,17 @@ public class PackingCases extends Node {
 	}
 	
 	public void rearrangeCases(){
-		float casespacing = 100 / countCases;
-		float casesize = 2f + 2f * FastMath.sqrt(countCases);
+		
+		if (countCases < 2) return;
+		
+		float casespacing = 100 / (countCases- 1);
+		float casesize = 3f + 15f /countCases;
 		
 		for(int i=0;i<countCases;i++)
 		{
 			Spatial boxi = this.getChild(i);
 			boxi.setLocalScale(casesize);
-			boxi.setLocalTranslation(-50+(i+1)*casespacing, -30, 0);
+			boxi.setLocalTranslation(-50+i*casespacing, -30, 0);
 		}
 	}
 

@@ -33,7 +33,6 @@
 package alienrabble;
 
 import alienrabble.actions.*;
-import alienrabble.sort.actions.PackingCasesAction;
 
 import com.jme.input.InputHandler;
 import com.jme.input.KeyBindingManager;
@@ -81,11 +80,16 @@ public class AlienRabbleHandler extends InputHandler {
      */
     private void setKeyBindings(String api) {
         KeyBindingManager keyboard = KeyBindingManager.getKeyBindingManager();
+//
+//        keyboard.set("forward", KeyInput.KEY_W);
+//        keyboard.set("backward", KeyInput.KEY_S);
+//        keyboard.set("turnRight", KeyInput.KEY_D);
+//        keyboard.set("turnLeft", KeyInput.KEY_A);
 
-        keyboard.set("forward", KeyInput.KEY_W);
-        keyboard.set("backward", KeyInput.KEY_S);
-        keyboard.set("turnRight", KeyInput.KEY_D);
-        keyboard.set("turnLeft", KeyInput.KEY_A);
+        keyboard.set("forward", KeyInput.KEY_UP);
+        keyboard.set("backward", KeyInput.KEY_DOWN);
+        keyboard.set("turnRight", KeyInput.KEY_RIGHT);
+        keyboard.set("turnLeft", KeyInput.KEY_LEFT);
     }
 
     /**
