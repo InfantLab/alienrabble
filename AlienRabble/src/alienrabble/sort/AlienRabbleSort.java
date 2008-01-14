@@ -40,22 +40,35 @@ import java.util.logging.Logger;
 
 import jmetest.input.TestInputHandler;
 
-import com.jme.app.SimpleGame;
 import com.jme.image.Texture;
 import com.jme.input.AbsoluteMouse;
+import com.jme.input.InputHandler;
+import com.jme.light.DirectionalLight;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
+import com.jme.renderer.ColorRGBA;
+import com.jme.renderer.pass.BasicPassManager;
+import com.jme.renderer.pass.RenderPass;
+import com.jme.renderer.pass.ShadowedRenderPass;
+import com.jme.scene.Node;
 import com.jme.scene.SceneElement;
 import com.jme.scene.Skybox;
 import com.jme.scene.Spatial;
 import com.jme.scene.Text;
 import com.jme.scene.state.AlphaState;
+import com.jme.scene.state.CullState;
+import com.jme.scene.state.LightState;
+import com.jme.scene.state.MaterialState;
 import com.jme.scene.state.TextureState;
+import com.jme.scene.state.ZBufferState;
+import com.jme.system.DisplaySystem;
+import com.jme.system.PropertiesIO;
 import com.jme.util.TextureManager;
 import com.jme.util.export.binary.BinaryImporter;
 import com.jme.util.resource.ResourceLocatorTool;
 import com.jme.util.resource.SimpleResourceLocator;
+import com.jmex.game.state.CameraGameState;
 
 
 /**
@@ -64,35 +77,83 @@ import com.jme.util.resource.SimpleResourceLocator;
  * @author Mark Powell
  * @version $Id: TestPick.java,v 1.35 2007/08/17 22:04:20 nca Exp $
  */
-public class AlienRabbleSort extends SimpleGame {
+public class AlienRabbleSort extends CameraGameState {
 	private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(AlienRabbleSort.class
             .getName());
 
+	/** Our display system. */
+	private DisplaySystem display;
+	 /** Game display properties. */
+    protected PropertiesIO properties;
+    /** Input handler. */
+    protected InputHandler input;
+    
+    private static ShadowedRenderPass shadowPass = new ShadowedRenderPass();
+    private BasicPassManager passManager;
+    
+    // display attributes for the window. We will keep these values
+    // to allow the user to change them
+    private int width, height, depth, freq;
+    private boolean fullscreen;
+    
+    private Node scene;
 	private AlienSort[] allAlienSort;
     private AbsoluteMouse mouse;
     private PackingCases packingcases;
     private Skybox skybox;
-//    private KeyInput key;
-
+    
+    public AlienRabbleSort(String name, PropertiesIO properties){
+    	super(name);
+    	this.properties = properties;
+		initGame();
+    }
 	
-	/**
-	 * Entry point for the test,
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		AlienRabbleSort app = new AlienRabbleSort();
-		app.setDialogBehaviour(ALWAYS_SHOW_PROPS_DIALOG);
-		app.start();
-	}
 
 	/**
 	 * builds the trimesh.
 	 * 
 	 * @see com.jme.app.SimpleGame#initGame()
 	 */
-	protected void simpleInitGame() {
+	protected void initGame() {
+		
+        // store the properties information
+        width = properties.getWidth();
+        height = properties.getHeight();
+        depth = properties.getDepth();
+        freq = properties.getFreq();
+        fullscreen = properties.getFullscreen();
+        
+        display = DisplaySystem.getDisplaySystem(properties.getRenderer());
+        // set the background to black
+        display.getRenderer().setBackgroundColor(ColorRGBA.black.clone());
+
+        display.setTitle("Alien Rabble - Sort");
+		cam.setLocation(new Vector3f(0f, 0f, 100f));
+		cam.setDirection(Vector3f.UNIT_Z.mult(-1));
+		cam.update();
+		
+		scene = rootNode;
+		
+        /** Create a ZBuffer to display pixels closest to the camera above farther ones.  */
+        ZBufferState buf = display.getRenderer().createZBufferState();
+        buf.setEnabled(true);
+        buf.setFunction(ZBufferState.CF_LEQUAL);
+        scene.setRenderState(buf);
+        
+        //Time for a little optimization. We don't need to render back face triangles, so lets
+        //not. This will give us a performance boost for very little effort.
+        CullState cs = display.getRenderer().createCullState();
+        cs.setCullMode(CullState.CS_BACK);
+        scene.setRenderState(cs);
+        
+        buildLighting();
+		buildSkyBox();
+		scene.attachChild(skybox);
+		
+		//set up passes
+        buildPassManager();
+		
         try {
             ResourceLocatorTool.addResourceLocator(
                     ResourceLocatorTool.TYPE_TEXTURE,
@@ -103,16 +164,14 @@ public class AlienRabbleSort extends SimpleGame {
             logger.log(Level.WARNING, "unable to setup texture directory.", e1);
         }
 
-        input.removeAllFromAttachedHandlers();
+        if (input != null) input.removeAllFromAttachedHandlers();
         
-        display.setTitle("Mouse Pick");
-		cam.setLocation(new Vector3f(0.0f, 0f, 100.0f));
-		cam.update();
-		
+
         Text text = Text.createDefaultTextLabel("Test Label", "Hits: 0 Shots: 0");
         text.setCullMode(SceneElement.CULL_NEVER);
         text.setTextureCombineMode(TextureState.REPLACE);
         text.setLocalTranslation(new Vector3f(1, 60, 0));
+        scene.attachChild(text);    	
 	
 		String[] strAliens;
 		
@@ -145,7 +204,7 @@ public class AlienRabbleSort extends SimpleGame {
 				allAlienSort[i] = new AlienSort(strAliens[i],model);
 				allAlienSort[i].setLocalTranslation(-5*numaliens + 10*i,30,0);
 				allAlienSort[i].setLocalRotation(q);
-				rootNode.attachChild(allAlienSort[i]);				
+				scene.attachChild(allAlienSort[i]);				
 				allAlienSort[i].setInitialValues();
 				allAlienSort[i].addAllControllers();
 			} catch (IOException e) {
@@ -155,10 +214,23 @@ public class AlienRabbleSort extends SimpleGame {
 		
 		packingcases = new PackingCases(2);
 		
-		rootNode.attachChild(packingcases);
+		scene.attachChild(packingcases);
 		
-		buildSkyBox();
-		rootNode.attachChild(skybox);
+		packingcases.setLightCombineMode(LightState.REPLACE);
+
+        MaterialState ms = display.getRenderer().createMaterialState();
+        ms.setEnabled(true);
+        ms.setColorMaterial(MaterialState.CM_AMBIENT_AND_DIFFUSE);
+		ms.setShininess(64);
+        packingcases.setRenderState(ms);
+        
+        AlphaState as = DisplaySystem.getDisplaySystem().getRenderer().createAlphaState();
+        as.setEnabled(true);
+        as.setBlendEnabled(true);
+        as.setSrcFunction(AlphaState.SB_SRC_ALPHA);
+        as.setDstFunction(AlphaState.DB_ONE_MINUS_SRC_ALPHA);
+        packingcases.setRenderState(as);
+
 
 		input = new AlienRabbleSortHandler(packingcases, properties.getRenderer());
 		
@@ -171,7 +243,8 @@ public class AlienRabbleSort extends SimpleGame {
         );
         mouse.setRenderState( cursorTextureState );
         mouse.registerWithInputHandler( input );
-                
+    
+        scene.attachChild(mouse);
         AlphaState as1 = display.getRenderer().createAlphaState();
         as1.setBlendEnabled(true);
         as1.setSrcFunction(AlphaState.SB_ONE);
@@ -179,28 +252,80 @@ public class AlienRabbleSort extends SimpleGame {
         as1.setTestEnabled(true);
         as1.setTestFunction(AlphaState.TF_GREATER);
         mouse.setRenderState(as1);
-        fpsNode.attachChild(mouse);
-        fpsNode.attachChild(text);
-        	
 
-	    AlienPick pick = new AlienPick(display, rootNode, text);
-		input.addAction(pick);
-	
-		
-    //    key = KeyInput.get();
+        AlienPick pick = new AlienPick(display, scene, text);
+		input.addAction(pick);	
 	}
 	
+    /**
+     * creates a light for the terrain.
+     */
+    private void buildLighting() {
+        /** Set up a basic, default light. */
+        DirectionalLight light = new DirectionalLight();
+        light.setDiffuse(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, .5f));
+        light.setDirection(new Vector3f(1,-1,-.5f));
+        light.setShadowCaster(true);
+        light.setEnabled(true);
+
+          /** Attach the light to a lightState and the lightState to rootNode. */
+        LightState lightState = display.getRenderer().createLightState();
+        lightState.setEnabled(true);
+        lightState.setGlobalAmbient(new ColorRGBA(.2f, .2f, .2f, 1f));
+        lightState.attach(light);
+        scene.setRenderState(lightState);
+    }
 	
-	protected void simpleUpdate()  {
+	/**
+	 * Gets called every time the game state manager switches to this game state.
+	 * Sets the window title.
+	 */
+	public void onActivate() {
+		DisplaySystem.getDisplaySystem().
+			setTitle("Alien Rabble - Grab Stage");
+		super.onActivate();
+	}
+    
+    /**
+     * draws the scene graph
+     * 
+     * @see com.jme.app.BaseGame#render(float)
+     */
+    protected void stateRender(float interpolation) {
+        // Clear the screen
+        display.getRenderer().clearBuffers();
+        display.getRenderer().draw(scene);
+        /** Have the PassManager render. */
+        passManager.renderPasses(display.getRenderer());
+    }
+	
+    public void stateUpdate(float interpolation) {
+    	super.stateUpdate(interpolation);
         //update the keyboard input 
-        input.update(tpf);
+        input.update(interpolation);
         
     	for(int i=0;i<allAlienSort.length;i++){
-    		allAlienSort[i].update(tpf);
+    		allAlienSort[i].update(interpolation);
     	}
+    	scene.updateRenderState();
     }
 	
 	
+    private void buildPassManager() {
+        passManager = new BasicPassManager();
+
+        // Add skybox first to make sure it is in the background
+        RenderPass rPass = new RenderPass();
+        rPass.add(skybox);
+        passManager.add(rPass);
+
+        shadowPass.add(scene);
+        shadowPass.setRenderShadows(true);
+        shadowPass.setLightingMethod(ShadowedRenderPass.MODULATIVE);
+        passManager.add(shadowPass);
+    }
+    
     /**
      * buildSkyBox creates a new skybox object with all the proper textures. The
      * textures used are the standard skybox textures from all the tests.
@@ -248,8 +373,14 @@ public class AlienRabbleSort extends SimpleGame {
         skybox.setTexture(Skybox.DOWN, down);
         skybox.preloadTextures();
         skybox.updateRenderState();
-       // scene.attachChild(skybox);
     }
 	
-	
+    /**
+     * will be called if the resolution changes
+     * 
+     * @see com.jme.app.BaseGame#reinit()
+     */
+    protected void reinit() {
+        display.recreateWindow(width, height, depth, freq, fullscreen);
+    }
 }

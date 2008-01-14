@@ -37,6 +37,9 @@ import alienrabble.actions.*;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
+import com.jme.input.action.InputAction;
+import com.jme.input.action.InputActionEvent;
+import com.jmex.game.state.GameStateManager;
 
 /**
  * Input Handler for the Flag Rush game. This controls a supplied spatial
@@ -80,16 +83,17 @@ public class AlienRabbleHandler extends InputHandler {
      */
     private void setKeyBindings(String api) {
         KeyBindingManager keyboard = KeyBindingManager.getKeyBindingManager();
-//
+
 //        keyboard.set("forward", KeyInput.KEY_W);
 //        keyboard.set("backward", KeyInput.KEY_S);
 //        keyboard.set("turnRight", KeyInput.KEY_D);
 //        keyboard.set("turnLeft", KeyInput.KEY_A);
-
+        
         keyboard.set("forward", KeyInput.KEY_UP);
         keyboard.set("backward", KeyInput.KEY_DOWN);
         keyboard.set("turnRight", KeyInput.KEY_RIGHT);
         keyboard.set("turnLeft", KeyInput.KEY_LEFT);
+        keyboard.set("exit", KeyInput.KEY_ESCAPE);
     }
 
     /**
@@ -108,7 +112,22 @@ public class AlienRabbleHandler extends InputHandler {
         VehicleRotateAction rotateRight = new VehicleRotateAction(node, VehicleRotateAction.RIGHT);
         addAction(rotateRight, "turnRight", true);
         
+        ExitAction exitAction = new ExitAction();
+        addAction(exitAction, "exit",false);
+        
         //not triggered by keyboard
         drift = new DriftAction(node);
+    }
+    
+    private class ExitAction extends InputAction {
+        public void performAction( InputActionEvent evt ) {
+            // if escape was pressed, we exit
+    		// Here we switch to the menu state which is already loaded
+    		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
+    		ms.menuStatus = MenuState.MENU_SORT_INSTRUCTIONS;
+    		ms.setActive(true);
+    		// And remove this state, because we don't want to keep it in memory.
+    		GameStateManager.getInstance().detachChild("ingrabgame");
+        }
     }
 }

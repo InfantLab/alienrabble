@@ -1,7 +1,6 @@
 package alienrabble.sort;
 
 import com.jme.bounding.BoundingBox;
-import com.jme.math.FastMath;
 import com.jme.math.Vector3f;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
@@ -25,13 +24,6 @@ public class PackingCases extends Node {
 			addCase();
 		}
 		
-        AlphaState as = DisplaySystem.getDisplaySystem().getRenderer().createAlphaState();
-        as.setEnabled(true);
-        as.setBlendEnabled(true);
-        as.setSrcFunction(AlphaState.SB_SRC_ALPHA);
-        as.setDstFunction(AlphaState.DB_ONE_MINUS_SRC_ALPHA);
-        this.setRenderState(as);
-			
 		
 	}
 	

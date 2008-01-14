@@ -59,7 +59,7 @@ public class AlienSort extends Node{
 	public static final int STATUS_SELECTED = 1;
 	public static final int STATUS_SORTED = 2;
 	
-	private static final float GROWFACTOR = 2.7f; // how much bigger are selected aliens?
+	private static final float GROWFACTOR = 3f; // how much bigger are selected aliens?
 	
 	private int currentStatus;
 	
@@ -102,7 +102,6 @@ public class AlienSort extends Node{
         }
         this.currentStatus = STATUS_UNSORTED_UNSELECTED;
         
-//       this.updateModelBound();
 
         this.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         //setInitialValues();
@@ -220,15 +219,7 @@ public class AlienSort extends Node{
 		return st;
 	}
 	
-//	public int getStatus(){
-//		return currentStatus;
-//	}
-//	public void setStatus(int Status){
-//		currentStatus = Status;
-//		UpdateStatus();
-//	}
 	public void UpdateStatus(){
-
 		if( (this.currentStatus&STATUS_SELECTED)==STATUS_SELECTED)
 		{
 			Unselect();
@@ -236,8 +227,8 @@ public class AlienSort extends Node{
 		{
 			Select();
 		}
-
 	}
+	
 	public void Select(){
     	if (this.currentStatus == STATUS_UNSORTED_UNSELECTED ){
     		currentStatus = STATUS_SELECTED;

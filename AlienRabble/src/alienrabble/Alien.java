@@ -59,8 +59,7 @@ public class Alien extends Node{
 	private static final Logger logger = Logger.getLogger(AlienRabble.class
             .getName());
 
-	private Node rootNode;
-    //reference to the level terrain for placement
+	//reference to the level terrain for placement
     TerrainBlock tb;
     /**
      * speed of this alien (distance it moves each frame).
@@ -85,14 +84,12 @@ public class Alien extends Node{
     public Alien(TerrainBlock tb, Node scene, String name, Spatial model) {
         super(name);
         this.tb = tb;
-        this.rootNode = scene;
         BoundingBox box = new BoundingBox();
         this.setModelBound(box);
- //       results = new BoundingCollisionResults();
         
         if (model == null){
 	        //Create the flag pole
-	        Cylinder c = new Cylinder("alien1", 10, 10, 2, 25 );
+	        Cylinder c = new Cylinder(name, 10, 10, 2, 25 );
 	        this.attachChild(c);
 	        Quaternion q = new Quaternion();
 	        //rotate the cylinder to be vertical

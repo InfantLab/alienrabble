@@ -3,7 +3,6 @@ package alienrabble;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -11,16 +10,11 @@ import javax.swing.ImageIcon;
 import jmetest.renderer.TestText;
 import jmetest.terrain.TestTerrainTrees;
 
-import alienrabble.AlienRabbleHandler;
-
-import com.jme.app.BaseGame;
 import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
 import com.jme.image.Texture;
 import com.jme.input.ChaseCamera;
 import com.jme.input.InputHandler;
-import com.jme.input.KeyBindingManager;
-import com.jme.input.KeyInput;
 import com.jme.input.thirdperson.ThirdPersonMouseLook;
 import com.jme.intersection.BoundingCollisionResults;
 import com.jme.intersection.CollisionResults;
@@ -28,7 +22,6 @@ import com.jme.light.DirectionalLight;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
-import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
 import com.jme.renderer.pass.BasicPassManager;
@@ -47,21 +40,24 @@ import com.jme.scene.state.LightState;
 import com.jme.scene.state.TextureState;
 import com.jme.scene.state.ZBufferState;
 import com.jme.system.DisplaySystem;
-import com.jme.system.JmeException;
+import com.jme.system.PropertiesIO;
 import com.jme.util.TextureManager;
 import com.jme.util.Timer;
 import com.jme.util.export.binary.BinaryImporter;
+import com.jmex.game.state.CameraGameState;
+import com.jmex.game.state.GameStateManager;
 import com.jmex.terrain.TerrainBlock;
 import com.jmex.terrain.util.MidPointHeightMap;
 import com.jmex.terrain.util.ProceduralTextureGenerator;
 
-public class AlienRabble extends BaseGame{
+public class AlienRabble extends CameraGameState{
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(AlienRabble.class
 	            .getName());
 	
 	private static final float GRAB_RADIUS = 2.5f;
 	    
+	
     // the terrain we will drive over.
     private TerrainBlock tb;
     // fence that will keep us in.
@@ -70,23 +66,22 @@ public class AlienRabble extends BaseGame{
     private Skybox skybox;
     //the new player object
     private Vehicle player;
-    //the flag to grab
-    private Flag flag;
-    //the flag to grab
     private Node aliencontainer;
+    private int numAliens;
     private Alien[] allAliens;
     private String[] strAliens;
     private Text text;
     //private CollisionTreeManager collisionTreeManager;
 	private CollisionResults results;
 		
+	/** Our display system. */
+	private DisplaySystem display;
+	 /** Game display properties. */
+    protected PropertiesIO properties;
 		
-    //private ChaseCamera chaser;
     protected InputHandler input;
     //the timer
     protected Timer timer;
-    // Our camera object for viewing the scene
-    private Camera cam;
     //The chase camera, this will follow our player as he zooms around the level
     private ChaseCamera chaser;
     // the root node of the scene graph
@@ -106,13 +101,19 @@ public class AlienRabble extends BaseGame{
     private static ShadowedRenderPass shadowPass = new ShadowedRenderPass();
     private BasicPassManager passManager;
 
-	
-	public static void main(String[] args) throws Exception {
-        AlienRabble app = new AlienRabble();
-        app.setDialogBehaviour(ALWAYS_SHOW_PROPS_DIALOG);
-  //      new ShadowTweaker(shadowPass).setVisible(true);
-        app.start();
+	public AlienRabble(String name, PropertiesIO properties) {
+		super(name);
+		this.properties = properties;
+		initSystem();
+		initGame();
 	}
+	
+//	public static void main(String[] args) throws Exception {
+//        AlienRabble app = new AlienRabble();
+//        app.setDialogBehaviour(ALWAYS_SHOW_PROPS_DIALOG);
+//  //      new ShadowTweaker(shadowPass).setVisible(true);
+//        app.start();
+//	}
     /**
      * During an update we look for the escape button and update the timer
      * to get the framerate. Things are now starting to happen, so we will 
@@ -120,7 +121,8 @@ public class AlienRabble extends BaseGame{
      * 
      * @see com.jme.app.BaseGame#update(float)
      */
-    protected void update(float interpolation) {
+    public void stateUpdate(float interpolation) {
+    	super.stateUpdate(interpolation);
         // update the time to get the framerate
         timer.update();
         interpolation = timer.getTimePerFrame();
@@ -130,18 +132,20 @@ public class AlienRabble extends BaseGame{
         chaser.update(interpolation);
         //update the fence to animate the force field texture
         fence.update(interpolation);
-        //update the flag to make it flap in the wind
-//        flag.update(interpolation);
         
         //we want to keep the skybox around our eyes, so move it with
         //the camera
         skybox.setLocalTranslation(cam.getLocation());
         skybox.updateGeometricState(0, true);
         
+
         // if escape was pressed, we exit
-        if (KeyBindingManager.getKeyBindingManager().isValidCommand("exit")) {
-            finished = true;
-        }
+        if (numAliens == 0) {
+			// Here we switch to the menu state which is already loaded
+			GameStateManager.getInstance().activateChildNamed("menusort");
+			// And remove this state, because we don't want to keep it in memory.
+			GameStateManager.getInstance().detachChild("ingrabgame");
+		}
         
         //We don't want the chase camera to go below the world, so always keep 
         //it 2 units above the level.
@@ -210,15 +214,25 @@ public class AlienRabble extends BaseGame{
         } 
     }
 
+	/**
+	 * Gets called every time the game state manager switches to this game state.
+	 * Sets the window title.
+	 */
+	public void onActivate() {
+		DisplaySystem.getDisplaySystem().
+			setTitle("Alien Rabble - Grab Stage");
+		super.onActivate();
+	}
+    
     /**
      * draws the scene graph
      * 
      * @see com.jme.app.BaseGame#render(float)
      */
-    protected void render(float interpolation) {
+    protected void renderState(float interpolation) {
         // Clear the screen
         display.getRenderer().clearBuffers();
-        //display.getRenderer().draw(scene);
+        display.getRenderer().draw(scene);
         /** Have the PassManager render. */
         passManager.renderPasses(display.getRenderer());
     }
@@ -229,6 +243,7 @@ public class AlienRabble extends BaseGame{
      * @see com.jme.app.BaseGame#initSystem()
      */
     protected void initSystem() {
+    	
         // store the properties information
         width = properties.getWidth();
         height = properties.getHeight();
@@ -236,24 +251,15 @@ public class AlienRabble extends BaseGame{
         freq = properties.getFreq();
         fullscreen = properties.getFullscreen();
         
-        try {
-            display = DisplaySystem.getDisplaySystem(properties.getRenderer());
-            display.setMinStencilBits(8);
-            display.createWindow(width, height, depth, freq, fullscreen);
-
-            cam = display.getRenderer().createCamera(width, height);
-        } catch (JmeException e) {
-            logger.log(Level.SEVERE, "Could not create displaySystem", e);
-            System.exit(1);
-        }
-
+        
+        display = DisplaySystem.getDisplaySystem(properties.getRenderer());
         // set the background to black
         display.getRenderer().setBackgroundColor(ColorRGBA.black.clone());
 
         // initialize the camera
         cam.setFrustumPerspective(45.0f, (float) width / (float) height, 1,
-                5000);
-        cam.setLocation(new Vector3f(200,1000,200));
+                2000);
+        cam.setLocation(new Vector3f(200,400,200));
         
         /** Signal that we've changed our camera's location/frustum. */
         cam.update();
@@ -262,9 +268,6 @@ public class AlienRabble extends BaseGame{
         timer = Timer.getTimer();
 
         display.getRenderer().setCamera(cam);
-
-        KeyBindingManager.getKeyBindingManager().set("exit",
-                KeyInput.KEY_ESCAPE);
 
     }
 
@@ -278,7 +281,7 @@ public class AlienRabble extends BaseGame{
         
         results = new BoundingCollisionResults(); 
         
-        scene = new Node("Scene graph node");
+        scene = rootNode;
         /** Create a ZBuffer to display pixels closest to the camera above farther ones.  */
         ZBufferState buf = display.getRenderer().createZBufferState();
         buf.setEnabled(true);
@@ -362,18 +365,6 @@ public class AlienRabble extends BaseGame{
         shadowPass.setLightingMethod(ShadowedRenderPass.MODULATIVE);
         passManager.add(shadowPass);
     }
-
-    /**
-     * we created a new Flag class, so we'll use it to add the flag to the world.
-     * This is the flag that we desire, the one to get.
-     *
-     */
-    private void buildFlag() {
-        //create the flag and place it
-        flag = new Flag(tb);
-        scene.attachChild(flag);
-        flag.placeFlag();
-    }
     
     /**
      * Add full set of aliens across environment
@@ -402,7 +393,8 @@ public class AlienRabble extends BaseGame{
 		strAliens[10] = "alienrabble/data/Greebles/Family1/m1_15.jbin";
 		strAliens[11] = "alienrabble/data/Greebles/Family1/m1_16.jbin";
 		
-		allAliens = new Alien[12];
+		numAliens = strAliens.length;
+		allAliens = new Alien[numAliens];
 	
 		for(int i=0;i<strAliens.length;i++)
 		{
@@ -588,6 +580,7 @@ public class AlienRabble extends BaseGame{
         p.setModelBound(new BoundingBox());
         p.updateModelBound();
         p.setRenderState(treeTex);
+        p.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         p.setTextureCombineMode(TextureState.REPLACE);
         
         for (int i = 0; i < 50; i++) {
@@ -647,7 +640,7 @@ public class AlienRabble extends BaseGame{
         skybox.setTexture(Skybox.DOWN, down);
         skybox.preloadTextures();
         skybox.updateRenderState();
-       // scene.attachChild(skybox);
+        scene.attachChild(skybox);
     }
     
     /**
@@ -693,20 +686,14 @@ public class AlienRabble extends BaseGame{
         display.recreateWindow(width, height, depth, freq, fullscreen);
     }
     
-    /**
-     * close the window and also exit the program.
-     */
-    protected void quit() {
-        super.quit();
-        System.exit(0);
-    }
+
 
     /**
      * clean up the textures.
      * 
      * @see com.jme.app.BaseGame#cleanup()
      */
-    protected void cleanup() {
+    public void cleanup() {
 
     }
 }

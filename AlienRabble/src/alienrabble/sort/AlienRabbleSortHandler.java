@@ -32,11 +32,15 @@
 
 package alienrabble.sort;
 
+import alienrabble.MenuState;
 import alienrabble.sort.actions.PackingCasesAction;
 
 import com.jme.input.InputHandler;
 import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
+import com.jme.input.action.InputAction;
+import com.jme.input.action.InputActionEvent;
+import com.jmex.game.state.GameStateManager;
 
 /**
  * Input Handler for the Flag Rush game. This controls a supplied spatial
@@ -81,6 +85,7 @@ public class AlienRabbleSortHandler extends InputHandler {
 //        keyboard.set("addCase", KeyInput.KEY_RIGHT);
         keyboard.set("removeCase", KeyInput.KEY_DOWN);
  //       keyboard.set("removeCase", KeyInput.KEY_LEFT);
+        keyboard.set("exit", KeyInput.KEY_ESCAPE);
     }
 
     /**
@@ -92,6 +97,22 @@ public class AlienRabbleSortHandler extends InputHandler {
         addAction(addcase, "addCase", false);
         PackingCasesAction removecase = new PackingCasesAction(packingcases, PackingCasesAction.REMOVECASE);
         addAction(removecase, "removeCase", false);
+        
+        ExitAction exitAction = new ExitAction();
+        addAction(exitAction, "exit",false);
+        
+    }
+    
+    private class ExitAction extends InputAction {
+        public void performAction( InputActionEvent evt ) {
+            // if escape was pressed, we exit
+    		// Here we switch to the menu state which is already loaded
+    		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
+    		ms.menuStatus = MenuState.MENU_FINISH;
+    		ms.setActive(true);
+    		// And remove this state, because we don't want to keep it in memory.
+    		GameStateManager.getInstance().detachChild("insortgame");
+        }
     }
     
     
