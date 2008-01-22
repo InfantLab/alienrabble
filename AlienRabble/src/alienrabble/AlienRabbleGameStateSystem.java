@@ -32,8 +32,15 @@
 
 package alienrabble;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import alienrabble.logging.ARDataLoadandSave;
 
 import com.jme.app.AbstractGame;
 import com.jme.app.BaseGame;
@@ -45,6 +52,7 @@ import com.jme.system.JmeException;
 import com.jme.util.Timer;
 import com.jmex.game.state.GameState;
 import com.jmex.game.state.GameStateManager;
+
 
 /**
  * <p>
@@ -110,6 +118,24 @@ public class AlienRabbleGameStateSystem extends BaseGame {
 	 * @see AbstractGame#initSystem()
 	 */
 	protected final void initSystem() {
+		logger.info("initialzing system caspee");
+		ARDataLoadandSave data = new ARDataLoadandSave("caspar.xml");
+		try {
+			data.test();
+		} catch (TransformerConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ParserConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (TransformerException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		try {
 			/** Get a DisplaySystem according to the renderer selected in the startup box. */
 			display = DisplaySystem.getDisplaySystem(properties.getRenderer());
@@ -192,5 +218,4 @@ public class AlienRabbleGameStateSystem extends BaseGame {
 	public static void exit() {
 		instance.finish();
 	}
-	
 }

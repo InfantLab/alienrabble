@@ -108,12 +108,6 @@ public class AlienRabble extends CameraGameState{
 		initGame();
 	}
 	
-//	public static void main(String[] args) throws Exception {
-//        AlienRabble app = new AlienRabble();
-//        app.setDialogBehaviour(ALWAYS_SHOW_PROPS_DIALOG);
-//  //      new ShadowTweaker(shadowPass).setVisible(true);
-//        app.start();
-//	}
     /**
      * During an update we look for the escape button and update the timer
      * to get the framerate. Things are now starting to happen, so we will 
@@ -154,13 +148,13 @@ public class AlienRabble extends CameraGameState{
             cam.update();
         }
         
-        //make sure that if the player left the level we don't crash. When we add collisions,
-        //the fence will do its job and keep the player inside.
-        float characterMinHeight = tb.getHeight(player
-                .getLocalTranslation())+agl;
-        if (!Float.isInfinite(characterMinHeight) && !Float.isNaN(characterMinHeight)) {
-            player.getLocalTranslation().y = characterMinHeight;
-        }
+//        //make sure that if the player left the level we don't crash. When we add collisions,
+//        //the fence will do its job and keep the player inside.
+//        float characterMinHeight = tb.getHeight(player
+//                .getLocalTranslation())+agl;
+//        if (!Float.isInfinite(characterMinHeight) && !Float.isNaN(characterMinHeight)) {
+//            player.getLocalTranslation().y = characterMinHeight;
+//        }
         
         //get the normal of the terrain at our current location. We then apply it to the up vector
         //of the player.

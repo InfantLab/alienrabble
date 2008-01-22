@@ -80,9 +80,6 @@ public class AlienSort extends Node{
      */
     public AlienSort(String name, Spatial model) {
     	super(name);
-        
-//        BoundingBox box = new BoundingBox();
-//        this.setModelBound(box);
 
     	if (model == null){
 	        //Create a cylinder

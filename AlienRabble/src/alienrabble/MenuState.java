@@ -32,12 +32,12 @@
 
 package alienrabble;
 
-import org.fenggui.ComboBox;
-import org.fenggui.TextEditor;
-import org.fenggui.composites.Window;
-import org.fenggui.event.ISelectionChangedListener;
-import org.fenggui.event.SelectionChangedEvent;
-import org.fenggui.layout.StaticLayout;
+//import org.fenggui.ComboBox;
+//import org.fenggui.TextEditor;
+//import org.fenggui.composites.Window;
+//import org.fenggui.event.ISelectionChangedListener;
+//import org.fenggui.event.SelectionChangedEvent;
+//import org.fenggui.layout.StaticLayout;
 
 import com.jme.image.Texture;
 import com.jme.input.AbsoluteMouse;
@@ -88,9 +88,6 @@ public class MenuState extends CameraGameState {
     private InputHandler input;
     private Mouse mouse;
     
-    org.fenggui.Display disp; // FengGUI's display
-	FengInputHandler fenginput;
-
     public MenuState(String name, PropertiesIO properties) {
         super(name);
 
@@ -101,7 +98,7 @@ public class MenuState extends CameraGameState {
         initText();
         menuStatus = MENU_GRAB_INSTRUCTIONS;
         writeText();
-        initGUI();
+//        initGUI();	
         
         rootNode.setLightCombineMode(LightState.OFF);
         rootNode.setRenderQueueMode(Renderer.QUEUE_ORTHO);
@@ -130,56 +127,6 @@ public class MenuState extends CameraGameState {
         mouse.registerWithInputHandler( input );
 	}
 	
-	/**
-	 * Create our GUI.  FengGUI init code goes in here
-	 *
-	 */
-	protected void initGUI()
-	{
-		// Grab a display using an LWJGL binding
-		//	   (obviously, since jME uses LWJGL)
-		disp = new org.fenggui.Display(new org.fenggui.render.lwjgl.LWJGLBinding());
- 
-		fenginput = new FengInputHandler(disp);
- 
-		//	 Create a dialog and set it to some location on the screen
-		Window frame = new Window();
-		disp.addWidget(frame);
-		frame.setX(20);
-		frame.setY(350);
-		frame.setSize(200, 100);
-		frame.setShrinkable(false);
-		//frame.setExpandable(true);
-		frame.setTitle("Pick a color");
-		frame.getContentContainer().setLayoutManager(new StaticLayout());
- 
-		// Create a combobox with some random values in it
-		//   we'll change these values to something more useful later on.
-		ComboBox<String> list = new ComboBox<String>();
-		frame.addWidget(list);
-		list.setSize(150, list.getMinHeight());
-		list.setShrinkable(false);
-		list.setX(25);
-		list.setY(25);
-		list.addItem("White");
-		list.addItem("Green");
-		list.addItem("Blue");
-		list.addItem("Red");
- 
-		list.addSelectionChangedListener(new CBListener());
- 
-		//try to add TextArea here but get OpenGLException
-		TextEditor ta = new TextEditor(false);
-		disp.addWidget(ta);
-		ta.setText("Hallo Text");
-		ta.setX(40);
-		ta.setY(50);
-		//ta.setSize(100, ta.getAppearance().getFont().get)
-		ta.setSizeToMinSize();
- 
-		// Update the display with the newly added components
-		disp.layout();
-	}
 	
 	/**
 	 * Creates a pretty cursor.
@@ -265,19 +212,6 @@ public class MenuState extends CameraGameState {
 		// Check if the button has been pressed.
 		rootNode.updateGeometricState(tpf, true);
 	}
-	
-	private class CBListener implements ISelectionChangedListener
-	{
-		public void selectionChanged(SelectionChangedEvent selectionChangedEvent)
-		{
-			if (!selectionChangedEvent.isSelected()) return;
-			String value = selectionChangedEvent.getToggableWidget().getText();
-			if ("White".equals(value)) text3.print("White");
-			if ("Red".equals(value)) text3.print("Red");
-			if ("Blue".equals(value)) text3.print("Blue");
-			if ("Green".equals(value)) text3.print("Green");
-		}
- 
-	}
+
 	
 }
