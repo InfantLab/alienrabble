@@ -32,6 +32,7 @@
 
 package alienrabble;
 
+import alienrabble.grab.AlienRabble;
 import alienrabble.sort.AlienRabbleSort;
 
 import com.jme.input.InputHandler;
@@ -119,7 +120,7 @@ public class MenuHandler extends InputHandler {
     
     private static class ExitAction extends InputAction {
         public void performAction( InputActionEvent evt ) {
-        	AlienRabbleGameStateSystem.exit();
+        	MainGameStateSystem.exit();
         }
     }
 }

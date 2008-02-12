@@ -30,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package alienrabble;
+package alienrabble.grab;
 
 import com.jme.intersection.BoundingCollisionResults;
 import com.jme.intersection.CollisionResults;
@@ -56,14 +56,12 @@ import com.jme.scene.Spatial;
 public class Vehicle extends Node {
     private static final long serialVersionUID = 1L;
     private static final float LEAN_BUFFER = 0.05f;
-    private final Node rootNode;
     private Spatial model;
     private float weight;
     private float velocity;
     private float acceleration;
     private float braking;
     private float turnSpeed;
-    private CollisionResults results;
     
     private float maxSpeed = 30;
     private float minSpeed = 10;
@@ -74,13 +72,7 @@ public class Vehicle extends Node {
     private float leanAngle;
     private Vector3f leanAxis = new Vector3f(0,0,1);
     private Quaternion q = new Quaternion();
-    
-//  information for rotation of the wheels
-    Spatial frontwheel, backwheel;
-    //rotate about the Y axis ... this is explained in the tutorial.
-    private Vector3f wheelAxis = new Vector3f(0, 1, 0);
-    private float angle = 0;
-    private Quaternion rotQuat = new Quaternion();
+
     
     /**
      * Basic constructor takes the model that represents the graphical 
@@ -91,8 +83,6 @@ public class Vehicle extends Node {
     public Vehicle(String id, Node scene, Spatial model) {
         super(id);
         setModel(model);
-        this.rootNode = scene;
-        results = new BoundingCollisionResults();
     }
     
     /**
@@ -141,30 +131,7 @@ public class Vehicle extends Node {
 //        }
     }
     
-    /**
-     * rotateWheels will rotate the wheel (front and back) a certain angle based on
-     * the velocity of the bike.
-     * @param time the time between frames.
-     */
-    private void rotateWheels(float time) {
-        //Rotate the tires if the vehicle is moving.
-        if (vehicleIsMoving()) {
-            if(velocity > FastMath.FLT_EPSILON) {
-                angle = angle - ((time) * velocity * 0.5f);
-                if (angle < -360) {
-                    angle = 0;
-                }
-            } else {
-                angle = angle + ((time) * velocity * 0.5f);
-                if (angle > 360) {
-                    angle = 0;
-                }
-            }
-            rotQuat.fromAngleAxis(angle, wheelAxis);
-            frontwheel.getLocalRotation().multLocal(rotQuat);
-            backwheel.setLocalRotation(frontwheel.getLocalRotation());
-        }
-    }
+   
 
     /**
      * Convenience method that determines if the vehicle is moving or not. This is

@@ -32,13 +32,13 @@
 
 package alienrabble.sort;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jmetest.input.TestInputHandler;
+import alienrabble.logging.ARDataLoadandSave;
+import alienrabble.logging.ARXMLSortData;
+import alienrabble.logging.ARXMLSortData.MouseEvent;
+import alienrabble.model.ARXMLModelData;
+import alienrabble.model.Model;
 
 import com.jme.image.Texture;
 import com.jme.input.AbsoluteMouse;
@@ -54,7 +54,6 @@ import com.jme.renderer.pass.ShadowedRenderPass;
 import com.jme.scene.Node;
 import com.jme.scene.SceneElement;
 import com.jme.scene.Skybox;
-import com.jme.scene.Spatial;
 import com.jme.scene.Text;
 import com.jme.scene.state.AlphaState;
 import com.jme.scene.state.CullState;
@@ -65,9 +64,6 @@ import com.jme.scene.state.ZBufferState;
 import com.jme.system.DisplaySystem;
 import com.jme.system.PropertiesIO;
 import com.jme.util.TextureManager;
-import com.jme.util.export.binary.BinaryImporter;
-import com.jme.util.resource.ResourceLocatorTool;
-import com.jme.util.resource.SimpleResourceLocator;
 import com.jmex.game.state.CameraGameState;
 
 
@@ -99,9 +95,16 @@ public class AlienRabbleSort extends CameraGameState {
     
     private Node scene;
 	private AlienSort[] allAlienSort;
+	private int numAliens;
     private AbsoluteMouse mouse;
     private PackingCases packingcases;
     private Skybox skybox;
+    
+    //the data logger
+    ARXMLSortData sortdata;
+    
+    ARXMLModelData modeldata;
+    
     
     public AlienRabbleSort(String name, PropertiesIO properties){
     	super(name);
@@ -116,6 +119,10 @@ public class AlienRabbleSort extends CameraGameState {
 	 * @see com.jme.app.SimpleGame#initGame()
 	 */
 	protected void initGame() {
+
+		//get the logging object
+		sortdata = ARDataLoadandSave.getInstance().getXmlSortData();
+
 		
         // store the properties information
         width = properties.getWidth();
@@ -148,68 +155,45 @@ public class AlienRabbleSort extends CameraGameState {
         scene.setRenderState(cs);
         
         buildLighting();
-		buildSkyBox();
-		scene.attachChild(skybox);
+//		buildSkyBox();
+//		scene.attachChild(skybox);
 		
 		//set up passes
         buildPassManager();
 		
-        try {
-            ResourceLocatorTool.addResourceLocator(
-                    ResourceLocatorTool.TYPE_TEXTURE,
-                    new SimpleResourceLocator(AlienRabbleSort.class
-                            .getClassLoader().getResource(
-                                    "alienrabble/data/Greebles/Family1/")));
-        } catch (URISyntaxException e1) {
-            logger.log(Level.WARNING, "unable to setup texture directory.", e1);
-        }
-
         if (input != null) input.removeAllFromAttachedHandlers();
         
-
         Text text = Text.createDefaultTextLabel("Test Label", "Hits: 0 Shots: 0");
         text.setCullMode(SceneElement.CULL_NEVER);
         text.setTextureCombineMode(TextureState.REPLACE);
         text.setLocalTranslation(new Vector3f(1, 60, 0));
         scene.attachChild(text);    	
 	
-		String[] strAliens;
+
+		modeldata = ARDataLoadandSave.getInstance().getXmlModelData_Sort();
 		
-		strAliens = new String[12];
-		strAliens[0] = "alienrabble/data/Greebles/Family1/f1_11.jbin";
-		strAliens[1] = "alienrabble/data/Greebles/Family1/f1_12.jbin";
-		strAliens[2] = "alienrabble/data/Greebles/Family1/f1_13.jbin";
-		strAliens[3] = "alienrabble/data/Greebles/Family1/f1_14.jbin";
-		strAliens[4] = "alienrabble/data/Greebles/Family1/f1_15.jbin";
-		strAliens[5] = "alienrabble/data/Greebles/Family1/f1_16.jbin";
-		strAliens[6] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
-		strAliens[7] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
-		strAliens[8] = "alienrabble/data/Greebles/Family1/m1_13.jbin";
-		strAliens[9] = "alienrabble/data/Greebles/Family1/m1_14.jbin";
-		strAliens[10] = "alienrabble/data/Greebles/Family1/m1_15.jbin";
-		strAliens[11] = "alienrabble/data/Greebles/Family1/m1_16.jbin";
-		
-		int numaliens = strAliens.length;
-		allAlienSort = new AlienSort[numaliens];
+		numAliens = modeldata.getNumModels();
+		allAlienSort = new AlienSort[numAliens];
 	
-		for(int i=0;i<numaliens;i++)
+		for(int i=0;i<numAliens;i++)
 		{
-			URL alienURL = AlienSort.class.getClassLoader().getResource(strAliens[i]);
-			BinaryImporter BI = new BinaryImporter();
-			Spatial model;
-			Quaternion q = new Quaternion();
-			q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
-			try {
-				model = (Spatial)BI.load(alienURL.openStream());
-				allAlienSort[i] = new AlienSort(strAliens[i],model);
-				allAlienSort[i].setLocalTranslation(-5*numaliens + 10*i,30,0);
-				allAlienSort[i].setLocalRotation(q);
-				scene.attachChild(allAlienSort[i]);				
-				allAlienSort[i].setInitialValues();
-				allAlienSort[i].addAllControllers();
-			} catch (IOException e) {
-				logger.info("darn exceptions:" + e.getMessage());
-			}
+			Model model = modeldata.getModel(i);
+//			Quaternion q = new Quaternion();
+//			q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
+
+			allAlienSort[i] = new AlienSort(model);
+			allAlienSort[i].setLocalTranslation(-5*numAliens + 10*i,30,0);
+//			allAlienSort[i].setLocalRotation(q);
+			scene.attachChild(allAlienSort[i]);				
+			allAlienSort[i].setInitialValues();
+			allAlienSort[i].addAllControllers();
+			
+			MouseEvent me = sortdata.new  MouseEvent();
+			me.objectid = model.getID();
+			me.objectname = model.getName();
+			me.x_location = allAlienSort[i].getLocalTranslation().x;
+			me.y_location = allAlienSort[i].getLocalTranslation().y;
+			sortdata.addStartingPosition(me); 
 		}
 		
 		packingcases = new PackingCases(2);
@@ -238,7 +222,7 @@ public class AlienRabbleSort extends CameraGameState {
         TextureState cursorTextureState = display.getRenderer().createTextureState();
         cursorTextureState.setTexture(
                 TextureManager.loadTexture(
-                        TestInputHandler.class.getClassLoader().getResource( "alienrabble/data/cursor/cursor1.png" ),
+                        AlienRabbleSort.class.getClassLoader().getResource( "alienrabble/data/cursor/cursor1.png" ),
                         Texture.MM_LINEAR, Texture.FM_LINEAR )
         );
         mouse.setRenderState( cursorTextureState );

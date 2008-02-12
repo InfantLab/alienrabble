@@ -1,4 +1,4 @@
-package alienrabble;
+package alienrabble.grab;
 
 import java.io.IOException;
 import java.net.URL;
@@ -7,8 +7,13 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
-import jmetest.renderer.TestText;
-import jmetest.terrain.TestTerrainTrees;
+import alienrabble.MenuState;
+import alienrabble.logging.ARDataLoadandSave;
+import alienrabble.logging.ARXMLGrabData;
+import alienrabble.logging.ARXMLGrabData.GrabEvent;
+import alienrabble.logging.ARXMLGrabData.PlayerLocation;
+import alienrabble.model.ARXMLModelData;
+import alienrabble.model.Model;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
@@ -57,6 +62,8 @@ public class AlienRabble extends CameraGameState{
 	
 	private static final float GRAB_RADIUS = 2.5f;
 	    
+	// temporary vector for the rotation
+    private static final Vector3f tempVa = new Vector3f();
 	
     // the terrain we will drive over.
     private TerrainBlock tb;
@@ -69,7 +76,6 @@ public class AlienRabble extends CameraGameState{
     private Node aliencontainer;
     private int numAliens;
     private Alien[] allAliens;
-    private String[] strAliens;
     private Text text;
     //private CollisionTreeManager collisionTreeManager;
 	private CollisionResults results;
@@ -101,6 +107,12 @@ public class AlienRabble extends CameraGameState{
     private static ShadowedRenderPass shadowPass = new ShadowedRenderPass();
     private BasicPassManager passManager;
 
+    //the data logger
+    ARXMLGrabData grabdata;
+    
+    ARXMLModelData modeldata;
+    
+    
 	public AlienRabble(String name, PropertiesIO properties) {
 		super(name);
 		this.properties = properties;
@@ -135,26 +147,29 @@ public class AlienRabble extends CameraGameState{
 
         // if escape was pressed, we exit
         if (numAliens == 0) {
-			// Here we switch to the menu state which is already loaded
-			GameStateManager.getInstance().activateChildNamed("menusort");
+    		// Here we switch to the menu state which is already loaded
+    		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
+    		ms.menuStatus = MenuState.MENU_SORT_INSTRUCTIONS;
+    		ms.setActive(true);
+    		
 			// And remove this state, because we don't want to keep it in memory.
 			GameStateManager.getInstance().detachChild("ingrabgame");
 		}
         
         //We don't want the chase camera to go below the world, so always keep 
-        //it 2 units above the level.
-        if(cam.getLocation().y < (tb.getHeight(cam.getLocation())+2)) {
-            cam.getLocation().y = tb.getHeight(cam.getLocation())+2;
+        //it at least 1.7 units above the level.
+        if(cam.getLocation().y < (tb.getHeight(cam.getLocation())+1.7f)) {
+            cam.getLocation().y = tb.getHeight(cam.getLocation())+1.7f;
             cam.update();
         }
         
-//        //make sure that if the player left the level we don't crash. When we add collisions,
-//        //the fence will do its job and keep the player inside.
-//        float characterMinHeight = tb.getHeight(player
-//                .getLocalTranslation())+agl;
-//        if (!Float.isInfinite(characterMinHeight) && !Float.isNaN(characterMinHeight)) {
-//            player.getLocalTranslation().y = characterMinHeight;
-//        }
+        //make sure that if the player left the level we don't crash. When we add collisions,
+        //the fence will do its job and keep the player inside.
+        float characterMinHeight = tb.getHeight(player
+                .getLocalTranslation())+agl;
+        if (!Float.isInfinite(characterMinHeight) && !Float.isNaN(characterMinHeight)) {
+            player.getLocalTranslation().y = characterMinHeight;
+        }
         
         //get the normal of the terrain at our current location. We then apply it to the up vector
         //of the player.
@@ -200,7 +215,25 @@ public class AlienRabble extends CameraGameState{
                     	player.setVelocity(-0.1f * player.getVelocity());
     		        	//we should make this vanish and log 
     		        	Alien as = (Alien) element;
+    		        	
+    					//log the grab location
+    					GrabEvent ge = grabdata.new GrabEvent();
+    					ge.alienid= as.getID();
+    					ge.alienname = as.getName();
+    					//need current time for logging
+    					ge.clockTicks = timer.getTime();
+    					ge.timeInSecs =  ge.clockTicks * 1f / timer.getResolution(); // *1f to get result as float
+    					ge.x_location = as.getLocalTranslation().x;
+    					ge.z_location = as.getLocalTranslation().z;
+    					grabdata.addGrabEvent(ge);
+    					
+    					//remove from scene
     		        	as.removeFromParent();
+    		        	
+    		        	//update count 
+    		        	numAliens--;
+    		        	
+    		        	text.print("Aliens: " + numAliens);
     		        	break;                    	
                     }
 		        }
@@ -213,8 +246,7 @@ public class AlienRabble extends CameraGameState{
 	 * Sets the window title.
 	 */
 	public void onActivate() {
-		DisplaySystem.getDisplaySystem().
-			setTitle("Alien Rabble - Grab Stage");
+		DisplaySystem.getDisplaySystem().setTitle("Alien Rabble - Grab Stage");
 		super.onActivate();
 	}
     
@@ -251,18 +283,17 @@ public class AlienRabble extends CameraGameState{
         display.getRenderer().setBackgroundColor(ColorRGBA.black.clone());
 
         // initialize the camera
-        cam.setFrustumPerspective(45.0f, (float) width / (float) height, 1,
-                2000);
+        cam.setFrustumPerspective(40.0f, (float) width / (float) height, 2,
+                400);
         cam.setLocation(new Vector3f(200,400,200));
         
         /** Signal that we've changed our camera's location/frustum. */
         cam.update();
 
-        /** Get a high resolution timer for FPS updates. */
-        timer = Timer.getTimer();
-
         display.getRenderer().setCamera(cam);
 
+        /** Get a high resolution timer for FPS updates. */
+        timer = Timer.getTimer();
     }
 
     /**
@@ -272,6 +303,9 @@ public class AlienRabble extends CameraGameState{
      */
     protected void initGame() {
         display.setTitle("Alien Rabble");
+        
+        //get a reference to the data logging class
+        grabdata = ARDataLoadandSave.getInstance().getXmlGrabData();
         
         results = new BoundingCollisionResults(); 
         
@@ -288,7 +322,6 @@ public class AlienRabble extends CameraGameState{
         cs.setCullMode(CullState.CS_BACK);
         scene.setRenderState(cs);
         
-
         //collisionTreeManager = new CollisionTreeManager( scene, new float[]{0.2f, 1.2f} );
         
         //Add terrain to the scene
@@ -307,41 +340,48 @@ public class AlienRabble extends CameraGameState{
         buildChaseCamera();
         //build the player input
         buildInput();
+
+        buildAlienCounter();
         //Add an alien randomly to the terrain
         addAliens();
         
         //set up passes
         buildPassManager();
-        
-        //add a debug message
-        text = new Text("Text Label", "Wall Collision: No");
-        
-        AlphaState as = display.getRenderer().createAlphaState();
-        as.setBlendEnabled(true);
-        as.setSrcFunction(AlphaState.SB_SRC_ALPHA);
-        as.setDstFunction(AlphaState.DB_ONE);
-        as.setTestEnabled(true);
-        as.setTestFunction(AlphaState.TF_GREATER);
-        as.setEnabled(true);
-
-        TextureState ts = display.getRenderer().createTextureState();
-        ts.setTexture(
-            TextureManager.loadTexture(
-                TestText.class.getClassLoader().getResource(Text.DEFAULT_FONT),
-                Texture.MM_LINEAR,
-                Texture.FM_LINEAR));
-        ts.setEnabled(true);
-        text.setRenderState(ts);
-        text.setRenderState(as);
-        
-		text.setLocalTranslation(new Vector3f(1, 60, 0));
-		text.setTextColor(ColorRGBA.white);
-		text.setZOrder(0);
-		scene.attachChild(text);
+ 
         
         // update the scene graph for rendering
         scene.updateGeometricState(0.0f, true);
         scene.updateRenderState();
+    }
+    
+    private void buildAlienCounter(){
+        //add a debug message
+        text = new Text("Text Label", "Aliens: ");
+        
+        TextureState ts = display.getRenderer().createTextureState();
+        ts.setTexture(
+            TextureManager.loadTexture(
+                AlienRabble.class.getClassLoader().getResource(Text.DEFAULT_FONT),
+                Texture.MM_LINEAR,
+                Texture.FM_LINEAR));
+        ts.setEnabled(true);
+        text.setRenderState(ts);
+        
+        AlphaState as = display.getRenderer().createAlphaState();
+        as.setBlendEnabled(true);
+        as.setSrcFunction(AlphaState.SB_SRC_ALPHA);
+        as.setDstFunction(AlphaState.DB_ONE_MINUS_SRC_ALPHA);
+        as.setTestEnabled(true);
+        as.setTestFunction(AlphaState.TF_GREATER);
+        as.setEnabled(true);
+        text.setRenderState(as);
+        
+        text.setLocalScale(3);
+		text.setLocalTranslation(new Vector3f(1, 60, 0));
+		text.setTextColor(ColorRGBA.white);
+		text.setZOrder(0);
+		scene.attachChild(text);
+
     }
     
     private void buildPassManager() {
@@ -369,50 +409,39 @@ public class AlienRabble extends CameraGameState{
     	aliencontainer = new Node("aliencontainer");
     	scene.attachChild(aliencontainer);
     	
-		Quaternion q = new Quaternion();
-		q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
-        
-	 	
-		strAliens = new String[12];
-		strAliens[0] = "alienrabble/data/Greebles/Family1/f1_11.jbin";
-		strAliens[1] = "alienrabble/data/Greebles/Family1/f1_12.jbin";
-		strAliens[2] = "alienrabble/data/Greebles/Family1/f1_13.jbin";
-		strAliens[3] = "alienrabble/data/Greebles/Family1/f1_14.jbin";
-		strAliens[4] = "alienrabble/data/Greebles/Family1/f1_15.jbin";
-		strAliens[5] = "alienrabble/data/Greebles/Family1/f1_16.jbin";
-		strAliens[6] = "alienrabble/data/Greebles/Family1/m1_11.jbin";
-		strAliens[7] = "alienrabble/data/Greebles/Family1/m1_12.jbin";
-		strAliens[8] = "alienrabble/data/Greebles/Family1/m1_13.jbin";
-		strAliens[9] = "alienrabble/data/Greebles/Family1/m1_14.jbin";
-		strAliens[10] = "alienrabble/data/Greebles/Family1/m1_15.jbin";
-		strAliens[11] = "alienrabble/data/Greebles/Family1/m1_16.jbin";
+		modeldata = ARDataLoadandSave.getInstance().getXmlModelData_Grab();
+			
+
+//		Quaternion q = new Quaternion();
+//		q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
 		
-		numAliens = strAliens.length;
+		numAliens = modeldata.getNumModels();
 		allAliens = new Alien[numAliens];
-	
-		for(int i=0;i<strAliens.length;i++)
+		
+		for(int i=0;i<numAliens;i++)
 		{
-			URL alienURL = AlienRabble.class.getClassLoader().getResource(strAliens[i]);
-			BinaryImporter BI = new BinaryImporter();
-			Spatial model;
-			try {
-				model = (Spatial)BI.load(alienURL.openStream());
-				allAliens[i] = new Alien(tb, scene,"alien"+i,model);
-				allAliens[i].setLocalRotation(q);
-				aliencontainer.attachChild(allAliens[i]);
-				allAliens[i].placeAlien();
-				allAliens[i].setPlayer(player);
-				} 
-			catch (IOException e) {
-					logger.info("darn exceptions:" + e.getMessage());
-			}
-		}			
+			Model thisalien = modeldata.getModel(i);
+			allAliens[i] = new Alien(tb, scene,thisalien.getName() ,thisalien);
+			aliencontainer.attachChild(allAliens[i]);
+			allAliens[i].placeAlien();
+			allAliens[i].setPlayer(player);
+			allAliens[i].setID(thisalien.getID());
+
+			//log the initial positions
+			GrabEvent ge = grabdata.new GrabEvent();
+			ge.alienid= allAliens[i].getID();
+			ge.alienname = allAliens[i].getName();
+			ge.clockTicks = 0;
+			ge.timeInSecs = 0;
+			ge.x_location = allAliens[i].getLocalTranslation().x;
+			ge.z_location = allAliens[i].getLocalTranslation().z;
+			grabdata.addStartingPosition(ge);		
+		}
+		text.print("Aliens: " + numAliens);
     }
     
     /**
-     * we are going to build the player object here. Now, we will load a .3ds model and convert it
-     * to .jme in realtime. The next lesson will show how to store as .jme so this conversion doesn't
-     * have to take place every time. 
+     * we are going to build the player object here. 
      * 
      * We now have a Vehicle object that represents our player. The vehicle object will allow
      * us to have multiple vehicle types with different capabilities.
@@ -440,7 +469,7 @@ public class AlienRabble extends CameraGameState{
         model.setLocalRotation(q);
         //set the vehicles attributes (these numbers can be thought
         //of as Unit/Second).
-        player = new Vehicle("Player Node",scene, model);
+        player = new Vehicle("player",scene, model);
         player.setAcceleration(8);
         player.setBraking(12);
         player.setTurnSpeed(2.2f);
@@ -456,6 +485,20 @@ public class AlienRabble extends CameraGameState{
         agl = ((BoundingSphere)player.getWorldBound()).radius;
         player.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         //collisionTreeManager.add(player );
+        
+        PlayerLocation pl = grabdata.new PlayerLocation();
+        pl.name =  player.getName();
+        pl.clockTicks = 0;
+        pl.timeInSecs = 0;
+        pl.x_location = player.getLocalTranslation().x;
+        pl.z_location = player.getLocalTranslation().z;
+        Vector3f rotation = player.getLocalRotation().getRotationColumn(2,tempVa);
+        pl.x_velocity = player.getVelocity() * rotation.x;
+        pl.z_velocity = player.getVelocity() * rotation.z;
+        
+        
+        
+        grabdata.logPlayerLocation(pl);
     }
     
     /**
@@ -565,7 +608,7 @@ public class AlienRabble extends CameraGameState{
         TextureState treeTex = display.getRenderer().createTextureState();
         treeTex.setEnabled(true);
         Texture tr = TextureManager.loadTexture(
-                TestTerrainTrees.class.getClassLoader().getResource(
+                AlienRabble.class.getClassLoader().getResource(
                         "jmetest/data/texture/grass.jpg"), Texture.MM_LINEAR_LINEAR,
                 Texture.FM_LINEAR);
         treeTex.setTexture(tr);
@@ -637,6 +680,12 @@ public class AlienRabble extends CameraGameState{
         scene.attachChild(skybox);
     }
     
+    public void setGrabDataLogger(ARXMLGrabData gd){
+    	grabdata = gd;
+    }
+    public ARXMLGrabData getGrabDataLogger(){
+    	return grabdata;
+    }
     /**
      * set the basic parameters of the chase camera. This includes the offset. We want
      * to be behind the vehicle and a little above it. So we will the offset as 0 for
@@ -649,16 +698,16 @@ public class AlienRabble extends CameraGameState{
     private void buildChaseCamera() {
         HashMap<String, Object> props = new HashMap<String, Object>();
         Vector3f targetOffset = new Vector3f();
-        targetOffset.y = ((BoundingSphere) player.getWorldBound()).radius * 2.3f;
+        targetOffset.y = ((BoundingSphere) player.getWorldBound()).radius * 2f;
         props.put(ThirdPersonMouseLook.PROP_ENABLED, "false");
         props.put(ChaseCamera.PROP_TARGETOFFSET,targetOffset);
-        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(5.5f, 180 * FastMath.DEG_TO_RAD, 25 * FastMath.DEG_TO_RAD));
-        props.put(ChaseCamera.PROP_DAMPINGK, "4");
-        props.put(ChaseCamera.PROP_SPRINGK, "7");
+        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(4f, 180 * FastMath.DEG_TO_RAD, 20 * FastMath.DEG_TO_RAD));
+        props.put(ChaseCamera.PROP_DAMPINGK, "3");
+        props.put(ChaseCamera.PROP_SPRINGK, "6");
         props.put(ChaseCamera.PROP_STAYBEHINDTARGET, "true");
         chaser = new ChaseCamera(cam, player, props);
-        chaser.setMaxDistance(9);
-        chaser.setMinDistance(3.5f);	
+        chaser.setMaxDistance(7);
+        chaser.setMinDistance(3.1f);	
     }
 
     /**

@@ -30,10 +30,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package alienrabble;
+package alienrabble.grab;
 
 
 import java.util.logging.Logger;
+
 
 import com.jme.bounding.BoundingBox;
 import com.jme.math.FastMath;
@@ -74,12 +75,17 @@ public class Alien extends Node{
 //    private CollisionResults results;
     private Vehicle player;
     
+    private String ID; //an ID for this alien.. simpler than the name probably just a number
+    
     
     /**
-     * Constructor builds the flag, taking the terrain as the parameter. This
+     * Constructor builds the alien, taking the terrain as the parameter. This
      * is just the reference to the game's terrain object so that we can 
-     * randomly place this flag on the level.
-     * @param tb the terrain used to place the flag.
+     * randomly place this alien on the level.
+     * @param tb the terrain used to place the alien.
+     * @param scene the scene the alien will be added to
+     * @param name the name for this node/alien
+     * @param model the 3D model for this alien
      */
     public Alien(TerrainBlock tb, Node scene, String name, Spatial model) {
         super(name);
@@ -88,29 +94,23 @@ public class Alien extends Node{
         this.setModelBound(box);
         
         if (model == null){
-	        //Create the flag pole
+        	//For the lack of anything better to do (and for debug purposes)..
+	        //Create a cylinder
 	        Cylinder c = new Cylinder(name, 10, 10, 2, 25 );
 	        this.attachChild(c);
 	        Quaternion q = new Quaternion();
 	        //rotate the cylinder to be vertical
-	        q.fromAngleAxis(FastMath.PI/2, new Vector3f(1,0,0));
+	        q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0,0));
 	        c.setLocalRotation(q);
 	        c.setLocalTranslation(new Vector3f(-12.5f,-12.5f,0));
 	        c.setDefaultColor(ColorRGBA.randomColor());
         }else{
         	setModel(model);
         }
-
-        Quaternion q = new Quaternion();
-		q.fromAngleAxis(2 * FastMath.nextRandomFloat() * FastMath.PI, new Vector3f(0,1, 0));
-		setLocalRotation(q);
-		
+        
         this.updateModelBound();
 
         this.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
-        this.setLocalScale(0.25f);
-        speed = FastMath.nextRandomFloat();
-        
     }
     
     public void setPlayer(Vehicle player){
@@ -140,8 +140,7 @@ public class Alien extends Node{
     }
     
     /**
-     * During the update, we decrement the time. When it reaches zero, we will
-     * reset the flag.
+     * 
      * @param time the time between frame.
      */
     public void update(float time) {
@@ -179,12 +178,19 @@ public class Alien extends Node{
      *
      */
     public void placeAlien() {
-        float x = 45 + FastMath.nextRandomFloat() * 130;
+    	//random location
+    	float x = 45 + FastMath.nextRandomFloat() * 130;
         float z = 45 + FastMath.nextRandomFloat() * 130;
-        float y = tb.getHeight(x,z) + 0.2f;
+        float y = tb.getHeight(x,z) + 0.1f;
         localTranslation.x = x;
         localTranslation.y = y;
         localTranslation.z = z;
+        //facing random direction
+        Quaternion q = new Quaternion();
+		q.fromAngleAxis(2 * FastMath.nextRandomFloat() * FastMath.PI, new Vector3f(0,1, 0));
+		this.setLocalRotation(q);
+		//traveling at random speed (not implemented yet)
+		speed = FastMath.nextRandomFloat();    
     }
     
     /**
@@ -195,5 +201,12 @@ public class Alien extends Node{
     public boolean removeFromParent() {
     	logger.info(this.getName() + " removed @ " );
     	return super.removeFromParent();
+    }
+    
+    public String getID(){
+    	return ID;
+    }
+    public void setID(String id){
+    	ID = id;
     }
 }

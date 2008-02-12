@@ -30,9 +30,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package alienrabble;
+package alienrabble.grab;
 
-import alienrabble.actions.*;
+import alienrabble.MenuState;
+import alienrabble.grab.actions.*;
 
 import com.jme.input.InputHandler;
 import com.jme.input.KeyBindingManager;

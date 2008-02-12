@@ -33,6 +33,8 @@
 package alienrabble.sort;
 
 
+import alienrabble.model.Model;
+
 import com.jme.animation.SpatialTransformer;
 import com.jme.bounding.BoundingBox;
 import com.jme.math.FastMath;
@@ -59,7 +61,9 @@ public class AlienSort extends Node{
 	public static final int STATUS_SELECTED = 1;
 	public static final int STATUS_SORTED = 2;
 	
-	private static final float GROWFACTOR = 3f; // how much bigger are selected aliens?
+	private static final float SCALEFACTOR = 1.7f; //magnify all the objects
+	private static final float GROWFACTOR = 3f; // how much bigger will selected alien grow?
+	private static final float YCENTRE = -12f; //how far up the screen will the selected alien be?
 	
 	private int currentStatus;
 	
@@ -70,7 +74,8 @@ public class AlienSort extends Node{
 	SpatialTransformer aliengrow;
 	SpatialTransformer alienshrink;
 	SpatialTransformer alienputinbox;
-    Spatial model;
+//    Spatial model;
+	Model model;
 	
     /**
      * Constructor builds the flag, taking the terrain as the parameter. This
@@ -78,9 +83,8 @@ public class AlienSort extends Node{
      * randomly place this flag on the level.
      * @param tb the terrain used to place the flag.
      */
-    public AlienSort(String name, Spatial model) {
-    	super(name);
-
+    public AlienSort(Model model) {
+//     	super(model.getName());
     	if (model == null){
 	        //Create a cylinder
 	        Cylinder c = new Cylinder("cylinder", 10, 10, 2, 25 );
@@ -101,7 +105,6 @@ public class AlienSort extends Node{
         
 
         this.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
-        //setInitialValues();
     }
     
      /**
@@ -112,12 +115,16 @@ public class AlienSort extends Node{
         return model;
     }
     
+    public String getID(){
+    	return model.getID();
+    }
+    
     /**
      * sets the model spatial of this vehicle. It first
      * detaches any previously attached models.
      * @param model the model to attach to this vehicle.
      */
-    public void setModel(final Spatial model) {
+    public void setModel(final Model model) {
         this.detachChild(this.model);
         this.model = model;
         BoundingBox box = new BoundingBox();
@@ -148,7 +155,8 @@ public class AlienSort extends Node{
 
     public void setInitialValues(){
     	initialLocation = this.localTranslation.clone();
-    	initialSize = this.localScale.clone();
+    	initialSize = this.localScale.clone().mult(SCALEFACTOR);
+    	this.setLocalScale(initialSize.clone());
     	Quaternion q = new Quaternion(this.localRotation.x,this.localRotation.y,this.localRotation.z,this.localRotation.w);
     	initialRotation.set(q);
     }
@@ -167,14 +175,14 @@ public class AlienSort extends Node{
 		Quaternion q0 = new Quaternion();
 		q0.set(localRotation);
 		Quaternion q = new Quaternion();
-		q.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Z);
+		q.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
 		st.setObject(this, 0, -1);
 		st.setRepeatType(SpatialTransformer.RT_WRAP);
 		st.setScale(0,0,initialSize.mult(GROWFACTOR));
-		st.setPosition(0,0, new Vector3f(0,0,0));
+		st.setPosition(0,0, new Vector3f(0,YCENTRE,0));
 		st.setRotation(0,0, q0);
-		st.setRotation(0,3, q0.mult(q));
-		st.setRotation(0,6, q0.mult(q).mult(q));
+		st.setRotation(0,4, q0.mult(q));
+		st.setRotation(0,8, q0.mult(q).mult(q));
 		st.interpolateMissing();
 		st.setActive(false);
 		return st;
@@ -186,7 +194,7 @@ public class AlienSort extends Node{
 		st.setScale(0,0, initialSize);
 		st.setScale(0,2, initialSize.mult(GROWFACTOR));
 		st.setPosition(0, 0, initialLocation);
-		st.setPosition(0,2, new Vector3f(0,0,0));
+		st.setPosition(0,2, new Vector3f(0,YCENTRE,0));
 		st.interpolateMissing();
 		st.setActive(false);
 		return st;
@@ -197,7 +205,7 @@ public class AlienSort extends Node{
 		st.setObject(this, 0, -1);
 		st.setScale(0,0, initialSize.mult(GROWFACTOR));
 		st.setScale(0,2, initialSize);
-		st.setPosition(0,0, new Vector3f(0,0,0));
+		st.setPosition(0,0, new Vector3f(0,YCENTRE,0));
 		st.setPosition(0,2, initialLocation);
 		st.interpolateMissing();
 		st.setActive(false);
@@ -209,7 +217,7 @@ public class AlienSort extends Node{
 		st.setObject(this, 0, -1);
 		st.setScale(0,0,initialSize.mult(GROWFACTOR));
 		st.setScale(0,2, initialSize);
-		st.setPosition(0, 0, new Vector3f(0,0,0));
+		st.setPosition(0, 0, new Vector3f(0,YCENTRE,0));
 		st.setPosition(0,2, box.getWorldTranslation());
 		st.interpolateMissing();
 		st.setActive(false);

@@ -32,13 +32,8 @@
 
 package alienrabble;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import alienrabble.logging.ARDataLoadandSave;
 
@@ -46,6 +41,7 @@ import com.jme.app.AbstractGame;
 import com.jme.app.BaseGame;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
+
 import com.jme.input.joystick.JoystickInput;
 import com.jme.system.DisplaySystem;
 import com.jme.system.JmeException;
@@ -70,15 +66,20 @@ import com.jmex.game.state.GameStateManager;
  * 
  * @author Per Thulin
  */
-public class AlienRabbleGameStateSystem extends BaseGame {
+public class MainGameStateSystem extends BaseGame {
     private static final Logger logger = Logger
-            .getLogger(AlienRabbleGameStateSystem.class.getName());
+            .getLogger(MainGameStateSystem.class.getName());
 	
 	/** Only used in the static exit method. */
 	private static AbstractGame instance;
 	
+	public static String ARVersionNumber = "0.1"; 
+	
 	/** High resolution timer for jME. */
-	private Timer timer;
+	public Timer timer;
+	
+	/** The object that handles data logging */
+	public ARDataLoadandSave datalogger;
 	
 	/** Simply an easy way to get at timer.getTimePerFrame(). */
 	private float tpf;
@@ -119,22 +120,6 @@ public class AlienRabbleGameStateSystem extends BaseGame {
 	 */
 	protected final void initSystem() {
 		logger.info("initialzing system caspee");
-		ARDataLoadandSave data = new ARDataLoadandSave("caspar.xml");
-		try {
-			data.test();
-		} catch (TransformerConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (ParserConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (TransformerException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		
 		try {
 			/** Get a DisplaySystem according to the renderer selected in the startup box. */
@@ -158,6 +143,8 @@ public class AlienRabbleGameStateSystem extends BaseGame {
 		/** Get a high resolution timer for FPS updates. */
 		timer = Timer.getTimer();
 		
+		//set up the logging classes
+		initDataLogging();	
 	}
 	
 	/**
@@ -176,6 +163,20 @@ public class AlienRabbleGameStateSystem extends BaseGame {
 		GameState menu = new MenuState("menu", properties);
 		menu.setActive(true);
 		GameStateManager.getInstance().attachChild(menu);
+	
+	}
+	
+	private void initDataLogging(){
+		datalogger = ARDataLoadandSave.getInstance();
+		datalogger.setUpLoadandSaveDocs("init.xml");	
+		// lood the participant and model init data 
+		datalogger.getXmlParticipantData().loadParticipantInit();
+		//this next line is hideous.. I apologize!
+		datalogger.getXmlModelData_Grab().setModelSetName(datalogger.getXmlParticipantData().getModelSet_Grab());
+		datalogger.getXmlModelData_Grab().loadModelPaths();
+		//same again for sort models
+		datalogger.getXmlModelData_Sort().setModelSetName(datalogger.getXmlParticipantData().getModelSet_Sort());
+		datalogger.getXmlModelData_Sort().loadModelPaths();
 	}
 	
 	/**
@@ -207,7 +208,7 @@ public class AlienRabbleGameStateSystem extends BaseGame {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		AlienRabbleGameStateSystem app = new AlienRabbleGameStateSystem();
+		MainGameStateSystem app = new MainGameStateSystem();
 		app.setDialogBehaviour(AbstractGame.ALWAYS_SHOW_PROPS_DIALOG);
 		app.start();
 	}

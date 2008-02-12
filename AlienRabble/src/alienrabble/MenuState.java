@@ -39,6 +39,8 @@ package alienrabble;
 //import org.fenggui.event.SelectionChangedEvent;
 //import org.fenggui.layout.StaticLayout;
 
+import alienrabble.logging.ARDataLoadandSave;
+
 import com.jme.image.Texture;
 import com.jme.input.AbsoluteMouse;
 import com.jme.input.InputHandler;
@@ -81,13 +83,22 @@ public class MenuState extends CameraGameState {
 	
 	private PropertiesIO properties;
 
+	// the objects for displaying the instruction text
     private Text text;
+    private Text text1;
     private Text text2;
     private Text text3;
+    
+    private String participantname; 
 
     private InputHandler input;
     private Mouse mouse;
     
+    public MenuState(String name, PropertiesIO properties, String participantname) {
+    	this(name,properties);
+    	this.participantname = participantname;
+ 	
+    }
     public MenuState(String name, PropertiesIO properties) {
         super(name);
 
@@ -113,6 +124,10 @@ public class MenuState extends CameraGameState {
 		display.setTitle("Alien Rabble- Menu");
 		super.onActivate();
 		writeText();
+		if (menuStatus == MENU_FINISH){
+			//all done so save the output file
+			ARDataLoadandSave.getInstance().saveAllData();
+		}
 	}
 	
 	/**
@@ -165,9 +180,13 @@ public class MenuState extends CameraGameState {
 	 * Inits the button placed at the center of the screen.
 	 */
 	private void initText() {
-        text = Text.createDefaultTextLabel( "instructions 1" );
-        text.getLocalTranslation().set( 400, 600, 0 );
+        text = Text.createDefaultTextLabel( "welcome" );
+        text.getLocalTranslation().set( 400, 720, 0 );
         rootNode.attachChild( text );
+
+		text1 = Text.createDefaultTextLabel( "instructions 1" );
+        text1.getLocalTranslation().set( 400, 600, 0 );
+        rootNode.attachChild( text1 );
 
         text2 = Text.createDefaultTextLabel( "instructions 2" );
         text2.getLocalTranslation().set( 400, 400, 0 );
@@ -181,19 +200,23 @@ public class MenuState extends CameraGameState {
 	private void writeText(){
 		if (menuStatus == MENU_START){
 		}else if (menuStatus == MENU_GRAB_INSTRUCTIONS){
-			text.print( "Use the arrow keys to navigate round the space." );
+			String name = ARDataLoadandSave.getInstance().getXmlParticipantData().getName();
+			text.print("Welcome " + name + "!");
+			text1.print( "Use the arrow keys to navigate round the space." );
 			text2.print( "Collect all the aliens as fast as you can." );
 			text3.print( "press ENTER to begin" );
 		}else if (menuStatus == MENU_GRAB_FEEDBACK){
 			
 		}else if (menuStatus == MENU_SORT_INSTRUCTIONS){
-		    text.print( "Use mouse to select individual aliens." );
+			text.print("");
+		    text1.print( "Use mouse to select individual aliens." );
 	        text2.print( "Then click on the box you want to place them in." );
 	        text3.print( "press ENTER to begin" );
 		}else if (menuStatus == MENU_SORT_FEEDBACK){
 			
 		}else if (menuStatus == MENU_FINISH){
-		    text.print( "Thank you for your participation" );
+			text.print("");
+			text1.print( "Thank you for your participation" );
 	        text2.print( "" );
 			text3.print( "press ENTER to finish" );
 		}		

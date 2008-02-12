@@ -5,8 +5,6 @@ import com.jme.math.Vector3f;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import com.jme.scene.shape.Box;
-import com.jme.scene.state.AlphaState;
-import com.jme.system.DisplaySystem;
 
 public class PackingCases extends Node {
 
@@ -43,7 +41,8 @@ public class PackingCases extends Node {
 	public void addCase(){
 		if (countCases < MAXCASES){
 			Node container = new Node("packingcase"+countCases);
-			Box box = new Box("box"+countCases,new Vector3f(0,0,0),1f,1f,1f);
+			//actually more like a tray than a box.
+			Box box = new Box("box"+countCases,new Vector3f(0,0,0),1f,0.2f,1f);
 			box.setRandomColors();
 			BoundingBox bbox = new BoundingBox();
 			box.setModelBound(bbox);

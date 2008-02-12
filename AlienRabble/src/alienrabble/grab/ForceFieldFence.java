@@ -30,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package alienrabble;
+package alienrabble.grab;
 
 
 import com.jme.bounding.BoundingBox;

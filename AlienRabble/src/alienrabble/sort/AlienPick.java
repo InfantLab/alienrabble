@@ -32,6 +32,10 @@
 
 package alienrabble.sort;
 
+import alienrabble.logging.ARDataLoadandSave;
+import alienrabble.logging.ARXMLSortData;
+import alienrabble.logging.ARXMLSortData.MouseEvent;
+
 import com.jme.input.MouseInput;
 import com.jme.input.action.InputActionEvent;
 import com.jme.input.action.MouseInputAction;
@@ -44,6 +48,7 @@ import com.jme.scene.Geometry;
 import com.jme.scene.Node;
 import com.jme.scene.Text;
 import com.jme.system.DisplaySystem;
+import com.jme.util.Timer;
 
 /**
  * <code>MousePick</code>
@@ -62,12 +67,17 @@ public class AlienPick extends MouseInputAction {
     private String hitItems;
     private AlienSort selectedAlien;
     
+    private ARXMLSortData sortdata;
+    private Timer timer;
+    
 
     public AlienPick(DisplaySystem display, Node scene, Text text) {
         this.display = display;
         this.scene = scene;
         this.text = text;
         selectedAlien = null;
+        timer = Timer.getTimer();
+        sortdata = ARDataLoadandSave.getInstance().getXmlSortData();
     }
     /* (non-Javadoc)
      * @see com.jme.input.action.MouseInputAction#performAction(float)
@@ -91,12 +101,10 @@ public class AlienPick extends MouseInputAction {
 			// of the mouse's location
 			Ray ray = new Ray(worldCoords, worldCoords2
 					.subtractLocal(worldCoords).normalizeLocal());
-        	
-//        	Ray ray = new Ray(camera.getLocation(), camera.getDirection()); // camera direction is already normalized
-            PickResults results = new BoundingPickResults();
-            results.setCheckDistance(true);
+ 
+			PickResults results = new BoundingPickResults();
+            results.setCheckDistance(false);
             scene.findPick(ray,results);
-
             
             hits += results.getNumber();
             hitItems = "";
@@ -123,6 +131,15 @@ public class AlienPick extends MouseInputAction {
         	        		as.Select();
         	        		selectedAlien = as;
         	        	}	
+        	        	MouseEvent me = sortdata.new MouseEvent();
+        	        	me.clockTicks = timer.getTime();
+        	        	me.timeInSecs =me.clockTicks * 1f / timer.getResolution();// * 1f to get result as float
+        	        	me.x_location = worldCoords.x;
+        	        	me.y_location = worldCoords.y;
+        	        	me.objectname = as.getName();
+        	        	me.objectid  = as.getID();
+        	        	me.objectclicked = true;
+        	        	sortdata.addMouseEvent(me);
         	        	results.clear();
         	        	break;
         			}
@@ -135,6 +152,14 @@ public class AlienPick extends MouseInputAction {
         	        	if (selectedAlien != null)
         	        	{
         	        		selectedAlien.putInBox((Node) element);
+            	        	MouseEvent me = sortdata.new MouseEvent();
+            	        	me.clockTicks = timer.getTime();
+            	        	me.timeInSecs =me.clockTicks * 1f / timer.getResolution();// * 1f to get result as float
+            	        	me.x_location = worldCoords.x;
+            	        	me.y_location = worldCoords.y;
+            	        	me.objectname = element.getName();
+            	        	me.objectclicked = true;
+            	        	sortdata.addMouseEvent(me);
         	        		results.clear();
             	        	break;
         	        	}
@@ -142,6 +167,13 @@ public class AlienPick extends MouseInputAction {
         	    }
             }
             shots++;
+        	MouseEvent me = sortdata.new MouseEvent();
+        	me.clockTicks = timer.getTime();
+        	me.timeInSecs =me.clockTicks * 1f / timer.getResolution();// * 1f to get result as float
+        	me.x_location = worldCoords.x;
+        	me.y_location = worldCoords.y;
+        	me.objectclicked = false;
+        	sortdata.addMouseEvent(me);
             results.clear();
             text.print("Hits: " + hits + " Shots: " + shots + " : " + hitItems);
             performingAction = false;
