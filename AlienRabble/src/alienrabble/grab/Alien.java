@@ -181,7 +181,7 @@ public class Alien extends Node{
     	//random location
     	float x = 45 + FastMath.nextRandomFloat() * 130;
         float z = 45 + FastMath.nextRandomFloat() * 130;
-        float y = tb.getHeight(x,z) + 0.1f;
+        float y = tb.getHeight(x,z) + 3f;
         localTranslation.x = x;
         localTranslation.y = y;
         localTranslation.z = z;

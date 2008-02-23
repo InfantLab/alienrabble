@@ -3,7 +3,6 @@
 	<name>AlienRabble</name>
 	<comment></comment>
 	<projects>
-		<project>jme</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

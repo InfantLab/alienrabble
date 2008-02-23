@@ -43,6 +43,7 @@ import com.jme.app.AbstractGame;
 import com.jme.app.SimpleGame;
 import com.jme.bounding.BoundingSphere;
 import com.jme.scene.Node;
+import com.jme.scene.Spatial;
 import com.jme.util.export.Savable;
 import com.jme.util.export.binary.BinaryExporter;
 import com.jme.util.export.binary.BinaryImporter;
@@ -77,72 +78,96 @@ public class AlienConverter extends SimpleGame {
     protected void simpleInitGame() {
 
     	String modelpath;
-		Node newmodel;
+		Spatial newmodel;
 //
 //		modelpath = "alienconverter/data/model/grabber2.3ds";
 //    	newmodel = loadModel(modelpath);
     		
     		
-		modelpath = "alienconverter/data/Greebles/Family5/m5_51.3ds";
-		newmodel = loadModel(modelpath);
-		
-		modelpath = "alienconverter/data/Greebles/Family5/m5_52.3ds";
-		newmodel = loadModel(modelpath);
-            
-		modelpath = "alienconverter/data/Greebles/Family5/m5_53.3ds";	
-		newmodel = loadModel(modelpath);
-		
-		modelpath = "alienconverter/data/Greebles/Family5/m5_54.3ds";
-		newmodel = loadModel(modelpath);
-		
-		modelpath = "alienconverter/data/Greebles/Family5/m5_55.3ds";
-		newmodel = loadModel(modelpath);
-		
-		modelpath = "alienconverter/data/Greebles/Family5/m5_56.3ds";
-		newmodel = loadModel(modelpath);
-//		
-//		modelpath = "alienconverter/data/Greebles/Family5/m5_57.3ds";
+//		modelpath = "alienconverter/data/Greebles/Family5/m5_51.3ds";
 //		newmodel = loadModel(modelpath);
 //		
-//		modelpath = "alienconverter/data/Greebles/Family5/m5_58.3ds";
+//		modelpath = "alienconverter/data/Greebles/Family5/m5_52.3ds";
+//		newmodel = loadModel(modelpath);
+//            
+//		modelpath = "alienconverter/data/Greebles/Family5/m5_53.3ds";	
 //		newmodel = loadModel(modelpath);
 //		
-//		modelpath = "alienconverter/data/Greebles/Family5/m5_59.3ds";
+//		modelpath = "alienconverter/data/Greebles/Family5/m5_54.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/m5_55.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/m5_56.3ds";
+//		newmodel = loadModel(modelpath);
+////		
+////		modelpath = "alienconverter/data/Greebles/Family5/m5_57.3ds";
+////		newmodel = loadModel(modelpath);
+////		
+////		modelpath = "alienconverter/data/Greebles/Family5/m5_58.3ds";
+////		newmodel = loadModel(modelpath);
+////		
+////		modelpath = "alienconverter/data/Greebles/Family5/m5_59.3ds";
+////		newmodel = loadModel(modelpath);
+////
+////		modelpath = "alienconverter/data/Greebles/Family5/m5_510.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/f5_51.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/f5_52.3ds";
+//		newmodel = loadModel(modelpath);
+//            
+//		modelpath = "alienconverter/data/Greebles/Family5/f5_53.3ds";	
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/f5_54.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/f5_55.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/f5_56.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/f5_57.3ds";
 //		newmodel = loadModel(modelpath);
 //
-//		modelpath = "alienconverter/data/Greebles/Family5/m5_510.3ds";
-		newmodel = loadModel(modelpath);
+//		modelpath = "alienconverter/data/Greebles/Family5/f5_58.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/f5_59.3ds";
+//		newmodel = loadModel(modelpath);
+//		
+//		modelpath = "alienconverter/data/Greebles/Family5/f5_510.3ds";
+//		newmodel = loadModel(modelpath);
 		
-		modelpath = "alienconverter/data/Greebles/Family5/f5_51.3ds";
+		modelpath = "alienconverter/data/medin/medin0000.obj";
 		newmodel = loadModel(modelpath);
-		
-		modelpath = "alienconverter/data/Greebles/Family5/f5_52.3ds";
+		modelpath = "alienconverter/data/medin/medin1000.obj";
 		newmodel = loadModel(modelpath);
-            
-		modelpath = "alienconverter/data/Greebles/Family5/f5_53.3ds";	
+		modelpath = "alienconverter/data/medin/medin0100.obj";
 		newmodel = loadModel(modelpath);
-		
-		modelpath = "alienconverter/data/Greebles/Family5/f5_54.3ds";
+		modelpath = "alienconverter/data/medin/medin0010.obj";
 		newmodel = loadModel(modelpath);
-		
-		modelpath = "alienconverter/data/Greebles/Family5/f5_55.3ds";
+		modelpath = "alienconverter/data/medin/medin0001.obj";
 		newmodel = loadModel(modelpath);
-		
-		modelpath = "alienconverter/data/Greebles/Family5/f5_56.3ds";
+		modelpath = "alienconverter/data/medin/medin1111.obj";
 		newmodel = loadModel(modelpath);
-		
-		modelpath = "alienconverter/data/Greebles/Family5/f5_57.3ds";
+		modelpath = "alienconverter/data/medin/medin0111.obj";
+		newmodel = loadModel(modelpath);
+		modelpath = "alienconverter/data/medin/medin1011.obj";
+		newmodel = loadModel(modelpath);
+		modelpath = "alienconverter/data/medin/medin1101.obj";
+		newmodel = loadModel(modelpath);
+		modelpath = "alienconverter/data/medin/medin1110.obj";
 		newmodel = loadModel(modelpath);
 
-		modelpath = "alienconverter/data/Greebles/Family5/f5_58.3ds";
-		newmodel = loadModel(modelpath);
 		
-		modelpath = "alienconverter/data/Greebles/Family5/f5_59.3ds";
-		newmodel = loadModel(modelpath);
 		
-		modelpath = "alienconverter/data/Greebles/Family5/f5_510.3ds";
-		newmodel = loadModel(modelpath);
-
+		
 		newmodel.setLocalScale(1f);
 		newmodel.setModelBound(new BoundingSphere());
 		newmodel.updateModelBound();
@@ -157,8 +182,8 @@ public class AlienConverter extends SimpleGame {
      *  
      *  Attention : in case the original model is changed you'll have to delete the jbin one the reload it. 
      */		
-    public static Node loadModel (String modelFile){
-    	Node			loadedModel	= null;
+    public static Spatial loadModel (String modelFile){
+    	Spatial			loadedModel	= null;
     	FormatConverter		formatConverter = null;		
     	ByteArrayOutputStream 	BO 		= new ByteArrayOutputStream();
     	String			modelFormat 	= modelFile.substring(modelFile.lastIndexOf(".") + 1, modelFile.length());
@@ -190,7 +215,7 @@ public class AlienConverter extends SimpleGame {
     		
     		try {
     			formatConverter.convert(modelURL.openStream(), BO);
-    			loadedModel = (Node) BinaryImporter.getInstance().load(new ByteArrayInputStream(BO.toByteArray()));
+    			loadedModel = (Spatial) BinaryImporter.getInstance().load(new ByteArrayInputStream(BO.toByteArray()));
     			
     			//save the jbin format
     			BinaryExporter.getInstance().save((Savable)loadedModel, new File(modelBinary));

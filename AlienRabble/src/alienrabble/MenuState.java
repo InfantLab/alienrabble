@@ -150,7 +150,7 @@ public class MenuState extends CameraGameState {
 		Texture texture =
 	        TextureManager.loadTexture(
 	    	        MenuState.class.getClassLoader().getResource(
-	    	        "jmetest/data/cursor/cursor1.png"),
+	    	        "alienrabble/data/cursor/cursor1.png"),
 	    	        Texture.MM_LINEAR_LINEAR,
 	    	        Texture.FM_LINEAR);
 		

@@ -105,29 +105,31 @@ public class ARXMLModelData {
 				}
 				// get the Quaternion that rotates the object initially
 				NodeList rotationsList = firstElement.getElementsByTagName(ROTATION_NODE);
+				float x = 0f,y = 0f, z = 0f, w = 1f; //the identity rotation
 				if (rotationsList.getLength()>0){
 					Element rotation = (Element) rotationsList.item(0);
-					float x = 0f,y = 0f, z = 0f, w = 0f;
 					if (rotation.hasAttribute("x"))	x = Float.valueOf(rotation.getAttribute("x"));
 					if (rotation.hasAttribute("y"))	y = Float.valueOf(rotation.getAttribute("y"));
 					if (rotation.hasAttribute("z"))	z = Float.valueOf(rotation.getAttribute("z"));
 					if (rotation.hasAttribute("w"))	w = Float.valueOf(rotation.getAttribute("w"));
-					
-					Quaternion q = new Quaternion(x,y,z,w);
-					allModels[s].setInitialRotation(q);
 				}
+				Quaternion q = new Quaternion(x,y,z,w);
+				allModels[s].setInitialRotation(q);
+			
 				//finally get the Vector3f that scales the object initially
+				x = 1f;
+				y = 1f; 
+				z = 1f;
 				NodeList scaleList = firstElement.getElementsByTagName(SCALE_NODE);
 				if (scaleList.getLength()>0){
 					Element scale = (Element) scaleList.item(0);
-					float x = 1f,y = 1f, z = 1f;
 					if (scale.hasAttribute("x"))	x = Float.valueOf(scale.getAttribute("x"));
 					if (scale.hasAttribute("y"))	y = Float.valueOf(scale.getAttribute("y"));
 					if (scale.hasAttribute("z"))	z = Float.valueOf(scale.getAttribute("z"));
-					
-					Vector3f sc = new Vector3f(x,y,z);
-					allModels[s].setInitialScale(sc);
 				}
+				Vector3f sc = new Vector3f(x,y,z);
+				allModels[s].setInitialScale(sc);
+			
 				//now try to load this binary 
 				allModels[s].loadModelBinary();
 				

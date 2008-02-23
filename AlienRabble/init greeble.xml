@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<alienrabbledata>
+<participant>
+	<dob>29-07-1974</dob>
+	<name>denis</name>
+	<id>5002</id>
+	<modelset name="grab" value="family1" />
+	<modelset name="sort" value="family1" />
+</participant>
+
+<modelset name="family1">
+<modeldata>
+	<name>f1_11.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/f1_11.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="0" />
+		<property name="BodyType" value="1" />
+		<dimension name="Size" value="1" />
+		<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>f1_12.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/f1_12.jbin</location>
+	<property name="Family" value="1" />
+	<property name="Gender" value="0" />
+	<property name="BodyType" value="2" />
+	<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>f1_13.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/f1_13.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="0" />
+		<property name="BodyType" value="3" />
+		<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>f1_14.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/f1_14.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="0" />
+		<property name="BodyType" value="4" />
+		<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+			<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>f1_15.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/f1_15.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="0" />
+		<property name="BodyType" value="5" />
+		<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+			<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>f1_16.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/f1_16.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="0" />
+		<property name="BodyType" value="6" />
+		<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+			<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>m1_11.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/m1_11.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="1" />
+		<property name="BodyType" value="1" />
+		<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+			<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>m1_12.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/m1_12.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="1" />
+		<property name="BodyType" value="2" />
+		<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+			<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>m1_13.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/m1_13.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="1" />
+		<property name="BodyType" value="3" />
+		<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+			<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>m1_14.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/m1_14.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="1" />
+		<property name="BodyType" value="4" />
+		<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+			<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>m1_15.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/m1_15.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="1" />
+		<property name="BodyType" value="5" />
+		<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+			<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>m1_16.jbin</name>
+	<location>alienrabble/data/Greebles/Family1/m1_16.jbin</location>
+		<property name="Family" value="1" />
+		<property name="Gender" value="1" />
+		<property name="BodyType" value="6" />
+		<dimension name="Size" value="1" />
+	<rotation x="-0.707107" y="0" z="0" w="0.7071068" />
+			<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+</modelset>
+
+
+
+</alienrabbledata>

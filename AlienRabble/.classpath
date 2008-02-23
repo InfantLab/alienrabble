@@ -2,6 +2,23 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/jme"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/lib/lwjgl.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/lib/jinput.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/lib/junit-4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/lib/jogg-0.0.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/lib/jorbis-0.0.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/lib/lwjgl_util_applet.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-audio.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-terrain.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-awt.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-effects.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-model.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-collada.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-editors.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-font.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-gamestates.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-scene.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Developer/workspace/jme/target/jme-xml.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

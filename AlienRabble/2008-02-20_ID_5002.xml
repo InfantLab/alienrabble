@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<alienrabbledata>
+<participant grab="medin" sort="medin">
+<name>denis</name>
+<id>5002</id>
+<dob>0034-11-25</dob>
+<testdate>2008-02-20</testdate>
+<starttime>10:37:49</starttime>
+<endtime>11:04:13</endtime>
+<AlienRabbleVersion>0.1</AlienRabbleVersion>
+<modelset/>
+</participant>
+<modelset name="medin">
+<modeldata>
+<name>medin0000.jbin</name>
+<location>alienrabble/data/medin/medin0000.jbin</location>
+<property Size="1"/>
+<property Antennae="0"/>
+<property Markings="0"/>
+<property Colour="0"/>
+<property Category="0"/>
+<property Body="0"/>
+</modeldata>
+<modeldata>
+<name>medin0001.jbin</name>
+<location>alienrabble/data/medin/medin0001.jbin</location>
+<property Size="1"/>
+<property Antennae="1"/>
+<property Markings="0"/>
+<property Colour="0"/>
+<property Category="0"/>
+<property Body="0"/>
+</modeldata>
+<modeldata>
+<name>medin0010.jbin</name>
+<location>alienrabble/data/medin/medin0010.jbin</location>
+<property Size="1"/>
+<property Antennae="0"/>
+<property Markings="1"/>
+<property Colour="0"/>
+<property Category="0"/>
+<property Body="0"/>
+</modeldata>
+<modeldata>
+<name>medin0100.jbin</name>
+<location>alienrabble/data/medin/medin0100.jbin</location>
+<property Size="1"/>
+<property Antennae="0"/>
+<property Markings="0"/>
+<property Colour="1"/>
+<property Category="0"/>
+<property Body="0"/>
+</modeldata>
+<modeldata>
+<name>medin1000.jbin</name>
+<location>alienrabble/data/medin/medin1000.jbin</location>
+<property Size="1"/>
+<property Antennae="0"/>
+<property Markings="0"/>
+<property Colour="0"/>
+<property Category="0"/>
+<property Body="1"/>
+</modeldata>
+<modeldata>
+<name>medin0111.jbin</name>
+<location>alienrabble/data/medin/medin0111.jbin</location>
+<property Size="1"/>
+<property Antennae="1"/>
+<property Markings="1"/>
+<property Colour="1"/>
+<property Category="1"/>
+<property Body="0"/>
+</modeldata>
+<modeldata>
+<name>medin1011.jbin</name>
+<location>alienrabble/data/medin/medin1011.jbin</location>
+<property Size="1"/>
+<property Antennae="1"/>
+<property Markings="1"/>
+<property Colour="0"/>
+<property Category="0"/>
+<property Body="1"/>
+</modeldata>
+<modeldata>
+<name>medin1101.jbin</name>
+<location>alienrabble/data/medin/medin1101.jbin</location>
+<property Size="1"/>
+<property Antennae="1"/>
+<property Markings="0"/>
+<property Colour="1"/>
+<property Category="1"/>
+<property Body="1"/>
+</modeldata>
+<modeldata>
+<name>medin1110.jbin</name>
+<location>alienrabble/data/medin/medin1110.jbin</location>
+<property Size="1"/>
+<property Antennae="0"/>
+<property Markings="1"/>
+<property Colour="1"/>
+<property Category="1"/>
+<property Body="1"/>
+</modeldata>
+<modeldata>
+<name>medin1111.jbin</name>
+<location>alienrabble/data/medin/medin1111.jbin</location>
+<property Size="1"/>
+<property Antennae="1"/>
+<property Markings="1"/>
+<property Colour="1"/>
+<property Category="1"/>
+<property Body="1"/>
+</modeldata>
+</modelset>
+<GrabSessionDetails>
+<id/>
+<modelset/>
+<experimenter/>
+<testdate>2008-02-20</testdate>
+<starttime>10:37:49</starttime>
+<starttime>11:04:13</starttime>
+<startingpositions>
+<grab>
+<alienname>medin0000.jbin</alienname>
+<alienid>medin0000.jbin</alienid>
+<time secs="0.0" ticks="0"/>
+<location x="170.23448" z="140.1951"/>
+</grab>
+<grab>
+<alienname>medin0001.jbin</alienname>
+<alienid>medin0001.jbin</alienid>
+<time secs="0.0" ticks="0"/>
+<location x="111.513214" z="84.421936"/>
+</grab>
+<grab>
+<alienname>medin0010.jbin</alienname>
+<alienid>medin0010.jbin</alienid>
+<time secs="0.0" ticks="0"/>
+<location x="155.73328" z="60.61556"/>
+</grab>
+<grab>
+<alienname>medin0100.jbin</alienname>
+<alienid>medin0100.jbin</alienid>
+<time secs="0.0" ticks="0"/>
+<location x="79.123886" z="116.8017"/>
+</grab>
+<grab>
+<alienname>medin1000.jbin</alienname>
+<alienid>medin1000.jbin</alienid>
+<time secs="0.0" ticks="0"/>
+<location x="105.55813" z="137.51129"/>
+</grab>
+<grab>
+<alienname>medin0111.jbin</alienname>
+<alienid>medin0111.jbin</alienid>
+<time secs="0.0" ticks="0"/>
+<location x="139.30804" z="95.61235"/>
+</grab>
+<grab>
+<alienname>medin1011.jbin</alienname>
+<alienid>medin1011.jbin</alienid>
+<time secs="0.0" ticks="0"/>
+<location x="91.68849" z="145.6102"/>
+</grab>
+<grab>
+<alienname>medin1101.jbin</alienname>
+<alienid>medin1101.jbin</alienid>
+<time secs="0.0" ticks="0"/>
+<location x="84.426575" z="76.71647"/>
+</grab>
+<grab>
+<alienname>medin1110.jbin</alienname>
+<alienid>medin1110.jbin</alienid>
+<time secs="0.0" ticks="0"/>
+<location x="120.829185" z="147.59262"/>
+</grab>
+<grab>
+<alienname>medin1111.jbin</alienname>
+<alienid>medin1111.jbin</alienid>
+<time secs="0.0" ticks="0"/>
+<location x="107.18442" z="148.92416"/>
+</grab>
+</startingpositions>
+<grabbedpositions/>
+<playertrajectory>
+<grab>player<vehiclename/>
+<time secs="94.737" ticks="94737"/>
+<location x="100.0" z="100.0"/>
+<velocity x="0.0" z="0.0"/>
+</grab>
+</playertrajectory>
+</GrabSessionDetails>
+<SortSessionDetails>
+<id/>
+<modelset/>
+<experimenter/>
+<testdate>2008-02-20</testdate>
+<starttime>10:37:50</starttime>
+<starttime>11:04:13</starttime>
+<startingpositions>
+<mouseclick>
+<time secs="0.0" ticks="0"/>
+<location x="-50.0" y="30.0"/>
+</mouseclick>
+<mouseclick>
+<time secs="0.0" ticks="0"/>
+<location x="-40.0" y="30.0"/>
+</mouseclick>
+<mouseclick>
+<time secs="0.0" ticks="0"/>
+<location x="-30.0" y="30.0"/>
+</mouseclick>
+<mouseclick>
+<time secs="0.0" ticks="0"/>
+<location x="-20.0" y="30.0"/>
+</mouseclick>
+<mouseclick>
+<time secs="0.0" ticks="0"/>
+<location x="-10.0" y="30.0"/>
+</mouseclick>
+<mouseclick>
+<time secs="0.0" ticks="0"/>
+<location x="0.0" y="30.0"/>
+</mouseclick>
+<mouseclick>
+<time secs="0.0" ticks="0"/>
+<location x="10.0" y="30.0"/>
+</mouseclick>
+<mouseclick>
+<time secs="0.0" ticks="0"/>
+<location x="20.0" y="30.0"/>
+</mouseclick>
+<mouseclick>
+<time secs="0.0" ticks="0"/>
+<location x="30.0" y="30.0"/>
+</mouseclick>
+<mouseclick>
+<time secs="0.0" ticks="0"/>
+<location x="40.0" y="30.0"/>
+</mouseclick>
+</startingpositions>
+<mouseclicks>
+<mouseclick>
+<time secs="349.111" ticks="349111"/>
+<location x="0.2418978" y="0.30902734"/>
+</mouseclick>
+<mouseclick>
+<name/>
+<id>medin1110.jbin</id>
+<time secs="355.125" ticks="355125"/>
+<location x="0.29976812" y="0.2789348"/>
+</mouseclick>
+<mouseclick>
+<time secs="355.125" ticks="355125"/>
+<location x="0.29976812" y="0.2789348"/>
+</mouseclick>
+<mouseclick>
+<name>packingcase1</name>
+<id/>
+<time secs="420.632" ticks="420632"/>
+<location x="0.58448994" y="-0.34374952"/>
+</mouseclick>
+<mouseclick>
+<time secs="420.632" ticks="420632"/>
+<location x="0.58448994" y="-0.34374952"/>
+</mouseclick>
+</mouseclicks>
+<sortevents/>
+<sortgroups/>
+<sortorder/>
+</SortSessionDetails>
+</alienrabbledata>

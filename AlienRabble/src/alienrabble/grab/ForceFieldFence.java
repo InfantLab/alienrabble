@@ -184,7 +184,7 @@ public class ForceFieldFence extends Node {
         //load a texture for the force field elements
         TextureState ts = DisplaySystem.getDisplaySystem().getRenderer().createTextureState();
         t = TextureManager.loadTexture(ForceFieldFence.class.getClassLoader()
-                  .getResource("jmetest/data/texture/reflector.jpg"),
+                  .getResource("alienrabble/data/texture/reflector.jpg"),
                   Texture.MM_LINEAR_LINEAR, Texture.FM_LINEAR);
         
         t.setWrap(Texture.WM_WRAP_S_WRAP_T);
@@ -208,7 +208,7 @@ public class ForceFieldFence extends Node {
         //load a texture for the towers
         TextureState ts2 = DisplaySystem.getDisplaySystem().getRenderer().createTextureState();
         Texture t2 = TextureManager.loadTexture(ForceFieldFence.class.getClassLoader()
-                  .getResource("jmetest/data/texture/post.jpg"),
+                  .getResource("alienrabble/data/texture/post.jpg"),
                   Texture.MM_LINEAR_LINEAR, Texture.FM_LINEAR);
         
         ts2.setTexture(t2);
@@ -227,7 +227,7 @@ public class ForceFieldFence extends Node {
         //load a texture for the struts
         TextureState ts3 = DisplaySystem.getDisplaySystem().getRenderer().createTextureState();
         Texture t3 = TextureManager.loadTexture(ForceFieldFence.class.getClassLoader()
-                  .getResource("jmetest/data/texture/rust.jpg"),
+                  .getResource("alienrabble/data/texture/rust.jpg"),
                   Texture.MM_LINEAR_LINEAR, Texture.FM_LINEAR);
         
         ts3.setTexture(t3);

@@ -92,6 +92,8 @@ public class AlienRabble extends CameraGameState{
     private ChaseCamera chaser;
     // the root node of the scene graph
     private Node scene;
+    
+    private TimeGauge timeGauge;
 
     // display attributes for the window. We will keep these values
     // to allow the user to change them
@@ -185,11 +187,14 @@ public class AlienRabble extends CameraGameState{
         //the graph.
         scene.updateGeometricState(interpolation, true);
         
-        
+        //update the countdown gauge
+        timeGauge.setGauge(timer.getTimeInSeconds());
+        timeGauge.simpleUpdate();
         //update all our aliens
         aliencontainer.updateWorldData(interpolation);
         
-   
+        
+        //check for collisions
         results.clear();
         player.findCollisions(fence, results);
         if (results.getNumber()>0){
@@ -324,6 +329,8 @@ public class AlienRabble extends CameraGameState{
         
         //collisionTreeManager = new CollisionTreeManager( scene, new float[]{0.2f, 1.2f} );
         
+        //Add the skybox
+        buildSkyBox();
         //Add terrain to the scene
         buildTerrain();
         //Add a flag randomly to the terrain
@@ -332,8 +339,6 @@ public class AlienRabble extends CameraGameState{
         buildLighting();
         //add the force field fence
         buildEnvironment();
-        //Add the skybox
-        buildSkyBox();
         //Build the player
         buildPlayer();
         //build the chase camera
@@ -348,10 +353,16 @@ public class AlienRabble extends CameraGameState{
         //set up passes
         buildPassManager();
  
+        buildTimeGauge();
         
         // update the scene graph for rendering
         scene.updateGeometricState(0.0f, true);
         scene.updateRenderState();
+    }
+    
+    private void buildTimeGauge(){
+    	timeGauge = new TimeGauge("timegauge");
+    	scene.attachChild((Node)timeGauge);
     }
     
     private void buildAlienCounter(){
@@ -530,11 +541,20 @@ public class AlienRabble extends CameraGameState{
         light.setShadowCaster(true);
         light.setEnabled(true);
 
+        DirectionalLight light2 = new DirectionalLight();
+        light2.setDiffuse(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+        light2.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, .5f));
+        light2.setDirection(new Vector3f(-1,-1,0.5f));
+        light2.setShadowCaster(true);
+        light2.setEnabled(true);
+
+        
           /** Attach the light to a lightState and the lightState to rootNode. */
         LightState lightState = display.getRenderer().createLightState();
         lightState.setEnabled(true);
-        lightState.setGlobalAmbient(new ColorRGBA(.2f, .2f, .2f, 1f));
+        lightState.setGlobalAmbient(new ColorRGBA(.4f, .4f, .4f, 1f));
         lightState.attach(light);
+        lightState.attach(light2);
         scene.setRenderState(lightState);
     }
 
@@ -558,11 +578,11 @@ public class AlienRabble extends CameraGameState{
         ProceduralTextureGenerator pt = new ProceduralTextureGenerator(
                 heightMap);
         pt.addTexture(new ImageIcon(AlienRabble.class.getClassLoader()
-                .getResource("jmetest/data/texture/grassb.png")), -128, 0, 128);
+                .getResource("alienrabble/data/texture/grassb.png")), -128, 0, 128);
         pt.addTexture(new ImageIcon(AlienRabble.class.getClassLoader()
-                .getResource("jmetest/data/texture/dirt.jpg")), 0, 128, 255);
+                .getResource("alienrabble/data/texture/dirt.jpg")), 0, 128, 255);
         pt.addTexture(new ImageIcon(AlienRabble.class.getClassLoader()
-                .getResource("jmetest/data/texture/highest.jpg")), 128, 255,
+                .getResource("alienrabble/data/texture/highest.jpg")), 128, 255,
                 384);
         pt.createTexture(32);
         
@@ -575,7 +595,7 @@ public class AlienRabble extends CameraGameState{
         //load a detail texture and set the combine modes for the two terrain textures.
         Texture t2 = TextureManager.loadTexture(
         		AlienRabble.class.getClassLoader().getResource(
-                "jmetest/data/texture/Detail.jpg"),
+                "alienrabble/data/texture/Detail.jpg"),
                 Texture.MM_LINEAR_LINEAR,
                 Texture.FM_LINEAR);
 
@@ -609,7 +629,7 @@ public class AlienRabble extends CameraGameState{
         treeTex.setEnabled(true);
         Texture tr = TextureManager.loadTexture(
                 AlienRabble.class.getClassLoader().getResource(
-                        "jmetest/data/texture/grass.jpg"), Texture.MM_LINEAR_LINEAR,
+                        "alienrabble/data/texture/grass.jpg"), Texture.MM_LINEAR_LINEAR,
                 Texture.FM_LINEAR);
         treeTex.setTexture(tr);
         
@@ -640,32 +660,32 @@ public class AlienRabble extends CameraGameState{
 
         Texture north = TextureManager.loadTexture(
         		AlienRabble.class.getClassLoader().getResource(
-            "jmetest/data/texture/north.jpg"),
+            "alienrabble/data/skybox/north.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture south = TextureManager.loadTexture(
         		AlienRabble.class.getClassLoader().getResource(
-            "jmetest/data/texture/south.jpg"),
+            "alienrabble/data/skybox/south.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture east = TextureManager.loadTexture(
         		AlienRabble.class.getClassLoader().getResource(
-            "jmetest/data/texture/east.jpg"),
+            "alienrabble/data/skybox/east.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture west = TextureManager.loadTexture(
         		AlienRabble.class.getClassLoader().getResource(
-            "jmetest/data/texture/west.jpg"),
+            "alienrabble/data/skybox/west.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture up = TextureManager.loadTexture(
         		AlienRabble.class.getClassLoader().getResource(
-            "jmetest/data/texture/top.jpg"),
+            "alienrabble/data/skybox/top.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture down = TextureManager.loadTexture(
         		AlienRabble.class.getClassLoader().getResource(
-            "jmetest/data/texture/bottom.jpg"),
+            "alienrabble/data/skybox/bottom.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
 

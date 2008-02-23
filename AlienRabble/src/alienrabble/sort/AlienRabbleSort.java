@@ -39,6 +39,7 @@ import alienrabble.logging.ARXMLSortData;
 import alienrabble.logging.ARXMLSortData.MouseEvent;
 import alienrabble.model.ARXMLModelData;
 import alienrabble.model.Model;
+import alienrabble.util.RandomPermutation;
 
 import com.jme.image.Texture;
 import com.jme.input.AbsoluteMouse;
@@ -174,16 +175,27 @@ public class AlienRabbleSort extends CameraGameState {
 		
 		numAliens = modeldata.getNumModels();
 		allAlienSort = new AlienSort[numAliens];
-	
+		
+		RandomPermutation randperm = new RandomPermutation();
+		randperm.setSize(numAliens);
+		int[] perm;
+		if (randperm.next()){
+			perm = randperm.getPermutation();
+		}else{
+			//permutation failed, just do them in order
+			//there must be a cleverer way but i'm too stupid
+			perm = new int[numAliens];
+			for(int p = 0;p<numAliens;p++){
+				perm[p]=p;
+			}
+		}
+		
 		for(int i=0;i<numAliens;i++)
 		{
-			Model model = modeldata.getModel(i);
-//			Quaternion q = new Quaternion();
-//			q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
+			Model model = modeldata.getModel(perm[i]);
 
 			allAlienSort[i] = new AlienSort(model);
 			allAlienSort[i].setLocalTranslation(-5*numAliens + 10*i,30,0);
-//			allAlienSort[i].setLocalRotation(q);
 			scene.attachChild(allAlienSort[i]);				
 			allAlienSort[i].setInitialValues();
 			allAlienSort[i].addAllControllers();
@@ -252,13 +264,22 @@ public class AlienRabbleSort extends CameraGameState {
         light.setDirection(new Vector3f(1,-1,-.5f));
         light.setShadowCaster(true);
         light.setEnabled(true);
-
+        
+        /** Set up a basic, default light. */
+        DirectionalLight light2 = new DirectionalLight();
+        light2.setDiffuse(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+        light2.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, .5f));
+        light2.setDirection(new Vector3f(-1,-1,-.5f));
+        light2.setShadowCaster(true);
+        light2.setEnabled(true);
+        
           /** Attach the light to a lightState and the lightState to rootNode. */
         LightState lightState = display.getRenderer().createLightState();
         lightState.setEnabled(true);
-        lightState.setGlobalAmbient(new ColorRGBA(.2f, .2f, .2f, 1f));
+        lightState.setGlobalAmbient(new ColorRGBA(.6f, .6f, .6f, 1f));
         lightState.attach(light);
-        scene.setRenderState(lightState);
+        lightState.attach(light2);
+         scene.setRenderState(lightState);
     }
 	
 	/**
@@ -320,32 +341,32 @@ public class AlienRabbleSort extends CameraGameState {
 
         Texture north = TextureManager.loadTexture(
         		AlienRabbleSort.class.getClassLoader().getResource(
-            "jmetest/data/texture/north.jpg"),
+            "alienrabble/data/skybox/north.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture south = TextureManager.loadTexture(
         		AlienRabbleSort.class.getClassLoader().getResource(
-            "jmetest/data/texture/south.jpg"),
+            "alienrabble/data/skybox/south.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture east = TextureManager.loadTexture(
         		AlienRabbleSort.class.getClassLoader().getResource(
-            "jmetest/data/texture/east.jpg"),
+            "alienrabble/data/skybox/east.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture west = TextureManager.loadTexture(
         		AlienRabbleSort.class.getClassLoader().getResource(
-            "jmetest/data/texture/west.jpg"),
+            "alienrabble/data/skybox/west.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture up = TextureManager.loadTexture(
         		AlienRabbleSort.class.getClassLoader().getResource(
-            "jmetest/data/texture/top.jpg"),
+            "alienrabble/data/skybox/top.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
         Texture down = TextureManager.loadTexture(
         		AlienRabbleSort.class.getClassLoader().getResource(
-            "jmetest/data/texture/bottom.jpg"),
+            "alienrabble/data/skybox/bottom.jpg"),
             Texture.MM_LINEAR,
             Texture.FM_LINEAR);
 
