@@ -66,7 +66,7 @@ public class AlienPick extends MouseInputAction {
     private Text text;
     private String hitItems;
     private AlienSort selectedAlien;
-    
+     
     private ARXMLSortData sortdata;
     private Timer timer;
     
@@ -151,7 +151,12 @@ public class AlienPick extends MouseInputAction {
         	        	//we should make this vanish and log 
         	        	if (selectedAlien != null)
         	        	{
+        	        		selectedAlien.removeFromParent();
+        	        		element.attachChild((Node) selectedAlien);
         	        		selectedAlien.putInBox((Node) element);
+        	        		//get an empty reference to PackingCases class to allow rearrange children
+        	        		PackingCases pc = new PackingCases();
+        	        		pc.rearrangeChildren(element);
             	        	MouseEvent me = sortdata.new MouseEvent();
             	        	me.clockTicks = timer.getTime();
             	        	me.timeInSecs =me.clockTicks * 1f / timer.getResolution();// * 1f to get result as float

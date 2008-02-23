@@ -148,7 +148,7 @@ public class AlienRabble extends CameraGameState{
         
 
         // if escape was pressed, we exit
-        if (numAliens == 0) {
+        if (aliencontainer.getChildren().size() == 0) {
     		// Here we switch to the menu state which is already loaded
     		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
     		ms.menuStatus = MenuState.MENU_SORT_INSTRUCTIONS;
@@ -190,9 +190,12 @@ public class AlienRabble extends CameraGameState{
         //update the countdown gauge
         timeGauge.setGauge(timer.getTimeInSeconds());
         timeGauge.simpleUpdate();
-        //update all our aliens
-        aliencontainer.updateWorldData(interpolation);
-        
+
+//        //update all our aliens
+//        aliencontainer.updateWorldData(interpolation);
+       for(int i = 0;i<allAliens.length;i++){
+    	   allAliens[i].update(interpolation);
+       }
         
         //check for collisions
         results.clear();
@@ -232,9 +235,10 @@ public class AlienRabble extends CameraGameState{
     					ge.z_location = as.getLocalTranslation().z;
     					grabdata.addGrabEvent(ge);
     					
-    					//remove from scene
-    		        	as.removeFromParent();
-    		        	
+//    					//remove from scene
+//    		        	as.removeFromParent();
+
+    					as.grabAlien(player);
     		        	//update count 
     		        	numAliens--;
     		        	
@@ -435,7 +439,6 @@ public class AlienRabble extends CameraGameState{
 			allAliens[i] = new Alien(tb, scene,thisalien.getName() ,thisalien);
 			aliencontainer.attachChild(allAliens[i]);
 			allAliens[i].placeAlien();
-			allAliens[i].setPlayer(player);
 			allAliens[i].setID(thisalien.getID());
 
 			//log the initial positions
@@ -483,8 +486,8 @@ public class AlienRabble extends CameraGameState{
         player = new Vehicle("player",scene, model);
         player.setAcceleration(8);
         player.setBraking(12);
-        player.setTurnSpeed(2.2f);
-        player.setWeight(25);
+        player.setTurnSpeed(2.4f);
+        player.setWeight(17);
         player.setMaxSpeed(18);
         player.setMinSpeed(6);
         

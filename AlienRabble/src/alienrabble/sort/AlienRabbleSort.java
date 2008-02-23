@@ -45,8 +45,6 @@ import com.jme.image.Texture;
 import com.jme.input.AbsoluteMouse;
 import com.jme.input.InputHandler;
 import com.jme.light.DirectionalLight;
-import com.jme.math.FastMath;
-import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.pass.BasicPassManager;
@@ -208,7 +206,7 @@ public class AlienRabbleSort extends CameraGameState {
 			sortdata.addStartingPosition(me); 
 		}
 		
-		packingcases = new PackingCases(2);
+		packingcases = new PackingCases(scene, 2);
 		
 		scene.attachChild(packingcases);
 		

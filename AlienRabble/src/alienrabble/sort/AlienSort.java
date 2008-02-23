@@ -63,7 +63,7 @@ public class AlienSort extends Node{
 	
 	private static final float SCALEFACTOR = 1.7f; //magnify all the objects
 	private static final float GROWFACTOR = 3f; // how much bigger will selected alien grow?
-	private static final float YCENTRE = -12f; //how far up the screen will the selected alien be?
+	private static final float YCENTRE = -2f; //how far up the screen will the selected alien be?
 	
 	private int currentStatus;
 	
@@ -150,6 +150,14 @@ public class AlienSort extends Node{
     			}			
     		}
     	}
+//    	else if (this.currentStatus == STATUS_SORTED){
+//    		if (alienputinbox.isActive()){
+//    			if (alienputinbox.getCurTime() >= alienputinbox.getMaxTime()){
+//    				alienputinbox.setActive(false);
+//    			}
+//    		}
+//    	}
+    		
         	
     }
 
@@ -215,24 +223,25 @@ public class AlienSort extends Node{
 		SpatialTransformer st = new SpatialTransformer(1);
 		st.setRepeatType(SpatialTransformer.RT_CLAMP);
 		st.setObject(this, 0, -1);
-		st.setScale(0,0,initialSize.mult(GROWFACTOR));
-		st.setScale(0,2, initialSize);
-		st.setPosition(0, 0, new Vector3f(0,YCENTRE,0));
-		st.setPosition(0,2, box.getWorldTranslation());
+		
+		st.setScale(0, 0, initialSize.mult(GROWFACTOR).divide(box.getLocalScale()));
+		st.setScale(0, 2, initialSize.divide(box.getLocalScale()));
+		st.setPosition(0, 0, box.getWorldTranslation().subtract(new Vector3f(0,YCENTRE,0)));
+		st.setPosition(0, 2,new Vector3f(0,0,0));
 		st.interpolateMissing();
 		st.setActive(false);
 		return st;
 	}
 	
-	public void UpdateStatus(){
-		if( (this.currentStatus&STATUS_SELECTED)==STATUS_SELECTED)
-		{
-			Unselect();
-		}else
-		{
-			Select();
-		}
-	}
+//	public void UpdateStatus(){
+//		if( (this.currentStatus&STATUS_SELECTED)==STATUS_SELECTED)
+//		{
+//			Unselect();
+//		}else
+//		{
+//			Select();
+//		}
+//	}
 	
 	public void Select(){
     	if (this.currentStatus == STATUS_UNSORTED_UNSELECTED ){
@@ -256,15 +265,27 @@ public class AlienSort extends Node{
     		}
     	}
 	}
+	public void Unsort(){
+		if (this.currentStatus == STATUS_SORTED){
+    		this.currentStatus = STATUS_UNSORTED_UNSELECTED;
+    		alienshrink.setActive(true);
+    		aliengrow.setActive(false);
+    		alienspinner.setActive(false);
+    		if (alienshrink.getCurTime() > alienshrink.getMaxTime()){
+    			alienshrink.setCurTime(0);
+    		}
+    	}
+	}
 	public void putInBox(Node box)
 	{
 		if (currentStatus == STATUS_SORTED) return;
-		alienputinbox = AlienPutInBox(box);
-		this.addController(alienputinbox);
+//		alienputinbox = AlienPutInBox(box);
+//		this.addController(alienputinbox);
 		alienshrink.setActive(false);
 		aliengrow.setActive(false);
 		alienspinner.setActive(false);
-		alienputinbox.setActive(true);
+		this.setLocalScale(1);
+		this.setLocalRotation(new Quaternion(0,0,0,1f));
 		currentStatus = STATUS_SORTED;
 	}
 }

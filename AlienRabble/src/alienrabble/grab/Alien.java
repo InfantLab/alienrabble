@@ -36,6 +36,7 @@ package alienrabble.grab;
 import java.util.logging.Logger;
 
 
+import com.jme.animation.SpatialTransformer;
 import com.jme.bounding.BoundingBox;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
@@ -59,6 +60,10 @@ public class Alien extends Node{
 
 	private static final Logger logger = Logger.getLogger(AlienRabble.class
             .getName());
+	
+	private static float SHRINKFACTOR = 0.3f;
+	
+	private SpatialTransformer grabanimation;
 
 	//reference to the level terrain for placement
     TerrainBlock tb;
@@ -72,8 +77,6 @@ public class Alien extends Node{
     private Vector3f orientation;
     
     private Spatial model;
-//    private CollisionResults results;
-    private Vehicle player;
     
     private String ID; //an ID for this alien.. simpler than the name probably just a number
     
@@ -113,10 +116,6 @@ public class Alien extends Node{
         this.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
     }
     
-    public void setPlayer(Vehicle player){
-    	this.player = player;
-    }
-    
     /**
      * retrieves the model Spatial of this alien.
      * @return the model Spatial of this alien.
@@ -139,28 +138,38 @@ public class Alien extends Node{
         this.attachChild(this.model);
     }
     
-    /**
-     * 
-     * @param time the time between frame.
-     */
-    public void update(float time) {
+    public void update(float time){
     	super.updateRenderState();
-    	
-    	
-//    	results.clear();
-//        player.calculateCollisions(this,  results);
-//		for ( int i = results.getNumber() - 1; i >= 0; i-- ) {
-//			Node element = results.getCollisionData(i).getSourceMesh().getParent();
-//            while (!(element instanceof Vehicle) && !(element == null) ) { 
-//              element = element.getParent();
-//            }
-//	        if ( element instanceof Vehicle ) {
-//	        	//we should make this vanish and log 
-//				player.setVelocity(-0.7f * player.getVelocity());
-//				removeFromParent();
-//			}
-//		}	
-    }
+    	if (grabanimation != null){
+ 			if (grabanimation.getCurTime() >= grabanimation.getMaxTime()){
+				this.removeFromParent();
+			}			    			
+		}
+	}
+    
+//    /**
+//     * 
+//     * @param time the time between frame.
+//     */
+//    public void updateWorldData(float time) {
+//    	
+//
+//	
+//    	
+////    	results.clear();
+////        player.calculateCollisions(this,  results);
+////		for ( int i = results.getNumber() - 1; i >= 0; i-- ) {
+////			Node element = results.getCollisionData(i).getSourceMesh().getParent();
+////            while (!(element instanceof Vehicle) && !(element == null) ) { 
+////              element = element.getParent();
+////            }
+////	        if ( element instanceof Vehicle ) {
+////	        	//we should make this vanish and log 
+////				player.setVelocity(-0.7f * player.getVelocity());
+////				removeFromParent();
+////			}
+////		}	
+//    }
     /**
      * reset sets the life time back to 10 seconds, and then randomly places the flag
      * on the terrain.
@@ -193,6 +202,43 @@ public class Alien extends Node{
 		speed = FastMath.nextRandomFloat();    
     }
     
+    public void grabAlien(Vehicle player){
+    	if (grabanimation != null) return;
+    	grabanimation = AlienGrabbedAnimation(player);
+    	this.addController(grabanimation);
+    	grabanimation.setActive(true);
+    	this.setIsCollidable(false);
+    }
+    
+    
+    /***
+     * a routine that animates the alien when we capture it,
+     * spinning it round and shrinking it. 
+     * @return
+     */
+	private SpatialTransformer AlienGrabbedAnimation(Vehicle player){
+		SpatialTransformer st = new SpatialTransformer(1);
+		Quaternion q0 = new Quaternion();
+		q0.set(localRotation);
+		Quaternion q = new Quaternion();
+		q.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
+		st.setObject(this, 0, -1);
+		st.setRepeatType(SpatialTransformer.RT_CLAMP);
+		st.setScale(0,0,localScale);
+		st.setScale(0,3,localScale.mult(SHRINKFACTOR) );
+		st.setPosition(0,0,localTranslation);
+	
+		Vector3f playerdirection = player.getLocalRotation().getRotationColumn(2);
+		playerdirection.y =+ 0.5f;
+		st.setPosition(0,3, localTranslation.addLocal(playerdirection));
+		st.setRotation(0,0, q0);
+		st.setRotation(0,1.5f, q0.mult(q));
+		st.setRotation(0,3, q0.mult(q).mult(q));
+		st.interpolateMissing();
+		st.setActive(false);
+		return st;
+	}
+    
     /**
      * <code>removeFromParent</code> removes this Spatial from it's parent.
      *
@@ -200,7 +246,10 @@ public class Alien extends Node{
      */
     public boolean removeFromParent() {
     	logger.info(this.getName() + " removed @ " );
-    	return super.removeFromParent();
+		grabanimation.setActive(false);
+		this.detachAllChildren();
+		this.updateRenderState();
+		return super.removeFromParent();
     }
     
     public String getID(){
