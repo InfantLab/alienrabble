@@ -63,6 +63,8 @@ import com.jme.scene.state.ZBufferState;
 import com.jme.system.DisplaySystem;
 import com.jme.system.PropertiesIO;
 import com.jme.util.TextureManager;
+import com.jmex.audio.AudioSystem;
+import com.jmex.audio.AudioTrack;
 import com.jmex.game.state.CameraGameState;
 
 
@@ -100,9 +102,12 @@ public class AlienRabbleSort extends CameraGameState {
     private Skybox skybox;
     
     //the data logger
-    ARXMLSortData sortdata;
+    private ARXMLSortData sortdata;
     
-    ARXMLModelData modeldata;
+    private ARXMLModelData modeldata;
+    
+    //sound effects
+    private AudioTrack laserSound;
     
     
     public AlienRabbleSort(String name, PropertiesIO properties){
@@ -160,13 +165,17 @@ public class AlienRabbleSort extends CameraGameState {
 		//set up passes
         buildPassManager();
 		
+        setupSounds();
+        
         if (input != null) input.removeAllFromAttachedHandlers();
         
         Text text = Text.createDefaultTextLabel("Test Label", "Hits: 0 Shots: 0");
         text.setCullMode(SceneElement.CULL_NEVER);
         text.setTextureCombineMode(TextureState.REPLACE);
         text.setLocalTranslation(new Vector3f(1, 60, 0));
-        scene.attachChild(text);    	
+       
+        //in production do so show this text information
+        //scene.attachChild(text);    	
 	
 
 		modeldata = ARDataLoadandSave.getInstance().getXmlModelData_Sort();
@@ -249,6 +258,21 @@ public class AlienRabbleSort extends CameraGameState {
 
         AlienPick pick = new AlienPick(display, scene, text);
 		input.addAction(pick);	
+	}
+	
+	private void setupSounds() {
+        /** Set the 'ears' for the sound API */
+        AudioSystem audio = AudioSystem.getSystem();
+        audio.getEar().trackOrientation(cam);
+        audio.getEar().trackPosition(cam);
+		
+		/** Create program sound */
+//		targetSound = audio.createAudioTrack( getClass().getResource( "/jmetest/data/sound/explosion.ogg" ), false);
+//        targetSound.setMaxAudibleDistance(1000);
+//        targetSound.setVolume(1.0f);
+		laserSound = audio.createAudioTrack( getClass().getResource( "/alienrabble/data/sounds/whizzoop.ogg" ), false);
+        laserSound.setMaxAudibleDistance(1000);
+        laserSound.setVolume(1.0f);
 	}
 	
     /**

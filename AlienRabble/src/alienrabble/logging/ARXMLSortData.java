@@ -62,7 +62,7 @@ public class ARXMLSortData{
 	public static final String TYPE_ADDBOX = "addbox";
 	public static final String TYPE_REMOVEBOX = "removebox";
 	public static final String TYPE_SORTRESULT = "sortresult";
-	
+	public static final String TYPE_CLICKNOTHING = "clicknothing";
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static final String TIME_FORMAT = "hh:mm:ss";
@@ -244,13 +244,13 @@ public class ARXMLSortData{
 		Element sortevent = doc.createElement(SORT_EVENT);
 		sortevent.setAttribute(EVENT_TYPE, se.type);
 		Element g1 = doc.createElement(NAME_NODE);
-		sortevent.setTextContent(se.objectname);
+		g1.setTextContent(se.objectname);
 		sortevent.appendChild(g1);
 		Element g1b = doc.createElement(ID_NODE);
-		sortevent.setTextContent(se.objectid);
+		g1b.setTextContent(se.objectid);
 		sortevent.appendChild(g1b);
 		Element g1c = doc.createElement(SORT_GROUP);
-		sortevent.setTextContent(se.objectid);
+		g1c.setTextContent(String.valueOf(se.sortgroup));
 		sortevent.appendChild(g1c);
 		
 		Element g2 = doc.createElement(EVENTTIME_NODE);

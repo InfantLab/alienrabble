@@ -2,6 +2,7 @@ package alienrabble.grab;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -49,6 +50,8 @@ import com.jme.system.PropertiesIO;
 import com.jme.util.TextureManager;
 import com.jme.util.Timer;
 import com.jme.util.export.binary.BinaryImporter;
+import com.jmex.audio.AudioSystem;
+import com.jmex.audio.AudioTrack;
 import com.jmex.game.state.CameraGameState;
 import com.jmex.game.state.GameStateManager;
 import com.jmex.terrain.TerrainBlock;
@@ -79,6 +82,12 @@ public class AlienRabble extends CameraGameState{
     private Text text;
     //private CollisionTreeManager collisionTreeManager;
 	private CollisionResults results;
+	
+    private TimeGauge timeGauge;
+    private Node guiNode;
+    private int gaugeVal;
+    private int gaugeChangeValue;
+    private float lastUpdate = 0;
 		
 	/** Our display system. */
 	private DisplaySystem display;
@@ -93,7 +102,6 @@ public class AlienRabble extends CameraGameState{
     // the root node of the scene graph
     private Node scene;
     
-    private TimeGauge timeGauge;
 
     // display attributes for the window. We will keep these values
     // to allow the user to change them
@@ -114,6 +122,9 @@ public class AlienRabble extends CameraGameState{
     
     ARXMLModelData modeldata;
     
+    //sound effects
+//    AudioTrack laserSound;
+//	AudioTrack targetSound;
     
 	public AlienRabble(String name, PropertiesIO properties) {
 		super(name);
@@ -187,16 +198,29 @@ public class AlienRabble extends CameraGameState{
         //the graph.
         scene.updateGeometricState(interpolation, true);
         
-        //update the countdown gauge
-        timeGauge.setGauge(timer.getTimeInSeconds());
-        timeGauge.simpleUpdate();
+//        //update the countdown gauge
+//        if (timer.getTimeInSeconds() > lastUpdate + 0.1f) {
+//            gaugeVal += gaugeChangeValue;
+//            if (gaugeVal > timeGauge.getMaximum() ||
+//            		gaugeVal < timeGauge.getMinimum()) {
+//                gaugeChangeValue *= -1;
+//            }
+//            lastUpdate = timer.getTimeInSeconds();
+//            timeGauge.setGauge(gaugeVal);
+//        }
 
 //        //update all our aliens
 //        aliencontainer.updateWorldData(interpolation);
-       for(int i = 0;i<allAliens.length;i++){
-    	   allAliens[i].update(interpolation);
-       }
+//       for(int i = 0;i<allAliens.length;i++){
+//    	   allAliens[i].update(interpolation);
+//       }
         
+       ArrayList<Spatial> remainingaliens = aliencontainer.getChildren();
+       for(int i= 0; i< remainingaliens.size();i++){
+    	   Alien thisalien = (Alien) remainingaliens.get(i);
+    	   thisalien.update(interpolation);
+       }
+       
         //check for collisions
         results.clear();
         player.findCollisions(fence, results);
@@ -215,7 +239,11 @@ public class AlienRabble extends CameraGameState{
 	              element = element.getParent();
 	            }
 		        if ( element instanceof Alien ) {
-
+		        		
+//					/** Signal our sound to play laser during collision */
+//		            laserSound.setWorldPosition(element.getWorldTranslation());
+//		            laserSound.play();
+		        	
                     relativePosition.set( element.getWorldTranslation() );
                     relativePosition.subtractLocal( player.getWorldTranslation() );
                     final float distance = relativePosition.length();
@@ -249,6 +277,9 @@ public class AlienRabble extends CameraGameState{
             }
         } 
     }
+    
+    
+
 
 	/**
 	 * Gets called every time the game state manager switches to this game state.
@@ -259,6 +290,22 @@ public class AlienRabble extends CameraGameState{
 		super.onActivate();
 	}
     
+	
+	private void setupSounds() {
+        /** Set the 'ears' for the sound API */
+        AudioSystem audio = AudioSystem.getSystem();
+        audio.getEar().trackOrientation(cam);
+        audio.getEar().trackPosition(cam);
+		
+		/** Create program sound */
+//		targetSound = audio.createAudioTrack( getClass().getResource( "/jmetest/data/sound/explosion.ogg" ), false);
+//        targetSound.setMaxAudibleDistance(1000);
+//        targetSound.setVolume(1.0f);
+//		laserSound = audio.createAudioTrack( getClass().getResource( "/alienrabble/data/sounds/whizzoop.ogg" ), false);
+//        laserSound.setMaxAudibleDistance(1000);
+//        laserSound.setVolume(1.0f);
+	}
+	
     /**
      * draws the scene graph
      * 
@@ -268,8 +315,10 @@ public class AlienRabble extends CameraGameState{
         // Clear the screen
         display.getRenderer().clearBuffers();
         display.getRenderer().draw(scene);
+//        display.getRenderer().draw(guiNode);
         /** Have the PassManager render. */
         passManager.renderPasses(display.getRenderer());
+        
     }
 
     /**
@@ -357,16 +406,58 @@ public class AlienRabble extends CameraGameState{
         //set up passes
         buildPassManager();
  
-        buildTimeGauge();
+//        buildTimeGauge();
+        
+        //add sound effects
+//        setupSounds();
         
         // update the scene graph for rendering
         scene.updateGeometricState(0.0f, true);
         scene.updateRenderState();
     }
     
+    /**
+     * Init the TimeGuage:
+     * - Position on Screen
+     * - Min / Max Values for the Gauge
+     */
     private void buildTimeGauge(){
-    	timeGauge = new TimeGauge("timegauge");
-    	scene.attachChild((Node)timeGauge);
+        gaugeChangeValue = 2;
+        gaugeVal = 1000;
+        timeGauge = new TimeGauge(display, "timegauge");
+        timeGauge.setMinimum(0);
+        timeGauge.setMaximum(1000);
+        timeGauge.setIsVertical(true);
+        timeGauge.setWidthHeight(40,300);
+        //timeGauge.setScale((display.getWidth() / 40),(display.getHeight() / 300));
+        // position the timeGauge in the lower left corner
+        //timeGauge.setPosition(timeGauge.getWidth(), timeGauge.getHeight()+50);
+        timeGauge.setPosition(display.getWidth() - 40f, 20f + 0.5f*timeGauge.getHeight());
+        timeGauge.setGauge(gaugeVal);
+        buildHUD();
+    }
+    
+    /**
+     * create a GUI Node to attach the TimeGauge to. 
+     */
+    private void buildHUD() {
+        guiNode = new Node("gui swing");
+        // Render the Gui node in the Ortho Queue
+        guiNode.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        // attach the ProgressBars node to the GuiNode
+        guiNode.attachChild(timeGauge.getNode());
+        // don't cull the gui away
+        guiNode.setCullMode(Spatial.CULL_NEVER);
+        // gui needs no lighting
+        guiNode.setLightCombineMode(LightState.OFF);
+        // update the render states (especially the texture state of the ProgressBar!)
+        guiNode.updateRenderState();
+        // update the world vectors (needed as we have altered local translation
+        // of the desktop and it's
+        // not called in the update loop)
+        guiNode.updateGeometricState(0, true);
+        
+        scene.attachChild(guiNode);
     }
     
     private void buildAlienCounter(){

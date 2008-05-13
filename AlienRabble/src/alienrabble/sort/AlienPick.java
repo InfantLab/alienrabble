@@ -35,6 +35,7 @@ package alienrabble.sort;
 import alienrabble.logging.ARDataLoadandSave;
 import alienrabble.logging.ARXMLSortData;
 import alienrabble.logging.ARXMLSortData.MouseEvent;
+import alienrabble.logging.ARXMLSortData.SortEvent;
 
 import com.jme.input.MouseInput;
 import com.jme.input.action.InputActionEvent;
@@ -164,7 +165,16 @@ public class AlienPick extends MouseInputAction {
             	        	me.y_location = worldCoords.y;
             	        	me.objectname = element.getName();
             	        	me.objectclicked = true;
+            	        	//me.type = ARXMLSortData.TYPE_SORTALIEN;
             	        	sortdata.addMouseEvent(me);
+            	        	SortEvent se = sortdata.new SortEvent();
+            	        	se.clockTicks = me.clockTicks;
+            	        	se.timeInSecs = me.timeInSecs;
+            	        	se.sortgroup = Integer.parseInt(element.getName().substring(11));
+            	        	se.objectname = selectedAlien.getName();
+            	        	se.objectid  = selectedAlien.getID();
+            	        	se.type = ARXMLSortData.TYPE_SORTALIEN;
+            	        	sortdata.addSortEvent(se);
         	        		results.clear();
             	        	break;
         	        	}
@@ -178,6 +188,7 @@ public class AlienPick extends MouseInputAction {
         	me.x_location = worldCoords.x;
         	me.y_location = worldCoords.y;
         	me.objectclicked = false;
+        	//me.type = ARXMLSortData.TYPE_CLICKNOTHING;
         	sortdata.addMouseEvent(me);
             results.clear();
             text.print("Hits: " + hits + " Shots: " + shots + " : " + hitItems);
