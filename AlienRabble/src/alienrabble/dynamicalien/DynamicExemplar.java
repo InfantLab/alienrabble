@@ -60,7 +60,7 @@ public class DynamicExemplar extends Node {
 	public static final String STRIPEINFO_NODE = "stripeinfo";
 	public static final String STRIPEANGLE_NODE = "stripeangle";
 	public static final String STRIPEFREQ_NODE = "stripefreq";
-	public static final String STRIPECOLOURS_NODE = "bodycolour";
+	public static final String STRIPECOLOURS_NODE = "stripecolours";
 	public static final String CATEGORYMEMBER_NODE = "bodycolour";
 	
 	//the colour constants
@@ -101,14 +101,10 @@ public class DynamicExemplar extends Node {
 	private TriMesh arms;
 	private SharedMesh legs[];
 	private SharedMesh eyes[];
-	private DisplaySystem display;
 
 
-	
-	
-	public DynamicExemplar(String name, DisplaySystem display){
+	public DynamicExemplar(String name){
 		super(name);
-		this.display = display;
 		
 		//set values for the default median alien
 		legCount = 9; 
@@ -165,12 +161,12 @@ public class DynamicExemplar extends Node {
 		stripeColours = n;
 		created = false;
 	}
-	public void setBodyHeight(int n){
+	public void setBodyHeight(float n){
 		bodyHeight = n;
 		created = false;
 	}
-	public void setBodyWidth(int n){
-		legType = n;
+	public void setBodyWidth(float n){
+		bodyWidth = n;
 		created = false;
 	}
 	public void setBodyType(int n){
@@ -190,8 +186,19 @@ public class DynamicExemplar extends Node {
 		eyeSize = n;
 		created = false;
 	}
+	public void setArmType(int n){
+		armType = n;
+		created = false;
+	}
+	public void setArmSize(float x){
+		armSize = x;
+		created = false;
+	}
 	
 	public void setUpExemplar(){
+		
+        float ztrans = 0;
+        float ytrans = 0;
 		
 		switch (bodyType){
 		case CAPSULE://capsule
@@ -199,7 +206,8 @@ public class DynamicExemplar extends Node {
 			break;
 		case BOX://rounded box
 			Vector3f boxextent = new Vector3f(bodyWidth/2,bodyHeight/2,bodyWidth/2);
-			body = new RoundedBox("body",boxextent,boxextent.mult(0.1f),boxextent.mult(0.1f));
+			body = new RoundedBox("body",boxextent,boxextent.mult(0.3f),boxextent.mult(0.3f));
+			ytrans = -6;
 			break;
 		case SPHERE://sphere
 			body = new Sphere("body", 12, 12, bodyHeight/2);
@@ -222,7 +230,7 @@ public class DynamicExemplar extends Node {
 			body = new Capsule("body", 12, 12, 12, bodyWidth/2, bodyHeight);
 		}
 		body.setModelBound(new BoundingBox());
-		body.setLocalTranslation(0, legLength + bodyHeight/2, 0);
+		body.setLocalTranslation(0, legLength + ytrans + bodyHeight/2, 0);
 		body.updateModelBound();
 	
 		String colours = "";
@@ -245,7 +253,7 @@ public class DynamicExemplar extends Node {
 		stripetexture += "_stripe_" + Long.toString(stripeFreq); 
 		stripetexture += "_angle_" + Long.toString(stripeAngle) + ".png";
 				
-        TextureState ts = display.getRenderer().createTextureState();
+        TextureState ts = DisplaySystem.getDisplaySystem().getRenderer().createTextureState();
         ts.setEnabled(true);
         Texture texture = TextureManager.loadTexture(TestDynamic.class
                 .getClassLoader().getResource(stripetexture),
@@ -255,12 +263,14 @@ public class DynamicExemplar extends Node {
         body.setRenderState(ts);
         this.attachChild(body);
         
-        MaterialState material = display.getRenderer().createMaterialState();
+        MaterialState material = DisplaySystem.getDisplaySystem().getRenderer().createMaterialState();
         material.setShininess( 128 );
         material.setDiffuse( eyeColour );
         material.setAmbient( eyeColour.mult( new ColorRGBA( 0.1f, 0.7f, 0.1f, 1 ) ) );
             
         String legmodel = "";
+        ztrans = 0;
+        ytrans = 0;
         
         switch (legType){
         case 1:
@@ -268,6 +278,7 @@ public class DynamicExemplar extends Node {
         	break;
         case 2: 
         	legmodel  = "alienrabble/data/model/legcurved.jbin";
+        	ytrans = 13;
         	break;
         default:
         	legmodel  = "alienrabble/data/model/blobleg3.jbin";
@@ -282,6 +293,7 @@ public class DynamicExemplar extends Node {
             legGeometry.setModelBound(new BoundingBox());
             //scale it to be MUCH smaller than it is originally
             legGeometry.setLocalScale(1f);
+            legGeometry.setLocalTranslation(0f,0f,ztrans);
             legGeometry.updateModelBound();
             //this.attachChild(model);
         } catch (IOException e) {
@@ -323,9 +335,9 @@ public class DynamicExemplar extends Node {
         	eyes[i].updateModelBound();
         	float angle = 0;
         	if (eyeCount==2){
-        		angle = 0.4f * FastMath.PI  + i * 0.2f *  FastMath.PI; 
+        		angle =-0.4f * FastMath.PI  - i * 0.2f *  FastMath.PI; 
         	}else{	
-        		angle = FastMath.PI / 4 + i * 2 * FastMath.PI / eyeCount; 
+        		angle = -1*FastMath.PI / 4 - i * 2 * FastMath.PI / eyeCount; 
         	}
         		
 	        Quaternion q = new Quaternion();
@@ -338,8 +350,8 @@ public class DynamicExemplar extends Node {
         }
 
         String armmodel = "";
-        float ztrans = 0;
-        float ytrans = 0;
+        ztrans = 0;
+        ytrans = 0;
         
         switch (armType){
         case 1:
@@ -361,7 +373,7 @@ public class DynamicExemplar extends Node {
             BinaryImporter importer = new BinaryImporter();
             arms = (TriMesh)importer.load(bikeFile.openStream());
             arms.setModelBound(new BoundingBox());
-            arms.setLocalScale(new Vector3f(2f,2*armSize,2f));
+            arms.setLocalScale(new Vector3f(1f,1f,armSize));
             arms.setLocalTranslation(0,ytrans + legLength + bodyHeight/4,ztrans);
             arms.updateModelBound();
             //this.attachChild(model);

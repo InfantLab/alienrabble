@@ -39,7 +39,7 @@ public class ARDataLoadandSave {
 	//separate sets of grab and sort exemplars
 	private ARXMLModelData myXmlModelData_Grab;
 	private ARXMLModelData myXmlModelData_Sort;
-	private ARXMLParticipantData myXmlParticipantData;
+	private ARXMLExperimentData myXmlParticipantData;
 	private ARXMLGrabData myXmlGrabData; // data from the grab phase
 	private ARXMLSortData myXmlSortData; // data from the sort phase
 	
@@ -49,7 +49,7 @@ public class ARDataLoadandSave {
 	public void setUpLoadandSaveDocs(String initfile){
 		this.initfile = initfile;
 		//create the participant data object
-		myXmlParticipantData = new ARXMLParticipantData(this.initfile);
+		myXmlParticipantData = new ARXMLExperimentData(this.initfile);
 		myXmlModelData_Sort = new ARXMLModelData(this.initfile);
 		myXmlModelData_Grab = new ARXMLModelData(this.initfile);
 		myXmlGrabData = new ARXMLGrabData();
@@ -153,7 +153,7 @@ public class ARDataLoadandSave {
 		return true;
 	}
 	
-	public ARXMLParticipantData getXmlParticipantData(){
+	public ARXMLExperimentData getXmlExperimentData(){
 		return myXmlParticipantData;
 	}
 	public ARXMLModelData getXmlModelData_Grab(){

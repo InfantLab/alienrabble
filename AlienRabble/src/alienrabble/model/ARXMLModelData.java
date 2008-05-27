@@ -26,6 +26,7 @@ public class ARXMLModelData {
 	public static final String MODELSET_NODE = "modelset";
 	public static final String MODELDATA_NODE = "modeldata";
 	public static final String NAME_NODE = "name";
+	public static final String ISDYNAMIC_NODE = "isdynamic";
 	public static final String LOCATION_NODE = "location";
 	public static final String DIMENSION_NODE = "dimension";
 	public static final String PROPERTY_NODE = "property";
@@ -100,8 +101,8 @@ public class ARXMLModelData {
 				for (int t = 0; t<  dimensionsList.getLength(); t++){
 					Element thisdimension = (Element) dimensionsList.item(t);
 					String name = thisdimension.getAttribute("name");
-					String value = thisdimension.getAttribute("value");
-					allModels[s].setProperty(name,value);
+					Float value = Float.valueOf(thisdimension.getAttribute("value"));
+					allModels[s].setDimension(name,value);
 				}
 				// get the Quaternion that rotates the object initially
 				NodeList rotationsList = firstElement.getElementsByTagName(ROTATION_NODE);
@@ -115,7 +116,7 @@ public class ARXMLModelData {
 				}
 				Quaternion q = new Quaternion(x,y,z,w);
 				allModels[s].setInitialRotation(q);
-			
+				
 				//finally get the Vector3f that scales the object initially
 				x = 1f;
 				y = 1f; 
@@ -129,10 +130,22 @@ public class ARXMLModelData {
 				}
 				Vector3f sc = new Vector3f(x,y,z);
 				allModels[s].setInitialScale(sc);
-			
-				//now try to load this binary 
-				allModels[s].loadModelBinary();
 				
+		
+				//check if this is dynamically created or a loaded binary model
+				NodeList tempList = firstElement.getElementsByTagName(ISDYNAMIC_NODE);
+				Element firstTempElement = (Element) tempList.item(0);
+				NodeList fstDyn = firstTempElement.getChildNodes();
+				String isDynamicStr = fstDyn.item(0).getNodeValue();
+				if ( isDynamicStr.toUpperCase().compareTo("TRUE")==0) {
+					allModels[s].setIsDynamicAlien(true);
+					allModels[s].createDynamicExemplar();
+				}else{
+					allModels[s].setIsDynamicAlien(false);
+					//now try to load this binary 
+					allModels[s].loadModelBinary();
+				}
+							
 			}
 		  }
 		  } catch (Exception e) {

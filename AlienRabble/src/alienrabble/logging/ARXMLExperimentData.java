@@ -18,18 +18,20 @@ import alienrabble.MainGameStateSystem;
 
 
 /**
- * This class handles information about our participant, loading the 
- * details from the initialization file and allowing them to be saved 
+ * This class handles information about our experimental setup and 
+ * our participant, loading the details from the initialization file 
+ * and allowing them to be saved 
  * with the performance data in the output file. 
  * 
- * @author monkey
+ * @author Caspar Addyman
  *
  */
-public class ARXMLParticipantData{
+public class ARXMLExperimentData{
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger 
-			= Logger.getLogger(ARXMLParticipantData.class.getName());
+			= Logger.getLogger(ARXMLExperimentData.class.getName());
 
+	public enum GameType {RULEDISCOVERY, GRABONLY, SORTONLY, GRABANDSORT};
 	
 	//the names of the various node types in our xml doc
 	public static final String TOPLEVEL_NODE = "alienrabbledata";
@@ -43,15 +45,31 @@ public class ARXMLParticipantData{
 	public static final String MODELSET_NODE = "modelset";
 	public static final String MODELSET_GRAB = "grab";
 	public static final String MODELSET_SORT = "sort";
+	public static final String EXPERIMENTSETUP_NODE = "experimentsetup";
 	public static final String EXPERIMENTER_NODE = "experimenter";
+	public static final String TIMEGAUGE_NODE = "timegauge";
+	public static final String GAMETYPE_NODE = "gametype";
+	public static final String NUMBEROFROUNDS_NODE = "numrounds";
+	public static final String NUMBEROFTREES_NODE = "numtrees";
 	public static final String PARTICIPANT_NODE = "participant";
+	
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static final String TIME_FORMAT = "hh:mm:ss";
 
 	
+	
 	private String initfile; // the initialization file 
 	
+	//experimental setup data
+	private String gamedesc; // rule discovery or grab/+sorting
+	private String experimenter;   // name of experimenter
+	private int timeGauge;	// how long timer goes for on a single round in seconds, 0 = no time gauge
+	private int numTrees;	// how many distractor trees will there be in grab phase
+	private int numRounds; // how many times will they get 
+	
+	
+	//participant related data
 	private String name; // participant's name
 	private String ID;   // ID number
 	private Date dob;	// date of birth
@@ -61,24 +79,49 @@ public class ARXMLParticipantData{
 	private String modelset_Grab; //which modelset do we use in grab phase
 	private String modelset_Sort; //which modelset do we use in sort phase
 	
+	public GameType gameType;
+	
 	/**
 	 * 
 	 * @param filename
 	 */
-	
-	public ARXMLParticipantData(String initfile) {
+	public ARXMLExperimentData(String initfile) {
 		this.initfile = initfile;
-		this.starttime = new Date();
-		this.testdate = new Date();
-	
+		starttime = new Date();
+		testdate = new Date();
+		//default values
+		gamedesc = "GRABSORT";
+		gameType = getGameType();
+		numTrees = 20;
+		numRounds = 1;
 	}
 	
+	public GameType getGameType(){
+		if (gamedesc.toUpperCase().compareTo("RULE")==0){
+			return GameType.RULEDISCOVERY;
+		}else if (gamedesc.toUpperCase().compareTo("GRAB")==0){
+			return GameType.GRABONLY;
+		}else if (gamedesc.toUpperCase().compareTo("SORT")==0){
+			return GameType.SORTONLY;
+		}else {
+			return GameType.GRABANDSORT;
+		}
+	}
 	
 	public String getID(){
 		return this.ID;
 	}
-	
-	public void loadParticipantInit(){
+
+	public int getTimeGauge(){
+		return timeGauge;
+	}
+	public int getNumTrees(){
+		return numTrees;
+	}
+	public int getNumRounds(){
+		return numTrees;
+	}	
+	public void loadExperimentInit(){
 	try {
 		File file = new File(initfile);
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -87,7 +130,39 @@ public class ARXMLParticipantData{
 		doc.getDocumentElement().normalize();
 		logger.info("Information for this particpant");
 		logger.info("Root element " + doc.getDocumentElement().getNodeName());
-		NodeList nodeList = doc.getElementsByTagName(PARTICIPANT_NODE);
+		
+		/////////////////////////////
+		// Experimental setup details
+		/////////////////////////////
+		NodeList nodeList = doc.getElementsByTagName(EXPERIMENTSETUP_NODE);
+		Element expsetup =  (Element) nodeList.item(0);
+		
+		//get the type of game this is 
+		NodeList gametypes = expsetup.getElementsByTagName(GAMETYPE_NODE);
+		Element gametypeel = (Element) gametypes.item(0);
+		this.gamedesc = gametypeel.getTextContent();
+		gameType = getGameType();
+		
+		//get time gauge value, 0 means no gauge
+		NodeList tgauge = expsetup.getElementsByTagName(TIMEGAUGE_NODE);
+		Element tgaugeel = (Element) tgauge.item(0);
+		this.timeGauge = Long.valueOf(tgaugeel.getTextContent()).intValue();
+		
+		//get number of repetitions of everything
+		NodeList rounds = expsetup.getElementsByTagName(NUMBEROFROUNDS_NODE);
+		Element roundsel = (Element) rounds.item(0);
+		this.numRounds  =  Long.valueOf(roundsel.getTextContent()).intValue();
+
+		//get number of trees in grab phase
+		NodeList trees = expsetup.getElementsByTagName(NUMBEROFTREES_NODE);
+		Element treesel = (Element) trees.item(0);
+		this.numTrees  =  Long.valueOf(treesel.getTextContent()).intValue();
+
+		
+		///////////////////////
+		// Participant details
+		///////////////////////
+		nodeList = doc.getElementsByTagName(PARTICIPANT_NODE);
 		Element participant =  (Element) nodeList.item(0);
 				
 		//get the name of participant
@@ -106,7 +181,7 @@ public class ARXMLParticipantData{
 		String strdob = dob.getTextContent();
 		this.dob = new SimpleDateFormat(DATE_FORMAT).parse(strdob);
 		
-		//get the name of participant
+		//get the name of modelsets used for grab and for sort phases
 		NodeList modelsets = participant.getElementsByTagName(MODELSET_NODE);
 		for (int t = 0; t<  modelsets.getLength(); t++){
 			Element thisproperty = (Element) modelsets.item(t);

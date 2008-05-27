@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 
 import alienrabble.MenuState;
 import alienrabble.logging.ARDataLoadandSave;
+import alienrabble.logging.ARXMLExperimentData;
 import alienrabble.logging.ARXMLGrabData;
 import alienrabble.logging.ARXMLGrabData.GrabEvent;
 import alienrabble.logging.ARXMLGrabData.PlayerLocation;
@@ -117,10 +118,15 @@ public class AlienRabble extends CameraGameState{
     private static ShadowedRenderPass shadowPass = new ShadowedRenderPass();
     private BasicPassManager passManager;
 
+    ARXMLExperimentData expdata;
+    
     //the data logger
     ARXMLGrabData grabdata;
     
     ARXMLModelData modeldata;
+    
+    private RightWrong rightWrong;
+    private RightWrong[] rightWrongCounter;
     
     //sound effects
 //    AudioTrack laserSound;
@@ -198,17 +204,19 @@ public class AlienRabble extends CameraGameState{
         //the graph.
         scene.updateGeometricState(interpolation, true);
         
-//        //update the countdown gauge
-//        if (timer.getTimeInSeconds() > lastUpdate + 0.1f) {
-//            gaugeVal += gaugeChangeValue;
-//            if (gaugeVal > timeGauge.getMaximum() ||
-//            		gaugeVal < timeGauge.getMinimum()) {
-//                gaugeChangeValue *= -1;
-//            }
-//            lastUpdate = timer.getTimeInSeconds();
-//            timeGauge.setGauge(gaugeVal);
-//        }
-
+        if (expdata.getTimeGauge() > 0){
+        	//update the countdown gauge
+	        if (timer.getTimeInSeconds() > lastUpdate + 0.1f) {
+	            gaugeVal += gaugeChangeValue;
+	            if (gaugeVal > timeGauge.getMaximum() ||
+	            		gaugeVal < timeGauge.getMinimum()) {
+	                gaugeChangeValue *= -1;
+	            }
+	            lastUpdate = timer.getTimeInSeconds();
+	            timeGauge.setGauge(gaugeVal);
+	        }
+        }
+        rightWrong.updateRenderState();
 //        //update all our aliens
 //        aliencontainer.updateWorldData(interpolation);
 //       for(int i = 0;i<allAliens.length;i++){
@@ -240,9 +248,8 @@ public class AlienRabble extends CameraGameState{
 	            }
 		        if ( element instanceof Alien ) {
 		        		
-//					/** Signal our sound to play laser during collision */
-//		            laserSound.setWorldPosition(element.getWorldTranslation());
-//		            laserSound.play();
+		        	
+//					/** Signal our sound to play laser during collision */		        	
 		        	
                     relativePosition.set( element.getWorldTranslation() );
                     relativePosition.subtractLocal( player.getWorldTranslation() );
@@ -250,8 +257,13 @@ public class AlienRabble extends CameraGameState{
                     if ( distance < GRAB_RADIUS ) {
                     	player.setVelocity(-0.1f * player.getVelocity());
     		        	//we should make this vanish and log 
-    		        	Alien as = (Alien) element;
-    		        	
+                    	
+                    	Alien as = (Alien) element;
+    		        		
+//    			            laserSound.setWorldPosition(element.getWorldTranslation());
+//    			            laserSound.play();
+
+    		        		
     					//log the grab location
     					GrabEvent ge = grabdata.new GrabEvent();
     					ge.alienid= as.getID();
@@ -267,7 +279,15 @@ public class AlienRabble extends CameraGameState{
 //    		        	as.removeFromParent();
 
     					as.grabAlien(player);
-    		        	//update count 
+
+    					// show the feedback icon
+    					if (expdata.gameType == ARXMLExperimentData.GameType.RULEDISCOVERY){    						
+    						rightWrong.setIsRight(as.Category() == 1);
+    						rightWrong.setBlankTime(5);
+    		        	}
+
+    					
+    					//update count 
     		        	numAliens--;
     		        	
     		        	text.print("Aliens: " + numAliens);
@@ -362,6 +382,7 @@ public class AlienRabble extends CameraGameState{
     protected void initGame() {
         display.setTitle("Alien Rabble");
         
+        expdata = ARDataLoadandSave.getInstance().getXmlExperimentData();
         //get a reference to the data logging class
         grabdata = ARDataLoadandSave.getInstance().getXmlGrabData();
         
@@ -405,8 +426,10 @@ public class AlienRabble extends CameraGameState{
         
         //set up passes
         buildPassManager();
- 
-//        buildTimeGauge();
+
+        if (expdata.getTimeGauge() > 0){        
+        	buildTimeGauge();
+        }
         
         //add sound effects
 //        setupSounds();
@@ -414,6 +437,8 @@ public class AlienRabble extends CameraGameState{
         // update the scene graph for rendering
         scene.updateGeometricState(0.0f, true);
         scene.updateRenderState();
+        
+        setupRightWrong();
     }
     
     /**
@@ -423,10 +448,10 @@ public class AlienRabble extends CameraGameState{
      */
     private void buildTimeGauge(){
         gaugeChangeValue = 2;
-        gaugeVal = 1000;
+        gaugeVal = expdata.getTimeGauge();
         timeGauge = new TimeGauge(display, "timegauge");
         timeGauge.setMinimum(0);
-        timeGauge.setMaximum(1000);
+        timeGauge.setMaximum(expdata.getTimeGauge());
         timeGauge.setIsVertical(true);
         timeGauge.setWidthHeight(40,300);
         //timeGauge.setScale((display.getWidth() / 40),(display.getHeight() / 300));
@@ -436,6 +461,45 @@ public class AlienRabble extends CameraGameState{
         timeGauge.setGauge(gaugeVal);
         buildHUD();
     }
+    
+    private void setupRightWrong(){
+        rightWrong = new RightWrong(display, "rightwrongtest");
+        rightWrong.setIsSmiley(true);
+        rightWrong.setIsRight(true);
+        rightWrong.setBlankTime(-1);
+        
+        rightWrong.setPosition(display.getWidth()/2, display.getHeight()/2);
+        
+        //rightWrong.setScale(1.2f,1.6f);
+        rightWrong.updateRenderState();
+        // update the world vectors (needed as we have altered local translation
+        // of the desktop and it's
+        // not called in the update loop)
+        rightWrong.updateGeometricState(0, true);
+        
+        scene.attachChild(rightWrong);
+        
+    }
+
+    private void setupRightWrongCount(int Count){
+        rightWrong = new RightWrong(display, "rightwrongtest");
+        rightWrong.setIsSmiley(true);
+        rightWrong.setIsRight(true);
+        rightWrong.setBlankTime(-1);
+        
+        rightWrong.setPosition(display.getWidth()/2, display.getHeight()/2);
+        
+        //rightWrong.setScale(1.2f,1.6f);
+        rightWrong.updateRenderState();
+        // update the world vectors (needed as we have altered local translation
+        // of the desktop and it's
+        // not called in the update loop)
+        rightWrong.updateGeometricState(0, true);
+        
+        scene.attachChild(rightWrong);
+        
+    }
+
     
     /**
      * create a GUI Node to attach the TimeGauge to. 
@@ -734,7 +798,8 @@ public class AlienRabble extends CameraGameState{
         p.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         p.setTextureCombineMode(TextureState.REPLACE);
         
-        for (int i = 0; i < 50; i++) {
+        int numtrees = expdata.getNumTrees();
+        for (int i = 0; i < numtrees; i++) {
         	Spatial s1 = new SharedMesh("tree"+i, p);
             float x = 45 + FastMath.nextRandomFloat() * 130;
             float z = 45 + FastMath.nextRandomFloat() * 130;

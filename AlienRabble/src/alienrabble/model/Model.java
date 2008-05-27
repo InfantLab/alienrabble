@@ -6,6 +6,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
+import alienrabble.dynamicalien.DynamicExemplar;
+
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.scene.Node;
@@ -35,12 +37,16 @@ public class Model extends Node {
 	private Hashtable<String, Float> dimensions; //scalar dimensional properties as name value pairs
 	private Quaternion initialRotation;
 	private Vector3f initialScale;
+	private boolean isDynamicAlien;
+	private DynamicExemplar dynamicAlien;
+	private int whichCategory; // a boolean for the rule learning task
 	
 	public Model(){
 		properties = new Hashtable<String, String>();
 		dimensions = new Hashtable<String, Float>();
 		binaryLocation = null;
 		hasmodel = false;
+		whichCategory = 0;
 		initialRotation = new Quaternion(0,0,0,0);
 		initialScale = new Vector3f(1,1,1);
 	}
@@ -59,6 +65,21 @@ public class Model extends Node {
 		this.name = name;
 	}
 
+	/*
+	 * the value for the category that this object is assigned to 
+	 * read from the dimensions in the xml file.
+	 */
+	public int Category(){
+		return whichCategory;
+	}
+	
+	public boolean IsDynamicAlien(){
+		return isDynamicAlien;
+	}
+	public void setIsDynamicAlien(boolean isDynamicAlien){
+		this.isDynamicAlien = isDynamicAlien;
+	}
+	
 	public String getID(){
 		return ID;
 	}
@@ -133,9 +154,50 @@ public class Model extends Node {
 		this.attachChild(model);
 		this.setLocalRotation(initialRotation);
 		this.setLocalScale(initialScale);
+		whichCategory = getDimension("Category").intValue();
 		hasmodel = true;
 		return true;
 	}		
+
+	public boolean createDynamicExemplar(){
+		if (!isDynamicAlien) return false;
+		if (hasmodel == true) return true;
+		
+		//set up the details for this alien
+		dynamicAlien = new DynamicExemplar(this.getName());
+		
+		//body
+		dynamicAlien.setBodyHeight(getDimension("BodyHeight"));
+		dynamicAlien.setBodyWidth(getDimension("BodyWidth"));
+		dynamicAlien.setBodyType(getDimension("BodyType").intValue());
+		
+		//legs
+		dynamicAlien.setLegType(getDimension("LegType").intValue());
+		dynamicAlien.setLegCount(getDimension("LegCount").intValue());
+		
+		//arms
+		dynamicAlien.setArmType(getDimension("ArmType").intValue());
+		dynamicAlien.setArmSize(getDimension("ArmSize"));
+		
+		//Stripes
+		dynamicAlien.setStripeColours(getDimension("StripeColours").intValue());
+		dynamicAlien.setStripeAngle(getDimension("StripeAngle").intValue());
+		dynamicAlien.setStripeFreq(getDimension("StripeFreq").intValue());
+
+		//eyes
+		dynamicAlien.setEyeCount(getDimension("EyeCount").intValue());
+		dynamicAlien.setEyeSize(getDimension("EyeSize"));
+
+		dynamicAlien.setUpExemplar();
+		this.attachChild(dynamicAlien);
+		this.setLocalRotation(initialRotation);
+		this.setLocalScale(initialScale);
+		
+		whichCategory = getDimension("Category").intValue();
+		
+		hasmodel = true;
+		return true;
+	}
 	
 	public void reset(){
 		this.detachAllChildren();

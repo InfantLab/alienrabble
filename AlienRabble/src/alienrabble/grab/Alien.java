@@ -36,6 +36,8 @@ package alienrabble.grab;
 import java.util.logging.Logger;
 
 
+import alienrabble.model.Model;
+
 import com.jme.animation.SpatialTransformer;
 import com.jme.bounding.BoundingBox;
 import com.jme.math.FastMath;
@@ -76,7 +78,7 @@ public class Alien extends Node{
      */
     private Vector3f orientation;
     
-    private Spatial model;
+    private Model model;
     
     private String ID; //an ID for this alien.. simpler than the name probably just a number
     
@@ -90,7 +92,7 @@ public class Alien extends Node{
      * @param name the name for this node/alien
      * @param model the 3D model for this alien
      */
-    public Alien(TerrainBlock tb, Node scene, String name, Spatial model) {
+    public Alien(TerrainBlock tb, Node scene, String name, Model model) {
         super(name);
         this.tb = tb;
         BoundingBox box = new BoundingBox();
@@ -120,7 +122,7 @@ public class Alien extends Node{
      * retrieves the model Spatial of this alien.
      * @return the model Spatial of this alien.
      */
-    public Spatial getModel() {
+    public Model getModel() {
         return model;
     }
     
@@ -129,7 +131,7 @@ public class Alien extends Node{
      * detaches any previously attached models.
      * @param model the model to attach to this vehicle.
      */
-    public void setModel(final Spatial model) {
+    public void setModel(final Model model) {
         this.detachChild(this.model);
         this.model = model;
         BoundingBox b = new BoundingBox();
@@ -147,29 +149,13 @@ public class Alien extends Node{
 		}
 	}
     
-//    /**
-//     * 
-//     * @param time the time between frame.
-//     */
-//    public void updateWorldData(float time) {
-//    	
-//
-//	
-//    	
-////    	results.clear();
-////        player.calculateCollisions(this,  results);
-////		for ( int i = results.getNumber() - 1; i >= 0; i-- ) {
-////			Node element = results.getCollisionData(i).getSourceMesh().getParent();
-////            while (!(element instanceof Vehicle) && !(element == null) ) { 
-////              element = element.getParent();
-////            }
-////	        if ( element instanceof Vehicle ) {
-////	        	//we should make this vanish and log 
-////				player.setVelocity(-0.7f * player.getVelocity());
-////				removeFromParent();
-////			}
-////		}	
-//    }
+	public int Category(){
+		if (this.model == null){
+			return 0;
+		}else{
+			return this.model.Category();
+		}
+	}
     /**
      * reset sets the life time back to 10 seconds, and then randomly places the flag
      * on the terrain.

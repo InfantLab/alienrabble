@@ -1,4 +1,4 @@
-package alienrabble.dynamicalien;
+	package alienrabble.dynamicalien;
 
 import com.jme.app.SimpleGame;
 import com.jme.bounding.BoundingBox;
@@ -50,7 +50,7 @@ public class TestDynamic extends SimpleGame {
 	    protected void simpleInitGame() {
 	        display.setTitle("Cylinder Test");
 
-	        myalien = new DynamicExemplar("onealien", display);
+	        myalien = new DynamicExemplar("onealien");
 	        myalien.setUpExemplar();
 
 	        lightState.setTwoSidedLighting(false);
