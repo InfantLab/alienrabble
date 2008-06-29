@@ -39,7 +39,7 @@ public class Model extends Node {
 	private Vector3f initialScale;
 	private boolean isDynamicAlien;
 	private DynamicExemplar dynamicAlien;
-	private int whichCategory; // a boolean for the rule learning task
+	private int whichCategory; 
 	
 	public Model(){
 		properties = new Hashtable<String, String>();

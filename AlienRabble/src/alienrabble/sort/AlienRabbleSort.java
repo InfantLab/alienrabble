@@ -215,7 +215,7 @@ public class AlienRabbleSort extends CameraGameState {
 			sortdata.addStartingPosition(me); 
 		}
 		
-		packingcases = new PackingCases(scene, 2);
+		packingcases = new PackingCases(scene, 3);
 		
 		scene.attachChild(packingcases);
 		

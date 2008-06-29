@@ -361,6 +361,7 @@ public class DynamicExemplar extends Node {
         	break;
         case 2: 
         	armmodel  = "alienrabble/data/model/claw3.jbin";
+        	ytrans = -4f;
         	break;
         default:
         	armmodel  = "alienrabble/data/model/claw3.jbin";

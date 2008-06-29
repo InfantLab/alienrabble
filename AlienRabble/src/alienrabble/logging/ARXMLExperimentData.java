@@ -119,7 +119,7 @@ public class ARXMLExperimentData{
 		return numTrees;
 	}
 	public int getNumRounds(){
-		return numTrees;
+		return numRounds;
 	}	
 	public void loadExperimentInit(){
 	try {

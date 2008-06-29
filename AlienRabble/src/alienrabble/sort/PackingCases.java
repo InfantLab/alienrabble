@@ -60,14 +60,14 @@ public class PackingCases extends Node {
 		if (countCases < MAXCASES){
 			Node container = new Node("packingcase"+countCases);
 			//actually more like a tray than a box.
-			Box box = new Box("box"+countCases,new Vector3f(0,0,0),1f,0.2f,0.4f);
+			Box box = new Box("box"+countCases,new Vector3f(0,0,0),1f,0.25f,0.42f);
 			box.setRandomColors();
 			BoundingBox bbox = new BoundingBox();
 			box.setModelBound(bbox);
 			box.updateModelBound();
 			container.attachChild(box);
 		    
-			this.attachChild(container);
+			this.attachChild(container);	
 			countCases++;
 			rearrangeCases();
 		}

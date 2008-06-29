@@ -99,7 +99,7 @@ public class AlienRabble extends CameraGameState{
     //the timer
     protected Timer timer;
     //The chase camera, this will follow our player as he zooms around the level
-    private ChaseCamera chaser;
+    private RestrictedChaseCamera chaser;
     // the root node of the scene graph
     private Node scene;
     
@@ -125,12 +125,18 @@ public class AlienRabble extends CameraGameState{
     
     ARXMLModelData modeldata;
     
-    private RightWrong rightWrong;
-    private RightWrong[] rightWrongCounter;
+    private RightWrong rightWrong;  // the feedback icon in centre of screen
+    private RightWrong[] rightCounter; //the column of cumulatively collected correct items
+    private RightWrong[] wrongCounter; //the column of cumulatively collected correct items
+    private int rightRunningTotal = 0;  //count
+    private int wrongRunningTotal = 0;  //count
+    private int sizeCategory1 = 5;
+    
+    private int roundCount =1;
     
     //sound effects
-//    AudioTrack laserSound;
-//	AudioTrack targetSound;
+    AudioTrack laserSound;
+   	AudioTrack targetSound;
     
 	public AlienRabble(String name, PropertiesIO properties) {
 		super(name);
@@ -153,28 +159,7 @@ public class AlienRabble extends CameraGameState{
         interpolation = timer.getTimePerFrame();
         //update the keyboard input (move the player around)
         input.update(interpolation);
-        //update the chase camera to handle the player moving around.
-        chaser.update(interpolation);
-        //update the fence to animate the force field texture
-        fence.update(interpolation);
-        
-        //we want to keep the skybox around our eyes, so move it with
-        //the camera
-        skybox.setLocalTranslation(cam.getLocation());
-        skybox.updateGeometricState(0, true);
-        
 
-        // if escape was pressed, we exit
-        if (aliencontainer.getChildren().size() == 0) {
-    		// Here we switch to the menu state which is already loaded
-    		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
-    		ms.menuStatus = MenuState.MENU_SORT_INSTRUCTIONS;
-    		ms.setActive(true);
-    		
-			// And remove this state, because we don't want to keep it in memory.
-			GameStateManager.getInstance().detachChild("ingrabgame");
-		}
-        
         //We don't want the chase camera to go below the world, so always keep 
         //it at least 1.7 units above the level.
         if(cam.getLocation().y < (tb.getHeight(cam.getLocation())+1.7f)) {
@@ -198,7 +183,52 @@ public class AlienRabble extends CameraGameState{
         }
         
         //update the player to check for collisions
-        player.update(interpolation);
+        player.update(interpolation);        
+        
+        //update the chase camera to handle the player moving around.
+       	chaser.update(interpolation, player);
+        //update the fence to animate the force field texture
+        fence.update(interpolation);
+        
+        //we want to keep the skybox around our eyes, so move it with
+        //the camera
+        skybox.setLocalTranslation(cam.getLocation());
+        skybox.updateGeometricState(0, true);
+        
+
+        // if escape was pressed, we exit
+        if (expdata.gameType == ARXMLExperimentData.GameType.RULEDISCOVERY){
+        	if ( rightRunningTotal == sizeCategory1 
+        	 ||  aliencontainer.getChildren().size() == 0){
+        		//have collected all the 'good' aliens
+        		//potentially we go round again
+        		if (roundCount < expdata.getNumRounds())
+        		{
+	        		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
+	        		ms.menuStatus = MenuState.MENU_RULE_FEEDBACK;
+	        		ms.setActive(true);
+	        		this.setActive(false);
+        		}else{
+            		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
+            		ms.menuStatus = MenuState.MENU_FINISH;
+            		ms.setActive(true);
+            		// And remove this state, because we don't want to keep it in memory.
+        			GameStateManager.getInstance().detachChild("ingrabgame");
+        		}
+        	}
+        }else{
+	        if (aliencontainer.getChildren().size() == 0) {
+	    		// Here we switch to the menu state which is already loaded
+	    		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
+	    		ms.menuStatus = MenuState.MENU_SORT_INSTRUCTIONS;
+	    		ms.setActive(true);
+	    		
+				// And remove this state, because we don't want to keep it in memory.
+				GameStateManager.getInstance().detachChild("ingrabgame");
+			}
+        }        
+        
+
         
         //Because we are changing the scene (moving the skybox and player) we need to update
         //the graph.
@@ -217,11 +247,13 @@ public class AlienRabble extends CameraGameState{
 	        }
         }
         rightWrong.updateRenderState();
-//        //update all our aliens
-//        aliencontainer.updateWorldData(interpolation);
-//       for(int i = 0;i<allAliens.length;i++){
-//    	   allAliens[i].update(interpolation);
-//       }
+        
+		for(int i = 0; i < rightCounter.length ; i++){
+			rightCounter[i].updateRenderState();
+		}
+		for(int i = 0; i < wrongCounter.length ; i++){
+			wrongCounter[i].updateRenderState();
+		}
         
        ArrayList<Spatial> remainingaliens = aliencontainer.getChildren();
        for(int i= 0; i< remainingaliens.size();i++){
@@ -260,8 +292,8 @@ public class AlienRabble extends CameraGameState{
                     	
                     	Alien as = (Alien) element;
     		        		
-//    			            laserSound.setWorldPosition(element.getWorldTranslation());
-//    			            laserSound.play();
+			            laserSound.setWorldPosition(element.getWorldTranslation());
+			            laserSound.play();
 
     		        		
     					//log the grab location
@@ -282,8 +314,19 @@ public class AlienRabble extends CameraGameState{
 
     					// show the feedback icon
     					if (expdata.gameType == ARXMLExperimentData.GameType.RULEDISCOVERY){    						
-    						rightWrong.setIsRight(as.Category() == 1);
-    						rightWrong.setBlankTime(5);
+    						if (as.Category() == 1){
+	    						rightWrong.setIsRight(true);
+	    						rightWrong.setBlankTime(3);
+	    						rightCounter[rightRunningTotal].setIsRight(true);
+	    						rightCounter[rightRunningTotal].setBlankTime(-1);
+	    						rightRunningTotal++;
+    						}else{
+    							rightWrong.setIsRight(false);
+	    						rightWrong.setBlankTime(3);
+	    						wrongCounter[wrongRunningTotal].setIsRight(false);
+	    						wrongCounter[wrongRunningTotal].setBlankTime(-1);
+	    						wrongRunningTotal++;
+    						}
     		        	}
 
     					
@@ -318,12 +361,12 @@ public class AlienRabble extends CameraGameState{
         audio.getEar().trackPosition(cam);
 		
 		/** Create program sound */
-//		targetSound = audio.createAudioTrack( getClass().getResource( "/jmetest/data/sound/explosion.ogg" ), false);
-//        targetSound.setMaxAudibleDistance(1000);
-//        targetSound.setVolume(1.0f);
-//		laserSound = audio.createAudioTrack( getClass().getResource( "/alienrabble/data/sounds/whizzoop.ogg" ), false);
-//        laserSound.setMaxAudibleDistance(1000);
-//        laserSound.setVolume(1.0f);
+		targetSound = audio.createAudioTrack( getClass().getResource( "/jmetest/data/sound/explosion.ogg" ), false);
+        targetSound.setMaxAudibleDistance(1000);
+        targetSound.setVolume(1.0f);
+		laserSound = audio.createAudioTrack( getClass().getResource( "/alienrabble/data/sounds/whizzoop.ogg" ), false);
+        laserSound.setMaxAudibleDistance(1000);
+        laserSound.setVolume(1.0f);
 	}
 	
     /**
@@ -374,6 +417,18 @@ public class AlienRabble extends CameraGameState{
         timer = Timer.getTimer();
     }
 
+    public void newRound(){
+    	roundCount++;
+    	//initGame();
+        
+    	//Add aliens randomly to the terrain
+    	addAliens();
+        rightRunningTotal = 0;
+        wrongRunningTotal = 0;
+        timeGauge.setGauge(expdata.getTimeGauge());
+        player.setLocalTranslation(new Vector3f(100,0, 100));
+    }
+    
     /**
      * initializes the scene
      * 
@@ -432,17 +487,18 @@ public class AlienRabble extends CameraGameState{
         }
         
         //add sound effects
-//        setupSounds();
+        setupSounds();
         
         // update the scene graph for rendering
         scene.updateGeometricState(0.0f, true);
         scene.updateRenderState();
         
         setupRightWrong();
+        setupRightWrongCount(sizeCategory1);
     }
     
     /**
-     * Init the TimeGuage:
+     * Init the TimeGauge:
      * - Position on Screen
      * - Min / Max Values for the Gauge
      */
@@ -463,42 +519,47 @@ public class AlienRabble extends CameraGameState{
     }
     
     private void setupRightWrong(){
-        rightWrong = new RightWrong(display, "rightwrongtest");
+        rightWrong = new RightWrong(display, "rightwrongfeedback");
         rightWrong.setIsSmiley(true);
-        rightWrong.setIsRight(true);
-        rightWrong.setBlankTime(-1);
+        rightWrong.setIsRight(false);
+        rightWrong.setBlankTime(0);
         
-        rightWrong.setPosition(display.getWidth()/2, display.getHeight()/2);
+        rightWrong.setPosition(display.getWidth()/2, display.getHeight()/5);
         
-        //rightWrong.setScale(1.2f,1.6f);
         rightWrong.updateRenderState();
-        // update the world vectors (needed as we have altered local translation
-        // of the desktop and it's
-        // not called in the update loop)
         rightWrong.updateGeometricState(0, true);
         
         scene.attachChild(rightWrong);
         
     }
 
-    private void setupRightWrongCount(int Count){
-        rightWrong = new RightWrong(display, "rightwrongtest");
-        rightWrong.setIsSmiley(true);
-        rightWrong.setIsRight(true);
-        rightWrong.setBlankTime(-1);
-        
-        rightWrong.setPosition(display.getWidth()/2, display.getHeight()/2);
-        
-        //rightWrong.setScale(1.2f,1.6f);
-        rightWrong.updateRenderState();
-        // update the world vectors (needed as we have altered local translation
-        // of the desktop and it's
-        // not called in the update loop)
-        rightWrong.updateGeometricState(0, true);
-        
-        scene.attachChild(rightWrong);
-        
+    private void setupRightWrongCount(int maxcount){
+
+    	float scalefactor = 1/FastMath.sqrt(2 + maxcount);
+ 
+    	rightCounter = new RightWrong[maxcount];
+    	wrongCounter = new RightWrong[maxcount];
+		for(int i = 0; i < maxcount; i++){
+			rightCounter[i] = new RightWrong(display, "rwcount"+i);
+			rightCounter[i].setIsSmiley(true);
+			rightCounter[i].setIsRight(false);
+			rightCounter[i].setBlankTime(0);
+			rightCounter[i].setScale(scalefactor, scalefactor);
+			rightCounter[i].setPosition(80*scalefactor, 100 + i * 160 * scalefactor );
+			scene.attachChild(rightCounter[i] );
+		}
+		for(int i = 0; i < maxcount; i++){
+			wrongCounter[i] = new RightWrong(display, "rwcount"+i);
+			wrongCounter[i].setIsSmiley(false);
+			wrongCounter[i].setIsRight(false);
+			wrongCounter[i].setBlankTime(0);
+			wrongCounter[i].setScale(scalefactor, scalefactor);
+			wrongCounter[i].setPosition(240 * scalefactor, 100 + i * 160 * scalefactor  );
+			scene.attachChild(wrongCounter[i] );
+		}
     }
+
+    
 
     
     /**
@@ -540,14 +601,14 @@ public class AlienRabble extends CameraGameState{
         AlphaState as = display.getRenderer().createAlphaState();
         as.setBlendEnabled(true);
         as.setSrcFunction(AlphaState.SB_SRC_ALPHA);
-        as.setDstFunction(AlphaState.DB_ONE_MINUS_SRC_ALPHA);
+        as.setDstFunction(AlphaState.DB_ONE);
         as.setTestEnabled(true);
         as.setTestFunction(AlphaState.TF_GREATER);
         as.setEnabled(true);
         text.setRenderState(as);
         
         text.setLocalScale(3);
-		text.setLocalTranslation(new Vector3f(1, 60, 0));
+		text.setLocalTranslation(new Vector3f(10, 10, 0));
 		text.setTextColor(ColorRGBA.white);
 		text.setZOrder(0);
 		scene.attachChild(text);
@@ -580,10 +641,6 @@ public class AlienRabble extends CameraGameState{
     	scene.attachChild(aliencontainer);
     	
 		modeldata = ARDataLoadandSave.getInstance().getXmlModelData_Grab();
-			
-
-//		Quaternion q = new Quaternion();
-//		q.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0, 0));
 		
 		numAliens = modeldata.getNumModels();
 		allAliens = new Alien[numAliens];
@@ -664,9 +721,7 @@ public class AlienRabble extends CameraGameState{
         Vector3f rotation = player.getLocalRotation().getRotationColumn(2,tempVa);
         pl.x_velocity = player.getVelocity() * rotation.x;
         pl.z_velocity = player.getVelocity() * rotation.z;
-        
-        
-        
+       
         grabdata.logPlayerLocation(pl);
     }
     
@@ -877,16 +932,18 @@ public class AlienRabble extends CameraGameState{
     private void buildChaseCamera() {
         HashMap<String, Object> props = new HashMap<String, Object>();
         Vector3f targetOffset = new Vector3f();
-        targetOffset.y = ((BoundingSphere) player.getWorldBound()).radius * 2f;
+        targetOffset.y = ((BoundingSphere) player.getWorldBound()).radius * 1.8f;
         props.put(ThirdPersonMouseLook.PROP_ENABLED, "false");
         props.put(ChaseCamera.PROP_TARGETOFFSET,targetOffset);
-        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(4f, 180 * FastMath.DEG_TO_RAD, 20 * FastMath.DEG_TO_RAD));
+        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(4.4f, 0,  20 * FastMath.DEG_TO_RAD));
+        props.put(ThirdPersonMouseLook.PROP_MAXASCENT, ""+45 * FastMath.DEG_TO_RAD);
         props.put(ChaseCamera.PROP_DAMPINGK, "3");
-        props.put(ChaseCamera.PROP_SPRINGK, "6");
+        props.put(ChaseCamera.PROP_SPRINGK, "7");
         props.put(ChaseCamera.PROP_STAYBEHINDTARGET, "true");
-        chaser = new ChaseCamera(cam, player, props);
-        chaser.setMaxDistance(7);
-        chaser.setMinDistance(3.1f);	
+       
+        chaser = new RestrictedChaseCamera(cam, player, props);
+        chaser.setMaxDistance(7f);
+        chaser.setMinDistance(3.2f);	
     }
 
     /**
@@ -896,8 +953,6 @@ public class AlienRabble extends CameraGameState{
     private void buildInput() {
         input = new AlienRabbleHandler(player, properties.getRenderer());
     }
-    
-
 
     /**
      * will be called if the resolution changes
@@ -907,8 +962,6 @@ public class AlienRabble extends CameraGameState{
     protected void reinit() {
         display.recreateWindow(width, height, depth, freq, fullscreen);
     }
-    
-
 
     /**
      * clean up the textures.
