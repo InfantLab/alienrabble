@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<alienrabbledata>
+<participant>
+<name>caspar</name>
+<id>5001</id>
+<dob>0034-11-25</dob>
+<testdate>2008-02-07</testdate>
+<starttime>11:22:15</starttime>
+<endtime>11:22:42</endtime>
+<AlienRabbleVersion>0.1</AlienRabbleVersion>
+</participant>
+<modelset name=""/>
+<GrabSessionDetails>
+<id/>
+<modelset/>
+<experimenter/>
+<testdate>2008-02-07</testdate>
+<starttime>11:22:15</starttime>
+<starttime>11:22:42</starttime>
+<startingpositions/>
+<grabbedpositions/>
+<playertrajectory>
+<grab>player<vehiclename/>
+<time secs="9.0" ticks="9442"/>
+<location x="100.0" z="100.0"/>
+<velocity x="0.0" z="0.0"/>
+</grab>
+</playertrajectory>
+</GrabSessionDetails>
+</alienrabbledata>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<alienrabbledata>
+
+<experimentsetup>
+	<gametype>RULE</gametype>
+	<timegauge>0</timegauge>
+	<numrounds>3</numrounds>
+	<numtrees>20</numtrees>
+	<experimenter>Caspar</experimenter>
+</experimentsetup>
+
+
+<participant>
+	<id>301</id>
+	<modelfile>sim2set1.xml</modelfile>
+	<dob>6-11-2004</dob>
+	<name>Mira</name>
+	<randomseed>501</randomseed>
+	<modelset name="grab" value="dynamic1" />
+	<modelset name="sort" value="dynamic1" />
+</participant>
+
+
+</alienrabbledata>
+	

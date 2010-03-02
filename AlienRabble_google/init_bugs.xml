@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<alienrabbledata>
+<participant>
+	<dob>29-07-1974</dob>
+	<name>denis</name>
+	<id>5002</id>
+	<modelset name="grab" value="medin" />
+	<modelset name="sort" value="medin" />
+</participant>
+
+<modelset name="medin">
+<modeldata>
+	<name>medin0000.jbin</name>
+	<location>alienrabble/data/medin/medin0000.jbin</location>
+		<property name="Category" value="0" />
+		<property name="Body" value="0" />
+		<property name="Colour" value="0" />
+		<property name="Markings" value="0" />
+		<property name="Antennae" value="0" />
+		<dimension name="Size" value="1" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>medin0001.jbin</name>
+	<location>alienrabble/data/medin/medin0001.jbin</location>
+		<property name="Category" value="0" />
+		<property name="Body" value="0" />
+		<property name="Colour" value="0" />
+		<property name="Markings" value="0" />
+		<property name="Antennae" value="1" />
+		<dimension name="Size" value="1" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>medin0010.jbin</name>
+	<location>alienrabble/data/medin/medin0010.jbin</location>
+		<property name="Category" value="0" />
+		<property name="Body" value="0" />
+		<property name="Colour" value="0" />
+		<property name="Markings" value="1" />
+		<property name="Antennae" value="0" />
+		<dimension name="Size" value="1" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>medin0100.jbin</name>
+	<location>alienrabble/data/medin/medin0100.jbin</location>
+		<property name="Category" value="0" />
+		<property name="Body" value="0" />
+		<property name="Colour" value="1" />
+		<property name="Markings" value="0" />
+		<property name="Antennae" value="0" />
+		<dimension name="Size" value="1" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>medin1000.jbin</name>
+	<location>alienrabble/data/medin/medin1000.jbin</location>
+		<property name="Category" value="0" />
+		<property name="Body" value="1" />
+		<property name="Colour" value="0" />
+		<property name="Markings" value="0" />
+		<property name="Antennae" value="0" />
+		<dimension name="Size" value="1" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>medin0111.jbin</name>
+	<location>alienrabble/data/medin/medin0111.jbin</location>
+		<property name="Category" value="1" />
+		<property name="Body" value="0" />
+		<property name="Colour" value="1" />
+		<property name="Markings" value="1" />
+		<property name="Antennae" value="1" />
+		<dimension name="Size" value="1" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>medin1011.jbin</name>
+	<location>alienrabble/data/medin/medin1011.jbin</location>
+		<property name="Category" value="0" />
+		<property name="Body" value="1" />
+		<property name="Colour" value="0" />
+		<property name="Markings" value="1" />
+		<property name="Antennae" value="1" />
+		<dimension name="Size" value="1" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>medin1101.jbin</name>
+	<location>alienrabble/data/medin/medin1101.jbin</location>
+		<property name="Category" value="1" />
+		<property name="Body" value="1" />
+		<property name="Colour" value="1" />
+		<property name="Markings" value="0" />
+		<property name="Antennae" value="1" />
+		<dimension name="Size" value="1" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>medin1110.jbin</name>
+	<location>alienrabble/data/medin/medin1110.jbin</location>
+		<property name="Category" value="1" />
+		<property name="Body" value="1" />
+		<property name="Colour" value="1" />
+		<property name="Markings" value="1" />
+		<property name="Antennae" value="0" />
+		<dimension name="Size" value="1" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+<modeldata>
+	<name>medin1111.jbin</name>
+	<location>alienrabble/data/medin/medin1111.jbin</location>
+		<property name="Category" value="1" />
+		<property name="Body" value="1" />
+		<property name="Colour" value="1" />
+		<property name="Markings" value="1" />
+		<property name="Antennae" value="1" />
+		<dimension name="Size" value="1" />
+		<scale x="0.7" y="0.7" z="0.7" />
+</modeldata>
+</modelset>
+
+
+
+</alienrabbledata>

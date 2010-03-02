@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Fri Feb 22 19:31:24 GMT 2008
+onejar.license.required=true
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=AlienRabble_fat.jar
+manifest.mergeall=true
+manifest.mainclass=alienrabble.MainGameStateSystem
+manifest.file=ar_jar_manifest
+jarname.isextern=false
+onejar.expand=
+excludes=<po|AlienRabble>~alienconverter/;<po|AlienRabble>~.DS_Store
+includes=
