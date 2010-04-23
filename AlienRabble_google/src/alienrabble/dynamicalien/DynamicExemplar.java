@@ -6,12 +6,9 @@ import java.net.URL;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-//import alienrabble.debug.SceneGraphDump;
-import alienrabble.grab.AlienRabble;
-import alienrabble.logging.ARXMLGrabData.PlayerLocation;
+import alienrabble.grab.AlienRabbleGrab;
 
 import com.jme.bounding.BoundingBox;
-import com.jme.bounding.BoundingSphere;
 import com.jme.image.Texture;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
@@ -19,17 +16,13 @@ import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
 import com.jme.scene.Node;
 import com.jme.scene.SharedMesh;
-import com.jme.scene.Spatial;
 import com.jme.scene.TriMesh;
 import com.jme.scene.shape.Capsule;
-import com.jme.scene.shape.Cylinder;
-import com.jme.scene.shape.Pyramid;
 import com.jme.scene.shape.RoundedBox;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.shape.Torus;
 import com.jme.scene.state.MaterialState;
 import com.jme.scene.state.TextureState;
-import com.jme.scene.state.ZBufferState;
 import com.jme.system.DisplaySystem;
 import com.jme.util.TextureManager;
 import com.jme.util.export.binary.BinaryImporter;
@@ -99,6 +92,8 @@ public class DynamicExemplar extends Node {
 	
 	private TriMesh body;
 	private TriMesh arms;
+	private TriMesh leftarm;
+	private TriMesh rightarm;
 	private SharedMesh legs[];
 	private SharedMesh eyes[];
 
@@ -197,8 +192,9 @@ public class DynamicExemplar extends Node {
 	
 	public void setUpExemplar(){
 		
-        float ztrans = 0;
+        float xtrans = 0;
         float ytrans = 0;
+        float ztrans = 0;
 		
 		switch (bodyType){
 		case CAPSULE://capsule
@@ -219,7 +215,7 @@ public class DynamicExemplar extends Node {
 			break;	
 		case LIGHTBULB:
 	        try {
-			          URL bikeFile = AlienRabble.class.getClassLoader().getResource("alienrabble/data/model/lightbulbbody.jbin");
+			          URL bikeFile = AlienRabbleGrab.class.getClassLoader().getResource("alienrabble/data/model/lightbulbbody.jbin");
 			          BinaryImporter importer = new BinaryImporter();
 			          body = (TriMesh)importer.load(bikeFile.openStream());
 			      } catch (IOException e) {
@@ -275,25 +271,27 @@ public class DynamicExemplar extends Node {
         switch (legType){
         case 1:
         	legmodel = "alienrabble/data/model/blobleg3.jbin";
+        	ytrans = 2;
         	break;
         case 2: 
-        	legmodel = "alienrabble/data/model/legcurved.jbin";
-        	ytrans = 13;
+        	legmodel  = "alienrabble/data/model/legcurved.jbin";
+        	ytrans = 2;
         	break;
         default:
         	legmodel  = "alienrabble/data/model/blobleg3.jbin";
+        	ytrans = 2;
         }
         
         
         TriMesh legGeometry = null;
         try {
-            URL bikeFile = AlienRabble.class.getClassLoader().getResource(legmodel);
+            URL bikeFile = AlienRabbleGrab.class.getClassLoader().getResource(legmodel);
             BinaryImporter importer = new BinaryImporter();
             legGeometry = (TriMesh)importer.load(bikeFile.openStream());
             legGeometry.setModelBound(new BoundingBox());
             //scale it to be MUCH smaller than it is originally
             legGeometry.setLocalScale(1f);
-            legGeometry.setLocalTranslation(0f,0f,ztrans);
+            legGeometry.setLocalTranslation(0f,ytrans, 0f);
             legGeometry.updateModelBound();
             //this.attachChild(model);
         } catch (IOException e) {
@@ -350,39 +348,82 @@ public class DynamicExemplar extends Node {
         }
 
         String armmodel = "";
-        ztrans = 0;
+        xtrans = 0;
         ytrans = 0;
+        ztrans = 0;
         
         switch (armType){
-        case 1:
+        case 3:
         	armmodel = "alienrabble/data/model/claw1.jbin";
-        	ztrans = 1f;
-        	ytrans = 4f;
+        	xtrans = -3f;
         	break;
-        case 2: 
+        	
+        case 4: 
         	armmodel  = "alienrabble/data/model/claw3.jbin";
-        	ytrans = -4f;
+        	xtrans = -3f;
+        	break;
+        case 1:
+        	armmodel =  "alienrabble/data/model/handleft.jbin";
+        	xtrans = -2f;
+        	break;
+        case 2:
+        	armmodel =  "alienrabble/data/model/clawleft.jbin";
+        	xtrans = -2f;
         	break;
         default:
         	armmodel  = "alienrabble/data/model/claw3.jbin";
         }
         
-        
-        arms = null;
-        try {
-            URL bikeFile = AlienRabble.class.getClassLoader().getResource(armmodel);
-            BinaryImporter importer = new BinaryImporter();
-            arms = (TriMesh)importer.load(bikeFile.openStream());
-            arms.setModelBound(new BoundingBox());
-            arms.setLocalScale(new Vector3f(1f,1f,armSize));
-            arms.setLocalTranslation(0,ytrans + legLength + bodyHeight/4,ztrans);
-            arms.updateModelBound();
-            //this.attachChild(model);
-        } catch (IOException e) {
-        	//do something
+        if (armType < 3) //have left and right hands on either side of body
+        {
+        	leftarm = null;
+        	rightarm = null;
+            arms = null;
+            try {
+                URL bikeFile = AlienRabbleGrab.class.getClassLoader().getResource(armmodel);
+                BinaryImporter importer = new BinaryImporter();
+                leftarm = (TriMesh)importer.load(bikeFile.openStream());
+                leftarm.setModelBound(new BoundingBox());
+                leftarm.setLocalTranslation(xtrans+bodyWidth/2,ytrans + legLength + bodyHeight/4,ztrans);
+                leftarm.setLocalScale(new Vector3f(armSize,1f,1f));
+                leftarm.updateModelBound();
+                //this.attachChild(model);
+            } catch (IOException e) {
+            	//do something
+            }
+            this.attachChild(leftarm);
+            try {
+                URL bikeFile = AlienRabbleGrab.class.getClassLoader().getResource(armmodel);
+                BinaryImporter importer = new BinaryImporter();
+                rightarm = (TriMesh)importer.load(bikeFile.openStream());
+                rightarm.setModelBound(new BoundingBox());
+                rightarm.setLocalTranslation(-xtrans-bodyWidth/2,ytrans + legLength + bodyHeight/4,ztrans);
+                rightarm.setLocalScale(new Vector3f(-1*armSize,-1f,1f));
+                rightarm.updateModelBound();
+                //this.attachChild(model);
+            } catch (IOException e) {
+            	//do something
+            }
+            this.attachChild(rightarm);
+        	
+        	
+        }else{  // it's a pair of arms passing through the body
+            arms = null;
+            try {
+                URL bikeFile = AlienRabbleGrab.class.getClassLoader().getResource(armmodel);
+                BinaryImporter importer = new BinaryImporter();
+                arms = (TriMesh)importer.load(bikeFile.openStream());
+                arms.setModelBound(new BoundingBox());
+                arms.setLocalTranslation(xtrans,ytrans + legLength + bodyHeight/4,ztrans);
+                arms.setLocalScale(new Vector3f(armSize,1f,1f));
+                 arms.updateModelBound();
+                //this.attachChild(model);
+            } catch (IOException e) {
+            	//do something
+            }
+            this.attachChild(arms);
         }
-        this.attachChild(arms);
-	}	
+ 	}	
 	
 	
 	/**

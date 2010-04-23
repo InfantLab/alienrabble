@@ -96,10 +96,10 @@ public class ForceFieldFence extends Node {
     private void buildFence() {
         //This cylinder will act as the four main posts at each corner
         Cylinder postGeometry = new Cylinder("post", 10, 10, 1, 10);
+        
+       //rotate the cylinders to be vertical
         Quaternion q = new Quaternion();
-        //rotate the cylinder to be vertical
         q.fromAngleAxis(FastMath.PI/2, new Vector3f(1,0,0));
-        postGeometry.setLocalRotation(q);
         postGeometry.setModelBound(new BoundingBox());
         postGeometry.updateModelBound();
         
@@ -109,12 +109,16 @@ public class ForceFieldFence extends Node {
         //We then translate the posts into position. 
         //Magic numbers are bad, but help illustrate the point.:)
         SharedMesh post1 = new SharedMesh("post1", postGeometry);
+        post1.setLocalRotation(q);
         post1.setLocalTranslation(new Vector3f(0,0.5f,0));
         SharedMesh post2 = new SharedMesh("post2", postGeometry);
+        post2.setLocalRotation(q);
         post2.setLocalTranslation(new Vector3f(32,0.5f,0));
         SharedMesh post3 = new SharedMesh("post3", postGeometry);
+        post3.setLocalRotation(q);
         post3.setLocalTranslation(new Vector3f(0,0.5f,32));
         SharedMesh post4 = new SharedMesh("post4", postGeometry);
+        post4.setLocalRotation(q);
         post4.setLocalTranslation(new Vector3f(32,0.5f,32));
         
         //This cylinder will be the horizontal struts that hold

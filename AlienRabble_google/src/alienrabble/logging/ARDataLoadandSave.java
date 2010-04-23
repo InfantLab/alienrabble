@@ -151,7 +151,8 @@ public class ARDataLoadandSave {
 	 * @return
 	 */
 	private boolean generateOutputFileName(){
-		this.outputfile = myXmlExperimentData.getCurrentDate() + "_ID_" + myXmlExperimentData.getID() + ".xml";
+		this.outputfile = "ID_" + myXmlExperimentData.getID() + myXmlExperimentData.getCurrentDate() + 
+		myXmlExperimentData.getCurrentTime()  + ".xml";
 		return true;
 	}
 	

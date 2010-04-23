@@ -39,11 +39,25 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import jmetest.renderer.TestSkybox;
+
+import alienrabble.grab.AlienRabbleHandler;
+
 import com.jme.app.AbstractGame;
 import com.jme.app.SimpleGame;
 import com.jme.bounding.BoundingSphere;
+import com.jme.image.Image;
+import com.jme.image.Texture;
+import com.jme.input.InputHandler;
+import com.jme.light.DirectionalLight;
+import com.jme.math.Quaternion;
+import com.jme.math.Vector3f;
+import com.jme.renderer.ColorRGBA;
 import com.jme.scene.Node;
+import com.jme.scene.Skybox;
 import com.jme.scene.Spatial;
+import com.jme.scene.state.LightState;
+import com.jme.util.TextureManager;
 import com.jme.util.export.Savable;
 import com.jme.util.export.binary.BinaryExporter;
 import com.jme.util.export.binary.BinaryImporter;
@@ -68,6 +82,17 @@ public class AlienConverter extends SimpleGame {
     private static final Logger logger = Logger
             .getLogger(AlienConverter.class.getName());
     
+    protected InputHandler input;
+    private Spatial displaymodel;
+    
+    private Skybox m_skybox;
+   
+    private Quaternion rotQuat1 = new Quaternion();
+    private float angle = 0;
+    private float direction = 1;
+    private float speed = 1;
+    private Vector3f axis = new Vector3f(1f,0f,0f);
+    
     public static void main(String[] args) {
         AlienConverter app = new AlienConverter();
         app.setConfigShowMode(AbstractGame.ConfigShowMode.AlwaysShow);
@@ -75,13 +100,36 @@ public class AlienConverter extends SimpleGame {
         app.start();
     }
 
+    
+    protected void simpleUpdate() {
+
+ 	   m_skybox.setLocalTranslation(cam.getLocation());
+ 	  
+    	if (tpf < 1) {
+	      angle = angle + (tpf * speed);
+	      if (angle > 360) {
+	        angle = 0;
+	      }
+	    }
+	    rotQuat1.fromAngleAxis(direction*angle, axis);
+	    displaymodel.setLocalRotation(rotQuat1);    	
+    }
+    
     protected void simpleInitGame() {
 
+    	if (1==1)
+    	{
+    		//make it look more like it will in actual game
+    		buildskybox();
+    		buildLighting();
+    	}
+    	input = new AlienConverterHandler(this);
+        
     	String modelpath;
 		Spatial newmodel;
-
-//		modelpath = "alienconverter/data/model/grabber2.3ds";
-//    	newmodel = loadModel(modelpath);
+		
+		modelpath = "alienconverter/data/grabber/grabberillusion2.obj";
+    	newmodel = loadModel(modelpath);
 //    		
     		
 //		modelpath = "alienconverter/data/Greebles/Family5/m5_51.3ds";
@@ -165,26 +213,28 @@ public class AlienConverter extends SimpleGame {
 //		modelpath = "alienconverter/data/medin/medin1110.obj";
 //		newmodel = loadModel(modelpath);
 
-	
-		modelpath = "alienconverter/data/model/claw1.obj";
-    	newmodel = loadModel(modelpath);
-
-		modelpath = "alienconverter/data/model/claw3.obj";
-    	newmodel = loadModel(modelpath);
-
-		modelpath = "alienconverter/data/model/legcurved.obj";
-    	newmodel = loadModel(modelpath);
-		
-    	modelpath = "alienconverter/data/model/leg/blobleg.obj";
-    	newmodel = loadModel(modelpath);
-
-    	modelpath = "alienconverter/data/model/leg/blobleg3.obj";
-    	newmodel = loadModel(modelpath);
+//	
+//		modelpath = "alienconverter/data/model/clawleft.obj";
+//    	newmodel = loadModel(modelpath);
+//
+//		modelpath = "alienconverter/data/model/handleft.obj";
+//    	newmodel = loadModel(modelpath);
+//
+//		modelpath = "alienconverter/data/model/legcurved.obj";
+//    	newmodel = loadModel(modelpath);
+//		
+//    	modelpath = "alienconverter/data/model/leg/blobleg.obj";
+//    	newmodel = loadModel(modelpath);
+//
+//    	modelpath = "alienconverter/data/model/leg/blobleg3.obj";
+//    	newmodel = loadModel(modelpath);
 
 		newmodel.setLocalScale(1f);
 		newmodel.setModelBound(new BoundingSphere());
 		newmodel.updateModelBound();
-        rootNode.attachChild(newmodel);
+		displaymodel = newmodel;
+		displaymodel.setLocalTranslation(0f, 0f, 0f);
+        rootNode.attachChild(displaymodel);
     }
     
     	
@@ -246,5 +296,81 @@ public class AlienConverter extends SimpleGame {
     	}
     	
     	return loadedModel;
+    
+    }
+    public void changeRotation(Vector3f axis, int direction, float speedchange){
+    	this.axis = axis;
+    	this.direction = direction;
+    	this.speed += speedchange;
+    }
+    
+    private void buildLighting() {
+        /** Set up a basic, default light. */
+        DirectionalLight light = new DirectionalLight();
+        light.setDiffuse(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, .5f));
+        light.setDirection(new Vector3f(1,-1,0));
+        light.setShadowCaster(true);
+        light.setEnabled(true);
+
+        DirectionalLight light2 = new DirectionalLight();
+        light2.setDiffuse(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+        light2.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, .5f));
+        light2.setDirection(new Vector3f(-1,-1,0.5f));
+        light2.setShadowCaster(true);
+        light2.setEnabled(true);
+
+        
+          /** Attach the light to a lightState and the lightState to rootNode. */
+        LightState lightState = display.getRenderer().createLightState();
+        lightState.setEnabled(true);
+        lightState.setGlobalAmbient(new ColorRGBA(.4f, .4f, .4f, 1f));
+        lightState.attach(light);
+        lightState.attach(light2);
+        rootNode.setRenderState(lightState);
+    }
+    private void buildskybox(){
+    	  // Create a skybox
+         m_skybox = new Skybox("skybox", 10, 10, 10);
+
+        Texture north = TextureManager.loadTexture(
+            TestSkybox.class.getClassLoader().getResource(
+            "jmetest/data/texture/north.jpg"),
+            Texture.MinificationFilter.BilinearNearestMipMap,
+            Texture.MagnificationFilter.Bilinear, Image.Format.GuessNoCompression, 0.0f, true);
+        Texture south = TextureManager.loadTexture(
+            TestSkybox.class.getClassLoader().getResource(
+            "jmetest/data/texture/south.jpg"),
+            Texture.MinificationFilter.BilinearNearestMipMap,
+            Texture.MagnificationFilter.Bilinear, Image.Format.GuessNoCompression, 0.0f, true);
+        Texture east = TextureManager.loadTexture(
+            TestSkybox.class.getClassLoader().getResource(
+            "jmetest/data/texture/east.jpg"),
+            Texture.MinificationFilter.BilinearNearestMipMap,
+            Texture.MagnificationFilter.Bilinear, Image.Format.GuessNoCompression, 0.0f, true);
+        Texture west = TextureManager.loadTexture(
+            TestSkybox.class.getClassLoader().getResource(
+            "jmetest/data/texture/west.jpg"),
+            Texture.MinificationFilter.BilinearNearestMipMap,
+            Texture.MagnificationFilter.Bilinear, Image.Format.GuessNoCompression, 0.0f, true);
+        Texture up = TextureManager.loadTexture(
+            TestSkybox.class.getClassLoader().getResource(
+            "jmetest/data/texture/top.jpg"),
+            Texture.MinificationFilter.BilinearNearestMipMap,
+            Texture.MagnificationFilter.Bilinear, Image.Format.GuessNoCompression, 0.0f, true);
+        Texture down = TextureManager.loadTexture(
+            TestSkybox.class.getClassLoader().getResource(
+            "jmetest/data/texture/bottom.jpg"),
+            Texture.MinificationFilter.BilinearNearestMipMap,
+            Texture.MagnificationFilter.Bilinear, Image.Format.GuessNoCompression, 0.0f, true);
+
+        m_skybox.setTexture(Skybox.Face.North, north);
+        m_skybox.setTexture(Skybox.Face.West, west);
+        m_skybox.setTexture(Skybox.Face.South, south);
+        m_skybox.setTexture(Skybox.Face.East, east);
+        m_skybox.setTexture(Skybox.Face.Up, up);
+        m_skybox.setTexture(Skybox.Face.Down, down);
+        m_skybox.preloadTextures();
+        rootNode.attachChild(m_skybox);
     }
 }

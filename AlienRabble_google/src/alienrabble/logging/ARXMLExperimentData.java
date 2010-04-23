@@ -23,6 +23,7 @@ import alienrabble.MainGameStateSystem;
  * and allowing them to be saved 
  * with the performance data in the output file. 
  * 
+ * 
  * @author Caspar Addyman
  *
  */
@@ -31,7 +32,7 @@ public class ARXMLExperimentData{
 	private static final Logger logger 
 			= Logger.getLogger(ARXMLExperimentData.class.getName());
 
-	public enum GameType {RULEDISCOVERY, GRABONLY, SORTONLY, GRABANDSORT};
+	public enum GameType {RULEDISCOVERY, GRABONLY, SORTONLY, GRABANDSORT, SAMEDIFF};
 	
 	//the names of the various node types in our xml doc
 	public static final String TOPLEVEL_NODE = "alienrabbledata";
@@ -50,6 +51,8 @@ public class ARXMLExperimentData{
 	public static final String EXPERIMENTER_NODE = "experimenter";
 	public static final String TIMEGAUGE_NODE = "timegauge";
 	public static final String GAMETYPE_NODE = "gametype";
+	public static final String SHOWSCORES_NODE = "showscores";
+	public static final String ARENASIZE_NODE = "arenasize";
 	public static final String NUMBEROFROUNDS_NODE = "numrounds";
 	public static final String NUMBEROFTREES_NODE = "numtrees";
 	public static final String PARTICIPANT_NODE = "participant";
@@ -67,6 +70,8 @@ public class ARXMLExperimentData{
 	private String gamedesc; // rule discovery or grab/+sorting
 	private String experimenter;   // name of experimenter
 	private int timeGauge;	// how long timer goes for on a single round in seconds, 0 = no time gauge
+	private int showScores;	//  0 = smiley face feedback, 1 = show the score for each exemplar
+	private int arenaSize;	// how big is the the arena?
 	private int numTrees;	// how many distractor trees will there be in grab phase
 	private int numRounds; // how many times will they get 
 	private String modelfile; //the name of xml file containing model descriptions.
@@ -114,11 +119,22 @@ public class ARXMLExperimentData{
 		return this.ID;
 	}
 
+	public String getExperimenter(){
+		return experimenter;
+	}
+	
+	public int getShowScores(){
+		return showScores;
+	}
+	
 	public int getTimeGauge(){
 		return timeGauge;
 	}
 	public int getNumTrees(){
 		return numTrees;
+	}
+	public int getArenaSize(){
+		return arenaSize;
 	}
 	public int getNumRounds(){
 		return numRounds;
@@ -145,11 +161,26 @@ public class ARXMLExperimentData{
 		this.gamedesc = gametypeel.getTextContent();
 		gameType = getGameType();
 		
+		//do we give feedback with smileys or scores
+		NodeList showscores = expsetup.getElementsByTagName(SHOWSCORES_NODE);
+		Element showscoresel = (Element) showscores.item(0);
+		try{
+			this.showScores = Boolean.parseBoolean(showscoresel.getTextContent())?1:0;
+		}catch (Exception e)
+		{
+			this.showScores = Integer.valueOf(showscoresel.getTextContent());			
+		}
+
 		//get time gauge value, 0 means no gauge
 		NodeList tgauge = expsetup.getElementsByTagName(TIMEGAUGE_NODE);
 		Element tgaugeel = (Element) tgauge.item(0);
 		this.timeGauge = Long.valueOf(tgaugeel.getTextContent()).intValue();
 		
+		//get arena size
+		NodeList arena = expsetup.getElementsByTagName(ARENASIZE_NODE);
+		Element arenael = (Element) arena.item(0);
+		this.arenaSize  =  Long.valueOf(arenael.getTextContent()).intValue();
+
 		//get number of repetitions of everything
 		NodeList rounds = expsetup.getElementsByTagName(NUMBEROFROUNDS_NODE);
 		Element roundsel = (Element) rounds.item(0);
@@ -160,7 +191,11 @@ public class ARXMLExperimentData{
 		Element treesel = (Element) trees.item(0);
 		this.numTrees  =  Long.valueOf(treesel.getTextContent()).intValue();
 
-		
+		//get experimenter name
+		NodeList expnames = expsetup.getElementsByTagName(EXPERIMENTER_NODE);
+		Element nameel = (Element) expnames.item(0);
+		this.experimenter  =  nameel.getTextContent();
+
 		///////////////////////
 		// Participant details
 		///////////////////////
@@ -202,6 +237,8 @@ public class ARXMLExperimentData{
 		}
 		} 
 	catch (Exception e) {
+			//TODO
+			//Dialog.showError ("Error reading the init.xml file. Please check the contents and formating of this file.");
 			e.printStackTrace();
 			logger.severe(e.getMessage());
 		}

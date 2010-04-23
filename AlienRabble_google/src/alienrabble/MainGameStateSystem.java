@@ -1,5 +1,8 @@
 /*
- * Copyright (c) 2003-2007 jMonkeyEngine
+ * Code Copyright (c) 2007-2009 Caspar Addyman
+ * 
+ * 
+ * Original Code Copyright (c) 2003-2007 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,7 +76,7 @@ public class MainGameStateSystem extends BaseGame {
 	/** Only used in the static exit method. */
 	private static AbstractGame instance;
 	
-	public static String ARVersionNumber = "0.1"; 
+	public static String ARVersionNumber = "1.0"; 
 	
 	/** High resolution timer for jME. */
 	public Timer timer;
@@ -209,7 +212,8 @@ public class MainGameStateSystem extends BaseGame {
 	 */
 	public static void main(String[] args) {
 		MainGameStateSystem app = new MainGameStateSystem();
-		app.setConfigShowMode(AbstractGame.ConfigShowMode.AlwaysShow);
+		app.setConfigShowMode(AbstractGame.ConfigShowMode.AlwaysShow, MainGameStateSystem.class.getClassLoader()
+	             .getResource("alienrabble/data/texture/splashscreen_v1_0.png"));
 		app.start();
 	}
 	

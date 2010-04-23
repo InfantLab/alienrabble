@@ -47,8 +47,9 @@ import com.jme.scene.Spatial;
 import com.jme.scene.shape.Cylinder;
 
 /**
- * Alien maintains a single alien object. The participant 
- * aims to grab as many aliens as possible. The main job of 
+ * Alien maintains a single alien object. ALiens start as a id line up at top
+ * of screen and the participant clicks on an alien to select it and then
+ * sort into one of the boxes. The main job of 
  * the class is to build and manage the alien's movement 
  * @author Caspar Addyman
  *

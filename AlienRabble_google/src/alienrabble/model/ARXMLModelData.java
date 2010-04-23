@@ -26,6 +26,8 @@ public class ARXMLModelData {
 	public static final String MODELSET_NODE = "modelset";
 	public static final String MODELDATA_NODE = "modeldata";
 	public static final String NAME_NODE = "name";
+//	public static final String SCORE_NODE = "score";
+	public static final String FEEDBACKTYPE_NODE = "feedbacktype";
 	public static final String ISDYNAMIC_NODE = "isdynamic";
 	public static final String LOCATION_NODE = "location";
 	public static final String DIMENSION_NODE = "dimension";
@@ -80,13 +82,19 @@ public class ARXMLModelData {
 				NodeList modelDataList = firstElement.getElementsByTagName(NAME_NODE);
 				Element firstModelElement = (Element) modelDataList.item(0);
 				NodeList fstNm = firstModelElement.getChildNodes();
-				System.out.println("Model Name : "  + ((Node) fstNm.item(0)).getNodeValue());
+//				System.out.println("Model Name : "  + ((Node) fstNm.item(0)).getNodeValue());
 				allModels[s] = new Model(((Node) fstNm.item(0)).getNodeValue());
+				//do we give smiley feedback or scores
+//				NodeList modelScoreList = firstElement.getElementsByTagName(SCORE_NODE);
+//				Element firstScoreElement = (Element) modelScoreList.item(0);
+//				NodeList fstScr = firstScoreElement.getChildNodes();
+////				System.out.println(Score : "  + ((Node) fstScr.item(0)).getNodeValue());
+//				allModels[s].setPoints( Integer.valueOf(fstScr.item(0).getNodeValue()));
 				//URI/location for the model binary
 				NodeList locationList = firstElement.getElementsByTagName(LOCATION_NODE);
 				Element locationElement = (Element) locationList.item(0);
 				NodeList locationItem = locationElement.getChildNodes();
-				System.out.println("Last Name : " + ((Node) locationItem.item(0)).getNodeValue());
+//				System.out.println("Last Name : " + ((Node) locationItem.item(0)).getNodeValue());
 				allModels[s].setBinaryLocation( ((Node) locationItem.item(0)).getNodeValue());
 				//now loop through all the properties and set them on the model object
 				NodeList propertiesList = firstElement.getElementsByTagName(PROPERTY_NODE);

@@ -60,7 +60,7 @@ import com.jmex.terrain.TerrainBlock;
 public class Alien extends Node{
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = Logger.getLogger(AlienRabble.class
+	private static final Logger logger = Logger.getLogger(AlienRabbleGrab.class
             .getName());
 	
 	private static float SHRINKFACTOR = 0.3f;

@@ -32,9 +32,10 @@
 
 package alienrabble.sort;
 
+import java.nio.FloatBuffer;
 import java.util.logging.Logger;
 
-import alienrabble.grab.AlienRabble;
+import alienrabble.grab.AlienRabbleGrab;
 import alienrabble.logging.ARDataLoadandSave;
 import alienrabble.logging.ARXMLSortData;
 import alienrabble.logging.ARXMLSortData.MouseEvent;
@@ -42,21 +43,28 @@ import alienrabble.model.ARXMLModelData;
 import alienrabble.model.Model;
 import alienrabble.util.RandomPermutation;
 
+import com.jme.bounding.BoundingBox;
+import com.jme.bounding.BoundingVolume;
 import com.jme.image.Texture;
 import com.jme.input.AbsoluteMouse;
 import com.jme.input.InputHandler;
+import com.jme.input.MouseInput;
+import com.jme.input.MouseInputListener;
 import com.jme.light.DirectionalLight;
 import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
+import com.jme.renderer.Renderer;
 import com.jme.renderer.pass.BasicPassManager;
 import com.jme.renderer.pass.RenderPass;
 import com.jme.renderer.pass.ShadowedRenderPass;
 import com.jme.renderer.pass.ShadowedRenderPass.LightingMethod;
 import com.jme.scene.Node;
 import com.jme.scene.Skybox;
+import com.jme.scene.TexCoords;
 import com.jme.scene.Text;
 import com.jme.scene.Spatial;
 import com.jme.scene.Spatial.CullHint;
+import com.jme.scene.shape.Quad;
 import com.jme.scene.state.BlendState;
 import com.jme.scene.state.CullState;
 import com.jme.scene.state.LightState;
@@ -66,6 +74,7 @@ import com.jme.scene.state.ZBufferState;
 import com.jme.system.DisplaySystem;
 import com.jme.system.GameSettings;
 import com.jme.util.TextureManager;
+import com.jme.util.geom.BufferUtils;
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.AudioTrack;
 import com.jmex.game.state.CameraGameState;
@@ -103,6 +112,9 @@ public class AlienRabbleSort extends CameraGameState {
     private AbsoluteMouse mouse;
     private PackingCases packingcases;
     private Skybox skybox;
+    private Node buttons; //parent for button properties
+    private Quad moreboxesbutton;
+    private Quad lessboxesbutton;
     
     //the data logger
     private ARXMLSortData sortdata;
@@ -164,7 +176,10 @@ public class AlienRabbleSort extends CameraGameState {
         buildLighting();
 //		buildSkyBox();
 //		scene.attachChild(skybox);
-		
+	
+        //set up the more and less boxes buttons.
+        buildLessMoreButtons();
+        
 		//set up passes
         buildPassManager();
 		
@@ -259,8 +274,10 @@ public class AlienRabbleSort extends CameraGameState {
         as1.setTestFunction(BlendState.TestFunction.GreaterThan);
         mouse.setRenderState(as1);
 
-        AlienPick pick = new AlienPick(display, scene, text);
+        AlienPick pick = new AlienPick(display, scene, text,moreboxesbutton, lessboxesbutton,packingcases);
 		input.addAction(pick);	
+		
+		
 	}
 	
 	private void setupSounds() {
@@ -273,7 +290,7 @@ public class AlienRabbleSort extends CameraGameState {
 //		targetSound = audio.createAudioTrack( AlienRabble.class.getClassLoader().getResource( "alienrabble/data/sound/explosion.ogg" ), false);
 //        targetSound.setMaxAudibleDistance(1000);
 //        targetSound.setVolume(1.0f);
-		laserSound = audio.createAudioTrack( AlienRabble.class.getClassLoader().getResource( "alienrabble/data/sound/whizzoop.ogg" ), false);
+		laserSound = audio.createAudioTrack( AlienRabbleGrab.class.getClassLoader().getResource( "alienrabble/data/sound/whizzoop.ogg" ), false);
         laserSound.setMaxAudibleDistance(1000);
         laserSound.setVolume(1.0f);
 	}
@@ -307,6 +324,71 @@ public class AlienRabbleSort extends CameraGameState {
          scene.setRenderState(lightState);
     }
 	
+    private void buildLessMoreButtons(){
+    	
+    	buttons = new Node("buttons");
+    	lessboxesbutton = new Quad("LessBoxes", 192,68);
+    	moreboxesbutton = new Quad("MoreBoxes", 192,68);
+    	
+    	
+    	lessboxesbutton.getLocalTranslation().x = 100;
+    	lessboxesbutton.getLocalTranslation().y = 50;
+    	moreboxesbutton.getLocalTranslation().x = width - 100;
+    	moreboxesbutton.getLocalTranslation().y = 50;
+	
+	    	
+	    LightState ls = display.getRenderer().createLightState();
+	    ls.setEnabled(false);
+	    buttons.setRenderState(ls);
+	    buttons.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+
+	    TextureState ts = display.getRenderer().createTextureState();
+	    ts.setTexture(TextureManager.loadTexture(getClass().getClassLoader()
+            .getResource("alienrabble/data/texture/morelessbuttons.png"), Texture.MinificationFilter.Trilinear,
+            Texture.MagnificationFilter.Bilinear, 1.0f, true));
+	    ts.setEnabled(true);
+	    buttons.setRenderState(ts);
+ 
+	    BlendState as = display.getRenderer().createBlendState();
+	    as.setBlendEnabled(true);
+	    as.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+	    as.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+	    as.setTestEnabled(false);
+	    as.setEnabled(true);
+	    buttons.setRenderState(as);
+	    
+	    // Render the Gui node in the Ortho Queue
+	    buttons.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+	    // don't cull the gui away
+	    buttons.setCullHint(Spatial.CullHint.Never);
+	    // gui needs no lighting
+	    buttons.setLightCombineMode(Spatial.LightCombineMode.Off);
+	    
+	    //set button texture coordinates
+		FloatBuffer fbuffer = BufferUtils.createVector2Buffer(4);
+		fbuffer.put(0f).put(1f);
+		fbuffer.put(0f).put(1f- 68f/256);
+		fbuffer.put(192f/256).put(1f- 68f/256);
+		fbuffer.put(192f/256).put(1f);
+		moreboxesbutton.setTextureCoords(new TexCoords(fbuffer));	
+	    //set button texture coordinates
+		FloatBuffer fbuffer2 = BufferUtils.createVector2Buffer(4);
+		fbuffer2.put(0f).put(0.5f);
+		fbuffer2.put(0f).put(0.5f- 68f/256);
+		fbuffer2.put(192f/256).put(0.5f - 68f/256);
+		fbuffer2.put(192f/256).put(0.5f);
+		lessboxesbutton.setTextureCoords(new TexCoords(fbuffer2));	
+		
+		lessboxesbutton.setModelBound(new BoundingBox());
+		moreboxesbutton.setModelBound(new BoundingBox());
+    	buttons.attachChild(lessboxesbutton);
+    	buttons.attachChild(moreboxesbutton);
+		buttons.updateModelBound();
+    	scene.attachChild(buttons);
+
+}
+    
+    
 	/**
 	 * Gets called every time the game state manager switches to this game state.
 	 * Sets the window title.
@@ -338,6 +420,7 @@ public class AlienRabbleSort extends CameraGameState {
     	for(int i=0;i<allAlienSort.length;i++){
     		allAlienSort[i].update(interpolation);
     	}
+    	scene.updateWorldBound();
     	scene.updateRenderState();
     }
 	
@@ -413,4 +496,6 @@ public class AlienRabbleSort extends CameraGameState {
     protected void reinit() {
         display.recreateWindow(width, height, depth, freq, fullscreen);
     }
+    
+
 }

@@ -1,5 +1,8 @@
 package alienrabble.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -12,7 +15,17 @@ import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
+import com.jme.util.export.Savable;
+import com.jme.util.export.binary.BinaryExporter;
 import com.jme.util.export.binary.BinaryImporter;
+import com.jmex.model.converters.AseToJme;
+import com.jmex.model.converters.FormatConverter;
+import com.jmex.model.converters.MaxToJme;
+import com.jmex.model.converters.Md2ToJme;
+import com.jmex.model.converters.Md3ToJme;
+import com.jmex.model.converters.MilkToJme;
+import com.jmex.model.converters.ObjToJme;
+import com.jmex.model.util.ModelLoader;
 
 
 /**
@@ -40,6 +53,7 @@ public class Model extends Node {
 	private boolean isDynamicAlien;
 	private DynamicExemplar dynamicAlien;
 	private int whichCategory; 
+	private int points;
 	
 	public Model(){
 		properties = new Hashtable<String, String>();
@@ -49,6 +63,7 @@ public class Model extends Node {
 		whichCategory = 0;
 		initialRotation = new Quaternion(0,0,0,0);
 		initialScale = new Vector3f(1,1,1);
+		points = 10;
 	}
 	
 	public Model(String name)
@@ -71,6 +86,14 @@ public class Model extends Node {
 	 */
 	public int Category(){
 		return whichCategory;
+	}
+	
+	public int Points(){
+		return points;
+	}
+	
+	public void setPoints(int alienPoints){
+		points = alienPoints;
 	}
 	
 	public boolean IsDynamicAlien(){
@@ -137,20 +160,70 @@ public class Model extends Node {
 	public Enumeration<String> getAllDimensions(){
 		return dimensions.keys();
 	}
-	
+
+    /*
+     *  This method opens a model in various format evaluating the extension
+     *  In case in the same directory is already presents the same model in jbin format loads it
+     *  Otherways load the model and save a jbin copy for the next time.
+     *  
+     *  Attention : in case the original model is changed you'll have to delete the jbin one the reload it. 
+     */	
 	public boolean loadModelBinary(){
 		if (binaryLocation == null) return false;
 		if (hasmodel == true) return true;
-		
-		URL alienURL = Model.class.getClassLoader().getResource(binaryLocation);
-		BinaryImporter BI = new BinaryImporter();
-		try {
-			model = (Spatial)BI.load(alienURL.openStream());
-			} 
-		catch (IOException e) {
-			logger.severe("failed to load model binary" + e.getMessage());
-			return false;
-		}
+
+	   	ByteArrayOutputStream 	BO 		= new ByteArrayOutputStream();
+    	Spatial			loadedModel	= null;
+    	FormatConverter	formatConverter = null;		
+    	String			modelFormat 	= binaryLocation.substring(binaryLocation.lastIndexOf(".") + 1, binaryLocation.length());
+    	String			modelBinary	= binaryLocation.substring(0, binaryLocation.lastIndexOf(".") + 1) + "jbin";
+    	URL				alienURL	= ModelLoader.class.getClassLoader().getResource(modelBinary);
+
+    	BinaryImporter BI = new BinaryImporter();
+
+    	
+    	//verify the presence of the jbin model
+    	if (alienURL == null){
+    		
+    		alienURL		= ModelLoader.class.getClassLoader().getResource(binaryLocation);
+    		
+    		//evaluate the format
+    		if (modelFormat.equals("3ds")){
+    			formatConverter = new MaxToJme();
+    		} else if (modelFormat.equals("md2")){
+    			formatConverter = new Md2ToJme();
+    		} else if (modelFormat.equals("md3")){
+    			formatConverter = new Md3ToJme();
+    		} else if (modelFormat.equals("ms3d")){
+    			formatConverter = new MilkToJme();
+    		} else if (modelFormat.equals("ase")){
+    			formatConverter = new AseToJme();
+    		} else if (modelFormat.equals("obj")){
+    			formatConverter = new ObjToJme();
+    		}
+    		formatConverter.setProperty("mtllib", alienURL);
+    		
+    		try {
+    			formatConverter.convert(alienURL.openStream(), BO);
+    			model = (Spatial) BI.load(new ByteArrayInputStream(BO.toByteArray()));
+    			
+    			//save the jbin format
+    			BinaryExporter.getInstance().save((Savable)loadedModel, new File(modelBinary));
+    		} catch (IOException e) {				
+    			e.printStackTrace();
+    			return false;
+    		}
+    	}else{
+    		try {
+    			//load the jbin format
+    			model = (Spatial) BI.load(alienURL.openStream());
+    		} catch (IOException e) {
+    			logger.severe("failed to load model binary" + e.getMessage());
+    			return false;
+    		}
+    	}
+    	
+  
 		this.attachChild(model);
 		this.setLocalRotation(initialRotation);
 		this.setLocalScale(initialScale);
@@ -159,6 +232,7 @@ public class Model extends Node {
 		return true;
 	}		
 
+	
 	public boolean createDynamicExemplar(){
 		if (!isDynamicAlien) return false;
 		if (hasmodel == true) return true;
@@ -194,6 +268,7 @@ public class Model extends Node {
 		this.setLocalScale(initialScale);
 		
 		whichCategory = getDimension("Category").intValue();
+		points = getDimension("Score").intValue();
 		
 		hasmodel = true;
 		return true;

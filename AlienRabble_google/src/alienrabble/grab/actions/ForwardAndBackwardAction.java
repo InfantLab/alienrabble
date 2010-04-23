@@ -17,7 +17,7 @@ public class ForwardAndBackwardAction extends KeyInputAction {
     public static final int FORWARD = 0;
     public static final int BACKWARD = 1;
     //the node to manipulate
-    private Vehicle node;
+    private Vehicle vehicle;
     private int direction;
 
     /**
@@ -26,7 +26,7 @@ public class ForwardAndBackwardAction extends KeyInputAction {
      * @param direction Constant either FORWARD or BACKWARD
      */
     public ForwardAndBackwardAction(Vehicle node, int direction) {
-        this.node = node;
+        this.vehicle = node;
         this.direction = direction;
     }
 
@@ -35,9 +35,9 @@ public class ForwardAndBackwardAction extends KeyInputAction {
      */
     public void performAction(InputActionEvent evt) {
         if(direction == FORWARD) {
-            node.accelerate(evt.getTime());
+            vehicle.accelerate(evt.getTime());
         } else if(direction == BACKWARD){
-            node.brake(evt.getTime());
+            vehicle.brake(evt.getTime());
         }
     }
 }

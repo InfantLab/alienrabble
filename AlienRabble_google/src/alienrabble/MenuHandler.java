@@ -32,7 +32,7 @@
 
 package alienrabble;
 
-import alienrabble.grab.AlienRabble;
+import alienrabble.grab.AlienRabbleGrab;
 import alienrabble.sort.AlienRabbleSort;
 
 import com.jme.input.InputHandler;
@@ -62,7 +62,7 @@ public class MenuHandler extends InputHandler {
         setKeyBindings();
         this.inMenuState = menuState;
         //initialize the game states
-        inGrabGame = new AlienRabble("ingrabgame", settings);
+        inGrabGame = new AlienRabbleGrab("ingrabgame", settings);
 	    inSortGame = new AlienRabbleSort("insortgame", settings);
 	    inGrabGame.setActive(false);
 	    inSortGame.setActive(false);

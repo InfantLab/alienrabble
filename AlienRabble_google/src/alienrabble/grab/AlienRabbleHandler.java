@@ -94,6 +94,11 @@ public class AlienRabbleHandler extends InputHandler {
         keyboard.set("backward", KeyInput.KEY_DOWN);
         keyboard.set("turnRight", KeyInput.KEY_RIGHT);
         keyboard.set("turnLeft", KeyInput.KEY_LEFT);
+
+        //just for my optical illusion thingy
+        keyboard.set("SpinForwards", KeyInput.KEY_S);
+        keyboard.set("SpinBackwards", KeyInput.KEY_Z);
+
         keyboard.set("exit", KeyInput.KEY_ESCAPE);
     }
 
@@ -112,6 +117,11 @@ public class AlienRabbleHandler extends InputHandler {
         addAction(rotateLeft, "turnLeft", true);
         VehicleRotateAction rotateRight = new VehicleRotateAction(node, VehicleRotateAction.RIGHT);
         addAction(rotateRight, "turnRight", true);
+        
+        VehicleRotateAction rotateForward = new VehicleRotateAction(node, VehicleRotateAction.FORWARD);
+        addAction(rotateForward, "spinForward", true);
+        VehicleRotateAction rotateBackward = new VehicleRotateAction(node, VehicleRotateAction.BACKWARD);
+        addAction(rotateBackward, "spinBackward", true);
         
         ExitAction exitAction = new ExitAction();
         addAction(exitAction, "exit",false);

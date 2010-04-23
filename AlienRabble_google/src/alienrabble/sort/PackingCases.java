@@ -35,7 +35,7 @@ public class PackingCases extends Node {
 	
 	public void removeCase(){
 		if (countCases > MINCASES){
-			Node caseToRemove = (Node) this.getChild(countCases-1);
+			Node caseToRemove = (Node) this.getChild("packingcase"+(countCases -1));
 			int numkids = caseToRemove.getChildren().size();
 			//the box we are trying to remove may contain aliens
 			//we ought to put them back 
@@ -84,7 +84,7 @@ public class PackingCases extends Node {
 		{
 			Node boxi = (Node) this.getChild(i);
 			boxi.setLocalScale(casesize);
-			boxi.setLocalTranslation(-50+i*casespacing, -30, 0);
+			boxi.setLocalTranslation(50-i*casespacing, -25, 0);
 			//now spread out the children
 			rearrangeChildren(boxi);
 		}

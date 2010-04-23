@@ -48,6 +48,7 @@ import com.jme.math.Vector3f;
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;
 import com.jme.scene.Text;
+import com.jme.scene.shape.Quad;
 import com.jme.system.DisplaySystem;
 import com.jme.util.Timer;
 
@@ -66,16 +67,22 @@ public class AlienPick extends MouseInputAction {
     private int shots = 0;
     private Text text;
     private String hitItems;
+    private Quad morebutton;
+    private Quad lessbutton;
     private AlienSort selectedAlien;
+    private PackingCases packingcases;
      
     private ARXMLSortData sortdata;
     private Timer timer;
     
 
-    public AlienPick(DisplaySystem display, Node scene, Text text) {
+    public AlienPick(DisplaySystem display, Node scene, Text text, Quad more, Quad less, PackingCases pc) {
         this.display = display;
         this.scene = scene;
         this.text = text;
+        morebutton = more;
+        lessbutton = less;
+        packingcases = pc;
         selectedAlien = null;
         timer = Timer.getTimer();
         sortdata = ARDataLoadandSave.getInstance().getXmlSortData();
@@ -86,16 +93,48 @@ public class AlienPick extends MouseInputAction {
     public void performAction(InputActionEvent evt) {
         shotTime += evt.getTime();
         if( MouseInput.get().isButtonDown(0) && shotTime > 0.3f && !performingAction) {
-        	
+        	shotTime = 0;
         	performingAction = true;
             float x = MouseInput.get().getXAbsolute();
             float y = MouseInput.get().getYAbsolute(); 
-        	shotTime = 0;
+            
+  	      //find out if we have hit a more or less button
+            if (getPickHits(morebutton, x, y) ) { // at button down
+            	//we should add more packingcases
+        		packingcases.addCase();
+        		//log this event
+        		MouseEvent me = sortdata.new MouseEvent();
+	        	me.clockTicks = timer.getTime();
+	        	me.timeInSecs =me.clockTicks * 1f / timer.getResolution();// * 1f to get result as float
+	        	me.x_location = x;
+	        	me.y_location = y;
+	        	me.objectname = "moreBoxesButton";
+	        	me.objectclicked = true;
+	        	sortdata.addMouseEvent(me);
+	        	performingAction = false;
+	        	return;
+            }
+            else if (getPickHits(lessbutton, x, y) ) { // at button down
+            	//we should remove a packingcase
+        		packingcases.removeCase();
+        		//log this event
+        		MouseEvent me = sortdata.new MouseEvent();
+	        	me.clockTicks = timer.getTime();
+	        	me.timeInSecs =me.clockTicks * 1f / timer.getResolution();// * 1f to get result as float
+	        	me.x_location = x;
+	        	me.y_location = y;
+	        	me.objectname = "lessBoxesButton";
+	        	me.objectclicked = true;
+	        	sortdata.addMouseEvent(me);
+	        	performingAction = false;
+	        	return;
+            }
+	        
 			Vector2f screenPos = new Vector2f();
 			// Get the position that the mouse is pointing to
 			screenPos.set(x,y);
 			// Get the world location of that X,Y value
-			Vector3f worldCoords = display.getWorldCoordinates(screenPos, 0);
+			Vector3f worldCoords = display.getWorldCoordinates(screenPos, -1);
 			Vector3f worldCoords2 = display.getWorldCoordinates(screenPos, 1);
           //  logger.info( worldCoords.toString() );
             // Create a ray starting from the camera, and going in the direction
@@ -115,7 +154,7 @@ public class AlienPick extends MouseInputAction {
                     if(i != results.getNumber() -1) {
                         hitItems += ", ";
                     }
-                    //Geometry geom = results.getPickData(i).getTargetMesh().getParent();
+                    //find out if we have hit an alien
                     Node element = results.getPickData(i).getTargetMesh().getParent();
                     while (!(element instanceof AlienSort) && !(element == null) ) { 
                       element = element.getParent();
@@ -144,6 +183,7 @@ public class AlienPick extends MouseInputAction {
         	        	results.clear();
         	        	break;
         			}
+        	        //find out if we have it a case
         	        element = results.getPickData(i).getTargetMesh().getParent();
                     while (!(element == null) && !(element.getName().startsWith("packingcase") )  ) { 
                       element = element.getParent();
@@ -191,8 +231,21 @@ public class AlienPick extends MouseInputAction {
         	//me.type = ARXMLSortData.TYPE_CLICKNOTHING;
         	sortdata.addMouseEvent(me);
             results.clear();
-            text.print("Hits: " + hits + " Shots: " + shots + " : " + hitItems);
+//            text.print("Hits: " + hits + " Shots: " + shots + " : " + hitItems);
             performingAction = false;
         }
     }
+    public boolean getPickHits(Quad q, float x, float y) {
+        int xFrom, xTo, yFrom, yTo;
+        xFrom = (int)(q.getWorldTranslation().x - q.getWidth() / 2);
+        xTo = (int)(q.getWorldTranslation().x + q.getWidth() / 2);
+        yFrom = (int)(q.getWorldTranslation().y - q.getHeight() / 2);
+        yTo = (int)(q.getWorldTranslation().y + q.getHeight() / 2);
+        return isBetween(x, xFrom, xTo) && isBetween(y, yFrom, yTo);
+      } // getPickHits
+
+      private boolean isBetween(float toCheck, float lower, float upper) {
+        return toCheck >= lower && toCheck <= upper;
+      } // isBetween
 }
+

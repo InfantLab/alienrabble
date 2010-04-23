@@ -48,7 +48,7 @@ public class ARXMLGrabData{
 	public static final String SECS_VALUE = "secs";
 	public static final String LOCATION_NODE = "location";
 	public static final String VELOCITY_NODE = "velocity";
-	
+	public static final String ROUND_NODE = "round";
 	
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
@@ -102,10 +102,11 @@ public class ARXMLGrabData{
 		Node oldGrabData = oldGrabList.item(0);
 		
 		Element e1 = doc.createElement(GRAB_SESSION_DETAILS_NODE);
-		if (oldGrabData != null)
+		//if (oldGrabData != null)
+//		{
+//			topElement.replaceChild(e1, oldGrabData);
+//		}else
 		{
-			topElement.replaceChild(e1, oldGrabData);
-		}else{
 			topElement.appendChild(e1);
 		}	
 
@@ -197,6 +198,9 @@ public class ARXMLGrabData{
 		g4.setAttribute("x",Float.toString(ge.x_location));
 		g4.setAttribute("z",Float.toString(ge.z_location));
 		grab.appendChild(g4);	
+		Element g5 = doc.createElement(ROUND_NODE);
+		g5.setTextContent(String.valueOf(ge.round));
+		grab.appendChild(g5);
 		return grab;
 	}
 
@@ -259,6 +263,7 @@ public class ARXMLGrabData{
 		public String alienname;
 		public String alienid;
 		public long clockTicks;
+		public int round;
 		public float timeInSecs;
 		public float x_location; 
 		//public float y_location; //only move in the horizontal plane 
