@@ -8,9 +8,9 @@ This document should talk you through the steps necessary to run the project fro
 
 = Pre-requisites =
 
-# Install [ Eclipse]. 
-# Install [ Subclipse]- an svn tool for eclipse. This allows you to check out code from online repositories such as code.google.com
-# Install jme2 from jMonkeyEngine - the game development toolkit that Alien Rabble is built with. 
+  # Install [ Eclipse]. 
+  # Install [ Subclipse]- an svn tool for eclipse. This allows you to check out code from online repositories such as code.google.com
+  # Install jme2 from jMonkeyEngine - the game development toolkit that Alien Rabble is built with. 
 
 http://www.jmonkeyengine.org/wiki/doku.php/setting_up_eclipse_to_build_jme_2
 
