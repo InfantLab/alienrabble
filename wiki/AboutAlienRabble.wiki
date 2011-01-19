@@ -1,0 +1,19 @@
+#summary Alien Rabble: A 3D category learning task for young children.
+
+= Introduction =
+
+Alien Rabble is a psychology experiment disguised as a simple 3D computer game. It designed for testing category learning in young children. It features two tasks, a collecting game where participants must drive a 
+
+
+It was developed by Caspar Addyman as part of his PhD at the Centre for Brain and Cognitive Development, Birkbeck, University of London. The scientific aims of the project are described in Chapter five:
+
+  Addyman, C (2009) _Rules and similarity in the development of category learning in children and adults_ Unpublished PhD Thesis, University of London  [http://www.scribd.com/full/31547266?access_key=key-2enxw01qbmqe3wqfiiry pdf]
+
+= Installation =
+
+The packaged game can be downloaded here.
+
+
+= Using the code =
+
+The source code and instructions on how to get it work are available here. 
