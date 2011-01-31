@@ -198,10 +198,14 @@ public class MenuState extends CameraGameState {
 		}else if (menuStatus == MENU_RULE_INSTRUCTIONS){
 			String name = ARDataLoadandSave.getInstance().getXmlExperimentData().getName();
 			text.print("Welcome " + name + "!");
-			text1.print( "Use the arrow keys to navigate round the space." );
-			text2.print( "Collect all the aliens as fast as you can." );
+			text1.print( "Collect all the good aliens and avoid the bad ones." );
+			text2.print( "Use the arrow keys to navigate round the space." );
 			text3.print( "press ENTER to begin" );
 		}else if (menuStatus == MENU_RULE_FEEDBACK){
+			text.print("Great");
+			text1.print( "Now do the same again!" );
+			text2.print( "Only faster and  no mistakes" );
+			text3.print( "press ENTER to begin" );
 			
 		}else if (menuStatus == MENU_SORT_INSTRUCTIONS){
 			text.print("");

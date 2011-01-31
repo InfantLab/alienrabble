@@ -3,6 +3,9 @@
 
 <experimentsetup>
 	<gametype>RULE</gametype>
+	<showscores>TRUE</showscores> 
+  <soundeffects>TRUE</soundeffects>
+  <arenasize>10</arenasize>
 	<timegauge>0</timegauge>
 	<numrounds>3</numrounds>
 	<numtrees>20</numtrees>
@@ -12,9 +15,9 @@
 
 <participant>
 	<id>301</id>
-	<modelfile>sim2set1.xml</modelfile>
+	<modelfile>kingston_rule1.xml</modelfile>
 	<dob>6-11-2004</dob>
-	<name>Mira</name>
+	<name>CASPAR</name>
 	<randomseed>501</randomseed>
 	<modelset name="grab" value="dynamic1" />
 	<modelset name="sort" value="dynamic1" />

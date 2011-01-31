@@ -62,8 +62,7 @@ import com.jmex.terrain.util.ProceduralTextureGenerator;
 
 public class AlienRabbleGrab extends CameraGameState{
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(AlienRabbleGrab.class
-	            .getName());
+	private static final Logger logger = Logger.getLogger(AlienRabbleGrab.class.getName());
 	
 	private static final float GRAB_RADIUS = 2.5f;
 	    
@@ -135,7 +134,7 @@ public class AlienRabbleGrab extends CameraGameState{
     private RightWrong[] wrongCounter; //the column of cumulatively collected correct items
     private int rightRunningTotal = 0;  //count
     private int wrongRunningTotal = 0;  //count
-    private int sizeCategory1 = 5;
+    private int sizeCategory1 = 8;
     
     private int roundCount =1;
     
@@ -296,7 +295,7 @@ public class AlienRabbleGrab extends CameraGameState{
     		        	//we should make this vanish and log 
                     	
                     	Alien as = (Alien) element;
-    		        		
+    		        	
 			            laserSound.setWorldPosition(element.getWorldTranslation());
 			            laserSound.play();
 
@@ -310,6 +309,7 @@ public class AlienRabbleGrab extends CameraGameState{
     					ge.timeInSecs =  ge.clockTicks * 1f / timer.getResolution(); // *1f to get result as float
     					ge.x_location = as.getLocalTranslation().x;
     					ge.z_location = as.getLocalTranslation().z;
+    					ge.round = roundCount;
     					grabdata.addGrabEvent(ge);
     					
 
@@ -351,6 +351,14 @@ public class AlienRabbleGrab extends CameraGameState{
     }
     
     
+    private void clearRightWrongCounters(){
+
+    	for (int counter=0;counter<sizeCategory1;counter++){
+    		//is there a better way to blank these?
+        	rightCounter[counter].setBlankTime(.001f);
+        	wrongCounter[counter].setBlankTime(.001f);
+	    }
+    }
 
 
 	/**
@@ -430,12 +438,19 @@ public class AlienRabbleGrab extends CameraGameState{
     	roundCount++;
     	//initGame();
         
+    	//remove any remaining aliens from previous round. 
+    	clearRightWrongCounters();
+    	
+    	//reset counters
+    	rightRunningTotal = 0;
+        wrongRunningTotal = 0;
+    	
     	//Add aliens randomly to the terrain
     	addAliens();
-        rightRunningTotal = 0;
-        wrongRunningTotal = 0;
-        timeGauge.setGauge(expdata.getTimeGauge());
-        player.setLocalTranslation(new Vector3f(100,0, 100));
+        if (expdata.getTimeGauge() > 0){        
+        	timeGauge.setGauge(expdata.getTimeGauge());
+        }
+    	player.setLocalTranslation(new Vector3f(100,0, 100));
     }
     
     /**
@@ -955,8 +970,8 @@ public class AlienRabbleGrab extends CameraGameState{
         targetOffset.y = ((BoundingSphere) player.getWorldBound()).radius * 2.0f;
         props.put(ThirdPersonMouseLook.PROP_ENABLED, "false");
         props.put(ChaseCamera.PROP_TARGETOFFSET,targetOffset);
-        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(6f, 0,  22 * FastMath.DEG_TO_RAD));
-        props.put(ThirdPersonMouseLook.PROP_MAXASCENT, +80 * FastMath.DEG_TO_RAD);
+        props.put(ChaseCamera.PROP_INITIALSPHERECOORDS, new Vector3f(6f, 0,  20 * FastMath.DEG_TO_RAD));
+        props.put(ThirdPersonMouseLook.PROP_MAXASCENT, +70 * FastMath.DEG_TO_RAD);
         props.put(ChaseCamera.PROP_DAMPINGK, "3");
         props.put(ChaseCamera.PROP_SPRINGK, "3");
         props.put(ChaseCamera.PROP_STAYBEHINDTARGET, "true");

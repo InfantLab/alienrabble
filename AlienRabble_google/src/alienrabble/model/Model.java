@@ -268,7 +268,7 @@ public class Model extends Node {
 		this.setLocalScale(initialScale);
 		
 		whichCategory = getDimension("Category").intValue();
-		points = getDimension("Score").intValue();
+		//points = getDimension("Score").intValue();
 		
 		hasmodel = true;
 		return true;

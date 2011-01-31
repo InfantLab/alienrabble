@@ -60,6 +60,7 @@ public class DynamicExemplar extends Node {
 	public static final int YELLOWBLUE = 0;
 	public static final int MAGENTACYAN = 1;
 	public static final int BLACKWHITE = 2;
+	public static final int REDAQUA = 3;
 
 	//the body types
 	public static final int CAPSULE = 1;
@@ -76,7 +77,7 @@ public class DynamicExemplar extends Node {
 	private int legCount; 
 	private int legType;
 	private float legLength;
-	private int stripeAngle; // 12 values from -75¼ to +90¼
+	private int stripeAngle; // 12 values from -75ï¿½ to +90ï¿½
 	private int stripeFreq;
 	private int stripeColours;
 	private int bodyType;  // for now just a cylinder allowed
@@ -240,6 +241,9 @@ public class DynamicExemplar extends Node {
 		case MAGENTACYAN:
 			colours = "magentacyan";
 			break;
+		case REDAQUA:
+			colours = "redaqua";
+			break;
 		default:
 			colours = "yellowblue";
 		}
@@ -292,8 +296,9 @@ public class DynamicExemplar extends Node {
             //scale it to be MUCH smaller than it is originally
             legGeometry.setLocalScale(1f);
             legGeometry.setLocalTranslation(0f,ytrans, 0f);
-            legGeometry.updateModelBound();
-            //this.attachChild(model);
+            
+        	legGeometry.updateModelBound();  
+        	
         } catch (IOException e) {
         	//do something
         }
@@ -313,10 +318,15 @@ public class DynamicExemplar extends Node {
         		angle = FastMath.PI / 4 + i * 2 * FastMath.PI / legCount; 
         	}
         		
-	        Quaternion q = new Quaternion();
+        	Quaternion q = new Quaternion();
 	        q.fromAngleAxis(angle, new Vector3f(0,1,0));
 	        legs[i].setLocalRotation(q);        
-	  	
+	        //fudge to rotate the legs to be vertical
+	        Quaternion rotateleg = new Quaternion();
+        	rotateleg.fromAngleAxis(FastMath.PI/2, new Vector3f(-1,0,0));
+        	//legs[i].getLocalRotation().multLocal(rotateleg);   
+        	legs[i].getLocalRotation().multLocal(rotateleg);;        
+        	
 	        this.attachChild(legs[i]);
         }
         

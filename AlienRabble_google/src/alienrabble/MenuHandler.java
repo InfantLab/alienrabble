@@ -110,12 +110,20 @@ public class MenuHandler extends InputHandler {
                 inGrabGame.setActive(true);		// Activate this state.  
                 inSortGame.setActive(false);
                 inMenuState.setActive(false);    
+        	}else if (inMenuState.menuStatus == MenuState.MENU_RULE_FEEDBACK){
+                inGrabGame.setActive(true);		// Activate this state.  
+                ((AlienRabbleGrab)inGrabGame).newRound();
+                inSortGame.setActive(false);
+                inMenuState.setActive(false);    
         	}else if (inMenuState.menuStatus == MenuState.MENU_SORT_INSTRUCTIONS) {
                 inGrabGame.setActive(false);
                 inSortGame.setActive(true); 	// Activate this state.  
                 inMenuState.setActive(false);       
-        	}
-        }
+        	}else if (inMenuState.menuStatus == MenuState.MENU_FINISH) {
+        		// exit the game
+        		MainGameStateSystem.exit();
+    	}
+       }
     }
     
     private static class ExitAction extends InputAction {
