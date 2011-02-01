@@ -9,11 +9,7 @@ Follow these instructions to start using the Alien Rabble application from a zip
 == Detailed instruction ==
 
   # Unzip the archive file AR.zip into a new folder onto your local drive (e.g. C:/AR )
-
  # In the AR directory open the init.xml file. Change the participant details as appropriate.
-
  # Open a command window, making sure you are in the new AR directory 
-
  #  Type the following command
-
-java -Djava.library.path=./lib -jar ./AlienRabble_fat.jar	
+   * java -Djava.library.path=./lib -jar ./AlienRabble_fat.jar	
