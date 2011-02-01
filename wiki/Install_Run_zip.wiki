@@ -6,7 +6,7 @@
 Follow these instructions to start using the Alien Rabble application from a zip file you have downloaded
 
 
-= Detailed instruction =
+== Detailed instruction ==
 
   # Unzip the archive file AR.zip into a new folder onto your local drive (e.g. C:/AR )
 
