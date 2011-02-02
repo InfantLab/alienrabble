@@ -13,7 +13,7 @@ Alien Rabble is built using the *jMonkeyEngine* game toolkit (aka jme) The simpl
 To summarise those steps
 
 ===Installing Eclipse + SVN===
-  # Install [http://eclipse.org Eclipse]. 
+  # Install [http://eclipse.org Eclipse].  (Version 3.6 works just fine)
   # Start Eclipse and goto the help menu, select Install New Software...
   # Click on the software source for your version of eclipse and then expand the _Collaboration_ option. Choose *Subversive SVN Team Provider.*
   # Restart Eclipse
