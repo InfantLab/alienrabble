@@ -6,13 +6,25 @@
 
 This document should talk you through the steps necessary to run the project from source code. These instructions are for working with the Eclipse IDE, a very powerful development platform for java and other languages that runs on all operating systems. It's completely free too. (In principle, it should  be easy to use other platforms too.)
 
-= Pre-requisites =
+== Pre-requisites ==
 
-  # Install [ Eclipse]. 
-  # Install [ Subclipse]- an svn tool for eclipse. This allows you to check out code from online repositories such as code.google.com
+Alien Rabble is built using the *jMonkeyEngine* game toolkit (aka jme) The simplest way to get started is to follow the _getting started_ instructions from the jme site. This version of Alien Rabble uses JME version 2. So follow this [http://www.jmonkeyengine.org/wiki/doku.php/setting_up_eclipse_to_build_jme_2
+ jMonkeyEngine2 Set up guide]
+
+To summarise those steps
+
+===Installing Eclipse + SVN===
+  # Install [http://eclipse.org Eclipse]. 
+  # Start Eclipse and goto the help menu, select Install New Software...
+  # Click on the software source for your version of eclipse and then expand the _Collaboration_ option. Choose *Subversive SVN Team Provider.*
+  # Restart Eclipse
+
+===Installing jMonkeyEngine 2===
+  # In the Eclipse 'Window' menu click on Show View and select Other..
+  # Choose SVN Repositories Browser.
+  # In the window that comes up click on the little 
   # Install jme2 from jMonkeyEngine - the game development toolkit that Alien Rabble is built with. 
 
-http://www.jmonkeyengine.org/wiki/doku.php/setting_up_eclipse_to_build_jme_2
 
 = Details =
 
