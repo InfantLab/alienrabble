@@ -1,5 +1,4 @@
 #summary How to use the source code.
-#labels Phase-Deploy
 
 
 = Installing the source code =
@@ -22,10 +21,22 @@ To summarise those steps
 ===Installing jMonkeyEngine 2===
   # In the Eclipse 'Window' menu click on Show View and select Other..
   # Choose SVN Repositories Browser.
-  # In the window that comes up click on the little 
-  # Install jme2 from jMonkeyEngine - the game development toolkit that Alien Rabble is built with. 
+  # In the Eclipse 'File' meun choose 'New' SVN Repository Location
+  # Paste the location of the jme2 source code into the URL field of the dialog: http://jmonkeyengine.googlecode.com/svn
+  # To install jme2, click on the little plus button next to the url in the left hand window and then right click on the item which called 'trunk 6733' (or something similar). 
+  # Choose 'check out' and all the necessary code and libaries will be copied to your hard disk.
 
+Finally be sure to follow the extra steps about *[http://www.jmonkeyengine.org/wiki/doku.php/setting_up_eclipse_to_build_jme_2#resolving_the_build_path_issues Resolving Build Path issues]*
 
-= Details =
+You can test that jMonkeyEngine is correctly installed by running any of the demo applications in jmetest.
 
-https://alienrabble.googlecode.com/svn
+== Installing Alien Rabble details ==
+
+Follow the same steps 1-6 for installing jMonkeyEngine sourcecode but using the URL  https://alienrabble.googlecode.com/svn
+
+_If you get a error message saying 'The certificate can't be validated' just click 'Trust' or 'Trust always' and continue.
+
+For step 5 choose _AlienRabble_google_
+
+== Running Alien Rabble from code ==
+ 
