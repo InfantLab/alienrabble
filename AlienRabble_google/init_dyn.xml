@@ -4,10 +4,9 @@
 <experimentsetup>
 	<gametype>RULE</gametype>
 	<showscores>TRUE</showscores> 
-  <soundeffects>TRUE</soundeffects>
-  <arenasize>10</arenasize>
+	<soundeffects>TRUE</soundeffects>
+	<arenasize>10</arenasize>
 	<timegauge>0</timegauge>
-	<numrounds>3</numrounds>
 	<numtrees>20</numtrees>
 	<experimenter>Caspar</experimenter>
 </experimentsetup>
@@ -15,14 +14,116 @@
 
 <participant>
 	<id>301</id>
-	<modelfile>kingston_rule1.xml</modelfile>
 	<dob>6-11-2004</dob>
 	<name>CASPAR</name>
+	<numblocks>3</numblocks>
+	<condition>1</condition>
 	<randomseed>501</randomseed>
+	<modelset name="rule" value="dynamic1" />
 	<modelset name="grab" value="dynamic1" />
 	<modelset name="sort" value="dynamic1" />
 </participant>
 
+
+ <conditions>
+   <condition>
+     <id>1</id>
+      <block value="1">
+	<ruleset>kingston_rule1.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+     <block value="2">
+	<ruleset>kingston_rule2.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    <block value="3">
+	<ruleset>kingston_rule4.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    </condition>
+
+   <condition>
+     <id>2</id>
+      <block value="1">
+	<ruleset>kingston_rule1.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+     <block value="2">
+	<ruleset>kingston_rule3.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    <block value="3">
+	<ruleset>kingston_rule4.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    </condition>
+      
+   <condition>
+     <id>3</id>
+      <block value="1">
+	<ruleset>kingston_rule2.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+     <block value="2">
+	<ruleset>kingston_rule1.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    <block value="3">
+	<ruleset>kingston_rule4.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    </condition>
+      
+      
+   <condition>
+     <id>4</id>
+      <block value="1">
+	<ruleset>kingston_rule2.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+     <block value="2">
+	<ruleset>kingston_rule3.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    <block value="3">
+	<ruleset>kingston_rule4.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    </condition>
+
+   <condition>
+     <id>5</id>
+      <block value="1">
+	<ruleset>kingston_rule3.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+     <block value="2">
+	<ruleset>kingston_rule1.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    <block value="3">
+	<ruleset>kingston_rule4.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    </condition>
+
+   <condition>
+     <id>6</id>
+      <block value="1">
+	<ruleset>kingston_rule3.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+     <block value="2">
+	<ruleset>kingston_rule2.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    <block value="3">
+	<ruleset>kingston_rule4.xml</ruleset>
+      <numrounds>3</numrounds>
+      </block>
+    </condition>
+</conditions>
+   
 
 </alienrabbledata>
 	
