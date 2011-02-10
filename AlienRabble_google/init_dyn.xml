@@ -16,7 +16,7 @@
 	<id>301</id>
 	<dob>6-11-2004</dob>
 	<name>CASPAR</name>
-	<numblocks>3</numblocks>
+	<numblocks>2</numblocks>
 	<condition>1</condition>
 	<randomseed>501</randomseed>
 	<modelset name="rule" value="dynamic1" />
@@ -30,15 +30,15 @@
      <id>1</id>
       <block value="1">
 	<ruleset>kingston_rule1.xml</ruleset>
-      <numrounds>3</numrounds>
+      <numrounds>1</numrounds>
       </block>
      <block value="2">
 	<ruleset>kingston_rule2.xml</ruleset>
-      <numrounds>3</numrounds>
+      <numrounds>1</numrounds>
       </block>
     <block value="3">
 	<ruleset>kingston_rule4.xml</ruleset>
-      <numrounds>3</numrounds>
+      <numrounds>1</numrounds>
       </block>
     </condition>
 

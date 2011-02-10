@@ -78,7 +78,7 @@ public class AlienRabbleGrab extends CameraGameState{
     private Skybox skybox;
     //the new player object
     private Vehicle player;
-    private Node aliencontainer;
+    private Node aliencontainer = null;
     private int numAliens;
     private Alien[] allAliens;
     private Node onscreentext;
@@ -274,8 +274,8 @@ public class AlienRabbleGrab extends CameraGameState{
     	   Alien thisalien = (Alien) remainingaliens.get(i);
     	   thisalien.update(interpolation);
        }
-       
-        //check for collisions
+
+       //check for collisions
         results.clear();
         player.findCollisions(fence, results);
         if (results.getNumber()>0){
@@ -450,6 +450,7 @@ public class AlienRabbleGrab extends CameraGameState{
     	blockCount++;
     	roundCount = 0;
     	//initGame();
+    	grabdata = ARDataLoadandSave.getInstance().getXmlRuleDiscoveryData(blockCount-1);
         
     	newRound();
     	
@@ -498,7 +499,6 @@ public class AlienRabbleGrab extends CameraGameState{
         expdata = ARDataLoadandSave.getInstance().getXmlExperimentData();
         //get a reference to the data logging class
         grabdata = ARDataLoadandSave.getInstance().getXmlGrabData();
-        ruledata = ARDataLoadandSave.getInstance().getXmlRuleDiscoveryData(0);
         
         results = new BoundingCollisionResults(); 
         
@@ -555,7 +555,7 @@ public class AlienRabbleGrab extends CameraGameState{
 
         //Finally
         //Add  aliens randomly to the terrain
-        newRound();
+        newBlock();
 
     }
     
@@ -696,11 +696,21 @@ public class AlienRabbleGrab extends CameraGameState{
      */
     private void addAliens() {
     	
-    	aliencontainer = new Node("aliencontainer");
-    	scene.attachChild(aliencontainer);
+    	if (aliencontainer == null){
+        	aliencontainer = new Node("aliencontainer");    		
+    	}else{
+        	//1st remove collection of old aliens
+            List<Spatial> remainingaliens = aliencontainer.getChildren();
+            for(int i= 0; i< remainingaliens.size();i++){
+         	   Alien thisalien = (Alien) remainingaliens.get(i);
+         	   thisalien.removeFromParent();
+            }
+            aliencontainer.detachAllChildren();
+      }
+    scene.attachChild(aliencontainer);
     	
     	if( expdata.gameType == GameType.RULEDISCOVERY){
-    		modeldata = ARDataLoadandSave.getInstance().getXmlModelData_RuleDiscovery(blockCount);
+    		modeldata = ARDataLoadandSave.getInstance().getXmlModelData_RuleDiscovery(blockCount-1);
     	}else{
     		modeldata = ARDataLoadandSave.getInstance().getXmlModelData_Grab();
     	}

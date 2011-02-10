@@ -1,5 +1,6 @@
 package alienrabble.logging;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -55,7 +56,7 @@ public class ARDataLoadandSave {
 		myXmlExperimentData = new ARXMLExperimentData(this.initfile);
 		//load its data
 		myXmlExperimentData.loadExperimentInit();
-		for(int b=0;b<3;b++){
+		for(int b=0;b<myXmlExperimentData.getNumBlocks();b++){
 			myXmlModelData_RuleDiscovery[b] = new ARXMLModelData(myXmlExperimentData.getBlockModelFile(b));
 			myXmlRuleDiscoveryData[b] = new ARXMLGrabData();
 		}
@@ -82,7 +83,10 @@ public class ARDataLoadandSave {
 		if (outputfile  == null){
 			if (!generateOutputFileName()) return false;
 		}
-		
+//		
+//		File file = new File(outputfile);
+//		String outputfilepath = file.getAbsolutePath();
+//		
 		DocumentBuilderFactory factory
 		 = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = null;
@@ -100,7 +104,7 @@ public class ARDataLoadandSave {
 		
 		doc = myXmlExperimentData.addParticipantData(doc);
 		if (myXmlExperimentData.gameType == GameType.RULEDISCOVERY){
-			for(int b=0;b<3;b++){
+			for(int b=0;b<myXmlExperimentData.getNumBlocks();b++){
 				doc = myXmlModelData_RuleDiscovery[b].addModelData(doc);
 				doc = myXmlRuleDiscoveryData[b].writeGrabData(doc);
 			}
@@ -164,8 +168,8 @@ public class ARDataLoadandSave {
 	 * @return
 	 */
 	private boolean generateOutputFileName(){
-		this.outputfile = "ID_" + myXmlExperimentData.getID() + myXmlExperimentData.getCurrentDate() + 
-		myXmlExperimentData.getCurrentTime()  + ".xml";
+		this.outputfile = "ID_" + myXmlExperimentData.getID() +"_" + myXmlExperimentData.getCurrentDate() + 
+		"_" + myXmlExperimentData.getCurrentTime()  + ".xml";
 		return true;
 	}
 	

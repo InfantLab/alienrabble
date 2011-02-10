@@ -65,7 +65,7 @@ public class Alien extends Node{
 	
 	private static float SHRINKFACTOR = 0.3f;
 	
-	private SpatialTransformer grabanimation;
+	private SpatialTransformer grabanimation = null;
 
 	//reference to the level terrain for placement
     TerrainBlock tb;
@@ -232,7 +232,9 @@ public class Alien extends Node{
      */
     public boolean removeFromParent() {
     	logger.info(this.getName() + " removed @ " );
-		grabanimation.setActive(false);
+		if (grabanimation!=null){
+			grabanimation.setActive(false);
+		}
 		this.detachAllChildren();
 		this.updateRenderState();
 		return super.removeFromParent();

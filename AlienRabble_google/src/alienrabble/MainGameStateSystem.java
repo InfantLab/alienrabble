@@ -177,8 +177,8 @@ public class MainGameStateSystem extends BaseGame {
 		datalogger.getXmlExperimentData().loadExperimentInit();
 		if(datalogger.getXmlExperimentData().getGameType() == GameType.RULEDISCOVERY){
 			//What models were used in this experiment. 
-			for(int block=0;block<3;block++){
-//				datalogger.getXmlModelData_RuleDiscovery(block).setModelFileName(datalogger.getXmlExperimentData().getBlockModelFile(block));
+			for(int block=0;block<datalogger.getXmlExperimentData().getNumBlocks();block++){
+//				datalogger.getXmlModelData_RuleDiscovery(block).setModelSetName(datalogger.getXmlExperimentData().getBlockModelFile(block));
 //				datalogger.getXmlModelData_RuleDiscovery(block).
 				datalogger.getXmlModelData_RuleDiscovery(block).loadModelPaths();
 			}

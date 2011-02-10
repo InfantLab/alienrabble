@@ -66,7 +66,7 @@ public class ARXMLExperimentData{
 	
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
-	public static final String TIME_FORMAT = "hh:mm:ss";
+	public static final String TIME_FORMAT = "hh-mm-ss";
 
 	
 	
@@ -392,7 +392,7 @@ public class ARXMLExperimentData{
 
 		//add  dob
 		Element e132 = doc.createElement(CONDITION_NODE);
-		e132.setTextContent(dateFormat.format(dob));
+		e132.setTextContent(this.condition);
 		e1.appendChild(e132);
 
 		//add  dob
