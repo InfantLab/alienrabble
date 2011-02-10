@@ -42,7 +42,7 @@ public class ARXMLModelData {
 
 	public ARXMLModelData(String filename) {
 		this.filename = filename;
-		this.modelset = ""; //default model set
+		this.modelset = "dynamic1"; //default model set
 		this.numModels = 0;
 		this.allModels = null;
 	}

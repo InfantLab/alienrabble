@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import alienrabble.logging.ARDataLoadandSave;
+import alienrabble.logging.ARXMLExperimentData.GameType;
 
 import com.jme.app.AbstractGame;
 import com.jme.app.BaseGame;
@@ -172,14 +173,23 @@ public class MainGameStateSystem extends BaseGame {
 	private void initDataLogging(){
 		datalogger = ARDataLoadandSave.getInstance();
 		datalogger.setUpLoadandSaveDocs("init_dyn.xml");	
-		// lood the participant and model init data 
+		// load the participant and model init data 
 		datalogger.getXmlExperimentData().loadExperimentInit();
-		//this next line is hideous.. I apologize!					
-		datalogger.getXmlModelData_Grab().setModelSetName(datalogger.getXmlExperimentData().getModelSet_Grab());
-		datalogger.getXmlModelData_Grab().loadModelPaths();
-		//same again for sort models
-		datalogger.getXmlModelData_Sort().setModelSetName(datalogger.getXmlExperimentData().getModelSet_Sort());
-		datalogger.getXmlModelData_Sort().loadModelPaths();
+		if(datalogger.getXmlExperimentData().getGameType() == GameType.RULEDISCOVERY){
+			//What models were used in this experiment. 
+			for(int block=0;block<3;block++){
+//				datalogger.getXmlModelData_RuleDiscovery(block).setModelFileName(datalogger.getXmlExperimentData().getBlockModelFile(block));
+//				datalogger.getXmlModelData_RuleDiscovery(block).
+				datalogger.getXmlModelData_RuleDiscovery(block).loadModelPaths();
+			}
+		}else{
+			//this next line is hideous.. I apologize!					
+			datalogger.getXmlModelData_Grab().setModelSetName(datalogger.getXmlExperimentData().getModelSet_Grab());
+			datalogger.getXmlModelData_Grab().loadModelPaths();
+			//same again for sort models
+			datalogger.getXmlModelData_Sort().setModelSetName(datalogger.getXmlExperimentData().getModelSet_Sort());
+			datalogger.getXmlModelData_Sort().loadModelPaths();			
+		}
 	}
 	
 	/**

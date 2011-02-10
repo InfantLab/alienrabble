@@ -12,6 +12,7 @@ import alienrabble.MenuState;
 import alienrabble.logging.ARDataLoadandSave;
 import alienrabble.logging.ARXMLExperimentData;
 import alienrabble.logging.ARXMLGrabData;
+import alienrabble.logging.ARXMLExperimentData.GameType;
 import alienrabble.logging.ARXMLGrabData.GrabEvent;
 import alienrabble.logging.ARXMLGrabData.PlayerLocation;
 import alienrabble.model.ARXMLModelData;
@@ -126,6 +127,7 @@ public class AlienRabbleGrab extends CameraGameState{
     
     //the data logger
     ARXMLGrabData grabdata;
+    ARXMLGrabData ruledata;
     
     ARXMLModelData modeldata;
     
@@ -136,7 +138,8 @@ public class AlienRabbleGrab extends CameraGameState{
     private int wrongRunningTotal = 0;  //count
     private int sizeCategory1 = 8;
     
-    private int roundCount =1;
+    private int blockCount = 0;
+    private int roundCount =0;
     
     //sound effects
     AudioTrack laserSound;
@@ -206,12 +209,19 @@ public class AlienRabbleGrab extends CameraGameState{
         	 ||  aliencontainer.getChildren().size() == 0){
         		//have collected all the 'good' aliens
         		//potentially we go round again
-        		if (roundCount < expdata.getNumRounds())
+        		if (blockCount < expdata.getNumBlocks())
         		{
-	        		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
-	        		ms.menuStatus = MenuState.MENU_RULE_FEEDBACK;
-	        		ms.setActive(true);
-	        		this.setActive(false);
+	        		if(roundCount < expdata.getNumRounds(blockCount)){
+		        		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
+		        		ms.menuStatus = MenuState.MENU_RULE_NEWROUND;
+		        		ms.setActive(true);
+		        		this.setActive(false);
+	        		}else{
+	        			MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
+		        		ms.menuStatus = MenuState.MENU_RULE_NEWBLOCK;
+		        		ms.setActive(true);
+		        		this.setActive(false);
+	        		}
         		}else{
             		MenuState ms = (MenuState) GameStateManager.getInstance().getChild("menu");
             		ms.menuStatus = MenuState.MENU_FINISH;
@@ -309,6 +319,7 @@ public class AlienRabbleGrab extends CameraGameState{
     					ge.timeInSecs =  ge.clockTicks * 1f / timer.getResolution(); // *1f to get result as float
     					ge.x_location = as.getLocalTranslation().x;
     					ge.z_location = as.getLocalTranslation().z;
+    					ge.block = blockCount;
     					ge.round = roundCount;
     					grabdata.addGrabEvent(ge);
     					
@@ -432,18 +443,29 @@ public class AlienRabbleGrab extends CameraGameState{
 
         /** Get a high resolution timer for FPS updates. */
         timer = Timer.getTimer();
+        timer.reset();
     }
+
+    public void newBlock(){
+    	blockCount++;
+    	roundCount = 0;
+    	//initGame();
+        
+    	newRound();
+    	
+     }
 
     public void newRound(){
     	roundCount++;
     	//initGame();
         
-    	//remove any remaining aliens from previous round. 
-    	clearRightWrongCounters();
-    	
     	//reset counters
     	rightRunningTotal = 0;
         wrongRunningTotal = 0;
+    	//remove any remaining aliens from previous round. 
+    	clearRightWrongCounters();
+    	
+
     	
     	//Add aliens randomly to the terrain
     	addAliens();
@@ -451,6 +473,18 @@ public class AlienRabbleGrab extends CameraGameState{
         	timeGauge.setGauge(expdata.getTimeGauge());
         }
     	player.setLocalTranslation(new Vector3f(100,0, 100));
+		//log the grab location
+		GrabEvent ge = grabdata.new GrabEvent();
+		ge.alienid= "-1";
+		ge.alienname = new String("Start round " + roundCount);
+		//need current time for logging
+		ge.clockTicks = timer.getTime();
+		ge.timeInSecs =  ge.clockTicks * 1.0f / timer.getResolution(); 
+		ge.x_location = player.getLocalTranslation().x;
+		ge.z_location = player.getLocalTranslation().z;
+		ge.block = blockCount;
+		ge.round = roundCount;
+		grabdata.addGrabEvent(ge);
     }
     
     /**
@@ -464,6 +498,7 @@ public class AlienRabbleGrab extends CameraGameState{
         expdata = ARDataLoadandSave.getInstance().getXmlExperimentData();
         //get a reference to the data logging class
         grabdata = ARDataLoadandSave.getInstance().getXmlGrabData();
+        ruledata = ARDataLoadandSave.getInstance().getXmlRuleDiscoveryData(0);
         
         results = new BoundingCollisionResults(); 
         
@@ -500,8 +535,6 @@ public class AlienRabbleGrab extends CameraGameState{
         buildInput();
 
         buildOnScreenText();
-        //Add an alien randomly to the terrain
-        addAliens();
         
         //set up passes
         buildPassManager();
@@ -519,6 +552,11 @@ public class AlienRabbleGrab extends CameraGameState{
         
         setupRightWrong();
         setupRightWrongCount(sizeCategory1);
+
+        //Finally
+        //Add  aliens randomly to the terrain
+        newRound();
+
     }
     
     /**
@@ -661,8 +699,11 @@ public class AlienRabbleGrab extends CameraGameState{
     	aliencontainer = new Node("aliencontainer");
     	scene.attachChild(aliencontainer);
     	
-		modeldata = ARDataLoadandSave.getInstance().getXmlModelData_Grab();
-		
+    	if( expdata.gameType == GameType.RULEDISCOVERY){
+    		modeldata = ARDataLoadandSave.getInstance().getXmlModelData_RuleDiscovery(blockCount);
+    	}else{
+    		modeldata = ARDataLoadandSave.getInstance().getXmlModelData_Grab();
+    	}
 		numAliens = modeldata.getNumModels();
 		allAliens = new Alien[numAliens];
 		
@@ -676,6 +717,8 @@ public class AlienRabbleGrab extends CameraGameState{
 
 			//log the initial positions
 			GrabEvent ge = grabdata.new GrabEvent();
+			ge.block = blockCount;
+			ge.round = roundCount;
 			ge.alienid= allAliens[i].getID();
 			ge.alienname = allAliens[i].getName();
 			ge.clockTicks = 0;

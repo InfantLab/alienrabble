@@ -63,10 +63,11 @@ public class MenuState extends CameraGameState {
 	//the different possible menu states
 	public static final int MENU_START = 0;
 	public static final int MENU_RULE_INSTRUCTIONS = 1;
-	public static final int MENU_RULE_FEEDBACK = 2;
-	public static final int MENU_SORT_INSTRUCTIONS = 3;
-	public static final int MENU_SORT_FEEDBACK = 4;
-	public static final int MENU_FINISH = 5;
+	public static final int MENU_RULE_NEWBLOCK = 2;
+	public static final int MENU_RULE_NEWROUND = 3;
+	public static final int MENU_SORT_INSTRUCTIONS = 4;
+	public static final int MENU_SORT_FEEDBACK = 5;
+	public static final int MENU_FINISH = 6;
 
 	//what type of menu should be displaying 
 	public int menuStatus;
@@ -201,12 +202,16 @@ public class MenuState extends CameraGameState {
 			text1.print( "Collect all the good aliens and avoid the bad ones." );
 			text2.print( "Use the arrow keys to navigate round the space." );
 			text3.print( "press ENTER to begin" );
-		}else if (menuStatus == MENU_RULE_FEEDBACK){
+		}else if (menuStatus == MENU_RULE_NEWBLOCK){
+			text.print("New Block");
+			text1.print( "This is a different set of aliens" );
+			text2.print( "They may have different families" );
+			text3.print( "press ENTER to begin" );			
+		}else if (menuStatus == MENU_RULE_NEWROUND){
 			text.print("Great");
 			text1.print( "Now do the same again!" );
 			text2.print( "Only faster and  no mistakes" );
 			text3.print( "press ENTER to begin" );
-			
 		}else if (menuStatus == MENU_SORT_INSTRUCTIONS){
 			text.print("");
 		    text1.print( "Use mouse to select individual aliens." );

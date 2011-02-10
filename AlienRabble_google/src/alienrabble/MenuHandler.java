@@ -110,9 +110,14 @@ public class MenuHandler extends InputHandler {
                 inGrabGame.setActive(true);		// Activate this state.  
                 inSortGame.setActive(false);
                 inMenuState.setActive(false);    
-        	}else if (inMenuState.menuStatus == MenuState.MENU_RULE_FEEDBACK){
+           	}else if (inMenuState.menuStatus == MenuState.MENU_RULE_NEWROUND){
                 inGrabGame.setActive(true);		// Activate this state.  
                 ((AlienRabbleGrab)inGrabGame).newRound();
+                inSortGame.setActive(false);
+                inMenuState.setActive(false);    
+        	}else if (inMenuState.menuStatus == MenuState.MENU_RULE_NEWBLOCK){
+                inGrabGame.setActive(true);		// Activate this state.  
+                ((AlienRabbleGrab)inGrabGame).newBlock();
                 inSortGame.setActive(false);
                 inMenuState.setActive(false);    
         	}else if (inMenuState.menuStatus == MenuState.MENU_SORT_INSTRUCTIONS) {

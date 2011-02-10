@@ -48,11 +48,11 @@ public class ARXMLGrabData{
 	public static final String SECS_VALUE = "secs";
 	public static final String LOCATION_NODE = "location";
 	public static final String VELOCITY_NODE = "velocity";
+	public static final String BLOCK_NODE = "block";
 	public static final String ROUND_NODE = "round";
 	
-
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
-	public static final String TIME_FORMAT = "hh:mm:ss";
+	public static final String TIME_FORMAT = "hh=mm=ss";
 
 	
 	private String ID;   // participant's ID number
@@ -65,7 +65,6 @@ public class ARXMLGrabData{
 
 	private ArrayList<GrabEvent> startingpositions = new ArrayList<GrabEvent>();
     private ArrayList<GrabEvent> allgrabs = new ArrayList<GrabEvent>();
-	
 	private ArrayList<PlayerLocation> playertrajectory = new ArrayList<PlayerLocation>();
 	
 	
@@ -127,7 +126,6 @@ public class ARXMLGrabData{
 
 		DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		DateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
-
 	
 		//add  current date
 		Element e13 = doc.createElement(TESTDATE_NODE);
@@ -198,9 +196,12 @@ public class ARXMLGrabData{
 		g4.setAttribute("x",Float.toString(ge.x_location));
 		g4.setAttribute("z",Float.toString(ge.z_location));
 		grab.appendChild(g4);	
-		Element g5 = doc.createElement(ROUND_NODE);
-		g5.setTextContent(String.valueOf(ge.round));
+		Element g5 = doc.createElement(BLOCK_NODE);
+		g5.setTextContent(String.valueOf(ge.block));
 		grab.appendChild(g5);
+		Element g6 = doc.createElement(ROUND_NODE);
+		g6.setTextContent(String.valueOf(ge.round));
+		grab.appendChild(g6);
 		return grab;
 	}
 
@@ -263,6 +264,7 @@ public class ARXMLGrabData{
 		public String alienname;
 		public String alienid;
 		public long clockTicks;
+		public int block;
 		public int round;
 		public float timeInSecs;
 		public float x_location; 

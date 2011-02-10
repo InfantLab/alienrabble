@@ -17,6 +17,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
+import alienrabble.logging.ARXMLExperimentData.GameType;
 import alienrabble.model.ARXMLModelData;
 
 /**
@@ -37,9 +38,11 @@ public class ARDataLoadandSave {
 	private String outputfile = null; //the name of the data save file. 
 	
 	//separate sets of grab and sort exemplars
+	private ARXMLModelData myXmlModelData_RuleDiscovery[] = new ARXMLModelData[3];
 	private ARXMLModelData myXmlModelData_Grab;
 	private ARXMLModelData myXmlModelData_Sort;
 	private ARXMLExperimentData myXmlExperimentData;
+	private ARXMLGrabData myXmlRuleDiscoveryData[] = new ARXMLGrabData[3]; // data from the grab phase
 	private ARXMLGrabData myXmlGrabData; // data from the grab phase
 	private ARXMLSortData myXmlSortData; // data from the sort phase
 	
@@ -52,6 +55,10 @@ public class ARDataLoadandSave {
 		myXmlExperimentData = new ARXMLExperimentData(this.initfile);
 		//load its data
 		myXmlExperimentData.loadExperimentInit();
+		for(int b=0;b<3;b++){
+			myXmlModelData_RuleDiscovery[b] = new ARXMLModelData(myXmlExperimentData.getBlockModelFile(b));
+			myXmlRuleDiscoveryData[b] = new ARXMLGrabData();
+		}
 		myXmlModelData_Sort = new ARXMLModelData(myXmlExperimentData.getModelFile());
 		myXmlModelData_Grab = new ARXMLModelData(myXmlExperimentData.getModelFile());
 		myXmlGrabData = new ARXMLGrabData();
@@ -92,11 +99,17 @@ public class ARDataLoadandSave {
 		Document doc = impl.createDocument(null,null,null);
 		
 		doc = myXmlExperimentData.addParticipantData(doc);
-		//TODO ought to track grab and sort model sets separately 
-		doc = myXmlModelData_Grab.addModelData(doc);
-		doc = myXmlGrabData.writeGrabData(doc);
-		doc = myXmlSortData.writeSortData(doc);
-		
+		if (myXmlExperimentData.gameType == GameType.RULEDISCOVERY){
+			for(int b=0;b<3;b++){
+				doc = myXmlModelData_RuleDiscovery[b].addModelData(doc);
+				doc = myXmlRuleDiscoveryData[b].writeGrabData(doc);
+			}
+		}else{
+			//TODO ought to track grab and sort model sets separately 
+			doc = myXmlModelData_Grab.addModelData(doc);
+			doc = myXmlGrabData.writeGrabData(doc);
+			doc = myXmlSortData.writeSortData(doc);
+		}
 		
 		// transform the Document into a String
 		DOMSource domSource = new DOMSource(doc);
@@ -159,6 +172,14 @@ public class ARDataLoadandSave {
 	public ARXMLExperimentData getXmlExperimentData(){
 		return myXmlExperimentData;
 	}
+	public ARXMLModelData getXmlModelData_RuleDiscovery(int block){
+		return myXmlModelData_RuleDiscovery[block];
+	}	
+	public ARXMLGrabData getXmlRuleDiscoveryData(int block){
+		return myXmlRuleDiscoveryData[block];
+	}
+
+	
 	public ARXMLModelData getXmlModelData_Grab(){
 		return myXmlModelData_Grab;
 	}	

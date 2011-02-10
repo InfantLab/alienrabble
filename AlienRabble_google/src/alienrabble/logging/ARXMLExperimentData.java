@@ -15,6 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import alienrabble.MainGameStateSystem;
+import alienrabble.model.Model;
 
 
 /**
@@ -53,8 +54,13 @@ public class ARXMLExperimentData{
 	public static final String GAMETYPE_NODE = "gametype";
 	public static final String SHOWSCORES_NODE = "showscores";
 	public static final String ARENASIZE_NODE = "arenasize";
+	public static final String CONDITION_NODE = "condition";
+	public static final String CONDITIONS_NODE = "conditions";
+	public static final String NUMBEROFBLOCKS_NODE = "numblocks";
 	public static final String NUMBEROFROUNDS_NODE = "numrounds";
 	public static final String NUMBEROFTREES_NODE = "numtrees";
+	public static final String BLOCK_NODE = "block";
+	public static final String RULESET_NODE = "ruleset";
 	public static final String PARTICIPANT_NODE = "participant";
 	public static final String DYNAMIC = "dynamic1";
 	
@@ -83,8 +89,15 @@ public class ARXMLExperimentData{
 	private Date testdate; // testing date
 	private Date starttime; // when testing began
 	private Date endtime; // when testing ended
+	private String modelset_Rule; //which modelset do we use in grab phase
 	private String modelset_Grab; //which modelset do we use in grab phase
 	private String modelset_Sort; //which modelset do we use in sort phase
+	private String condition; //what set of events does  this participant see?
+	private int numblocks; //how many blocks per condition?
+	private String ruleset[] = new String[3]; //rulesets used in each block of testing
+	private int numrounds[] = new int[3];  //num rounds per block
+	
+	
 	
 	public GameType gameType;
 	
@@ -139,6 +152,16 @@ public class ARXMLExperimentData{
 	public int getNumRounds(){
 		return numRounds;
 	}	
+	public int getNumBlocks(){
+		return numblocks;
+	}	
+	public String getBlockModelFile(int block){
+		return ruleset[block];
+	}
+	public int getNumRounds(int block){
+		return numrounds[block];
+	}
+	
 	public void loadExperimentInit(){
 	try {
 		File file = new File(initfile);
@@ -174,22 +197,17 @@ public class ARXMLExperimentData{
 		//get time gauge value, 0 means no gauge
 		NodeList tgauge = expsetup.getElementsByTagName(TIMEGAUGE_NODE);
 		Element tgaugeel = (Element) tgauge.item(0);
-		this.timeGauge = Long.valueOf(tgaugeel.getTextContent()).intValue();
+		this.timeGauge = Integer.valueOf(tgaugeel.getTextContent());
 		
 		//get arena size
 		NodeList arena = expsetup.getElementsByTagName(ARENASIZE_NODE);
 		Element arenael = (Element) arena.item(0);
-		this.arenaSize  =  Long.valueOf(arenael.getTextContent()).intValue();
-
-		//get number of repetitions of everything
-		NodeList rounds = expsetup.getElementsByTagName(NUMBEROFROUNDS_NODE);
-		Element roundsel = (Element) rounds.item(0);
-		this.numRounds  =  Long.valueOf(roundsel.getTextContent()).intValue();
+		this.arenaSize  =  Integer.valueOf(arenael.getTextContent());
 
 		//get number of trees in grab phase
 		NodeList trees = expsetup.getElementsByTagName(NUMBEROFTREES_NODE);
 		Element treesel = (Element) trees.item(0);
-		this.numTrees  =  Long.valueOf(treesel.getTextContent()).intValue();
+		this.numTrees  =  Integer.valueOf(treesel.getTextContent());
 
 		//get experimenter name
 		NodeList expnames = expsetup.getElementsByTagName(EXPERIMENTER_NODE);
@@ -219,23 +237,69 @@ public class ARXMLExperimentData{
 		this.dob = new SimpleDateFormat(DATE_FORMAT).parse(strdob);
 		
 		//get the name of the modelfile
-		NodeList models = participant.getElementsByTagName(MODELFILE_NODE);
+		NodeList models = participant.getElementsByTagName(MODELSET_NODE);
 		Element model = (Element) models.item(0);
-		this.modelfile = model.getTextContent();
+		this.modelset_Rule = model.getTextContent();
 		
-		//get the name of modelsets used for grab and for sort phases
-		NodeList modelsets = participant.getElementsByTagName(MODELSET_NODE);
-		for (int t = 0; t<  modelsets.getLength(); t++){
-			Element thisproperty = (Element) modelsets.item(t);
-			String mname = thisproperty.getAttribute("name");
-			String value = thisproperty.getAttribute("value");
-			if (mname.equals(MODELSET_SORT)){
-				modelset_Sort = value;
-			}else if (mname.equals(MODELSET_GRAB)){
-				modelset_Grab = value;
+		////////////////////////
+		// Condition details 
+		///////////////////////
+		//get the number of the condition
+		NodeList whichcond = participant.getElementsByTagName(CONDITION_NODE);
+		Element whichcondel = (Element) whichcond.item(0);
+		this.condition = whichcondel.getTextContent();
+
+		//get the number of the condition
+		NodeList numblcks = participant.getElementsByTagName(NUMBEROFBLOCKS_NODE);
+		Element blockel = (Element) numblcks.item(0);
+		this.numblocks = Integer.valueOf(blockel.getTextContent());
+		
+		//get appropriate condition info for this participant
+		NodeList conds = doc.getElementsByTagName(CONDITIONS_NODE);
+		Element condsels =  (Element) conds.item(0);
+
+		
+	  //this mess finds the correct condition element for this participant
+	  NodeList conditionList = condsels.getElementsByTagName(CONDITION_NODE);
+	  int numConditions = conditionList.getLength();
+	  boolean found = false;
+	  Element condEl = null;
+	  for (int s = 0; s < numConditions; s++) {
+		Node firstNode = conditionList.item(s);
+		if (firstNode.getNodeType() == Node.ELEMENT_NODE) {
+			condEl = (Element) firstNode;
+			//get the id for this condition
+			NodeList condList = condEl.getElementsByTagName(ID_NODE);
+			Element condIDel = (Element) condList.item(0);
+			String thisid = condIDel.getTextContent();
+			if (thisid.contentEquals(this.condition)){
+				//found the correct Condition
+				found = true;
+				break;
 			}
 		}
-		} 
+	  }
+	  if (found){
+		  for(int b =0; b<numblocks; b++){
+			NodeList blocknode = condEl.getElementsByTagName(BLOCK_NODE); 
+			Element blckel=  (Element) blocknode.item(b);
+		//	int block = Integer.valueOf(blckel.getTextContent());		
+			
+			//get ruleset for this round
+			NodeList rulesetnode = blckel.getElementsByTagName(RULESET_NODE);
+			Element rulesetel = (Element) rulesetnode.item(0);
+			ruleset[b] = rulesetel.getTextContent();
+			
+			//get numrounds 
+			NodeList nrounds = blckel.getElementsByTagName(NUMBEROFROUNDS_NODE);
+			Element nr = (Element) nrounds.item(0);
+			numrounds[b] =  Integer.valueOf(nr.getTextContent());
+		  }
+		}else{
+			logger.severe("Condition not found");
+		}
+		  
+	}
 	catch (Exception e) {
 			//TODO
 			//Dialog.showError ("Error reading the init.xml file. Please check the contents and formating of this file.");
@@ -260,6 +324,10 @@ public class ARXMLExperimentData{
     	return name;
     }
  
+    public String getModelSet_Rule(){
+    	return modelset_Rule;
+}
+
     public String getModelSet_Grab(){
         	return modelset_Grab;
     }
@@ -316,6 +384,22 @@ public class ARXMLExperimentData{
 		Element e13 = doc.createElement(DOB_NODE);
 		e13.setTextContent(dateFormat.format(dob));
 		e1.appendChild(e13);
+
+		//add  dob
+		Element e131 = doc.createElement(NUMBEROFBLOCKS_NODE);
+		e131.setTextContent(Integer.toString(numblocks));
+		e1.appendChild(e131);
+
+		//add  dob
+		Element e132 = doc.createElement(CONDITION_NODE);
+		e132.setTextContent(dateFormat.format(dob));
+		e1.appendChild(e132);
+
+		//add  dob
+		Element e133 = doc.createElement(DOB_NODE);
+		e133.setTextContent(dateFormat.format(dob));
+		e1.appendChild(e133);
+
 		
 		//add  current date
 		Element e14 = doc.createElement(TESTDATE_NODE);
