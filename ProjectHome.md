@@ -1,0 +1,1 @@
+Alien Rabble uses the jMonkeyEngine game toolkit to create an environment in which to build and run games that can collected data to answer questions in experimental psychology research. Initially it was developed to assess the category learning abilities of young children (and adults) in a more ecologically valid / realistic setting than traditional laboratory tasks.
